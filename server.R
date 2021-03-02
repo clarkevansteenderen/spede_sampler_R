@@ -90,10 +90,10 @@ server = function(input, output, session) {
         for(i in seq(along=files)) {
             
             treex = ape::read.tree(files[i])
-            treex.ultra = ape::chronos(treex, lambda = 0) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
+            treex.ultra = phytools::force.ultrametric(treex) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
             #tree.ultra = phytools::force.ultrametric(treex)
             treex.ultra2 = multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
-            treex.gmyc = gmyc(treex.ultra2, quiet = F)
+            treex.gmyc = gmyc(treex.ultra2, quiet = F, method = "multiple")
 
             # these three lines below write the files to the same folder:
             # uncomment to write them
@@ -105,6 +105,8 @@ server = function(input, output, session) {
             clust_ent[i,1] = files[i] # populate file name
             clust_ent[i,2] = treex.gmyc$cluster[which.max(treex.gmyc$likelihood)] # extract the number of clusters
             clust_ent[i,3] = treex.gmyc$entity[which.max(treex.gmyc$likelihood)] # extract the number of entities
+            
+            
             
             # Increment the progress bar, and update the detail text.
             incProgress(1/length(files), detail = paste("Processing tree file ", i, " of ", length(files)))

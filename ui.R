@@ -1,5 +1,5 @@
 
-mypackages <- c("ape", "shiny", "shinyhelper", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2")
+mypackages <- c("ape", "shiny", "shinyhelper", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -12,7 +12,7 @@ library(shinythemes)
 library(shinyFiles)
 library(reshape2)
 library(shinyalert)
-
+library(phytools)
 
 ui <- fluidPage(theme = shinytheme("flatly"),
                 
@@ -24,7 +24,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 titlePanel(h4("Created by Clarke van Steenderen")),
                 br(),
                 
-                tabsetPanel(tabPanel(strong("Home"),
+                tabsetPanel(tabPanel(strong("Home: multiple ML trees", style = "color:darkblue"),
                     br(), br(),
                     #sidebarLayout(
                         sidebarPanel(strong("Click to view the help file:", style = "color:green; font-size: 18px")
@@ -48,7 +48,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                     
                             mainPanel() ),
                     
-                            tabPanel("View Data", 
+                            tabPanel(strong("View Data", style = "color:darkblue"),
                                      br(), br(),
                                      actionButton('all_data', label=strong('Show all data'), style="color: black; background-color: lightgreen; border-color: green", icon("edit")),
                                      downloadButton("download_clust_ent_data", label = strong("Download all data"), style="color: black; background-color: lightgreen; border-color: green"),
@@ -61,7 +61,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                
                             ),
          
-                            tabPanel("Plot Results", 
+                            tabPanel(strong("Plot Results", style = "color:darkblue"), 
                                      br(), br(),
                                      actionButton("plot_clusts", label = strong("Plot clusters vs entities"), style="color: black; background-color: lightgreen; border-color: green", icon("drafting-compass")), 
                                      downloadButton("download_clust_plot", label = strong("Download"), style="color: black; background-color: lightgreen; border-color: green"),
