@@ -1,5 +1,5 @@
 
-mypackages <- c("ape", "shiny", "shinyhelper", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools")
+mypackages <- c("ape", "shiny", "shinyhelper", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -13,6 +13,7 @@ library(shinyFiles)
 library(reshape2)
 library(shinyalert)
 library(phytools)
+library(ggplot2)
 
 ui <- fluidPage(theme = shinytheme("flatly"),
                 
@@ -42,6 +43,15 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
                             br(),
                             radioButtons("data_type", label="Maximum Likelihood program used to produce tree files:", choices = c("FastTree", "RAxML")),
+                            br(),
+                            checkboxInput("set_seed", label = "Set a seed?", value = FALSE),
+                            
+                            checkboxInput("group_info", label="Check this box if you wish to upload predefined grouping information. If yes, upload a .csv file, and select the columns containing your grouping information and sample names from the dropdown menu.", value = FALSE),
+                            br(),
+                            fileInput("predefined_groups", label="Upload a .csv file containing predefined groups for your samples:", accept = ".csv"),
+                            selectInput("col.group", "Select Group Column:", choices=NULL),
+                            selectInput("sample_names", "Select Sample Name Column:", choices=NULL),
+                            br(),
                             actionButton("run_gmyc", label = strong("RUN"), style="color: black; background-color: lightgreen; border-color: green", icon("check-square")),
                             br(),br()
                                                            ),
@@ -83,7 +93,31 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                      plotOutput("clust_ent_plot", height = "600px"),
                                      br(), br(),
                                      
-                                     )
+                                     ),
+                    
+                          tabPanel(strong("Plot Trees", style = "color:darkblue"),
+                                    br(), br(),
+                                    selectInput("select_tree", label = "Select a tree to plot", choices = NULL),
+                                    sliderInput("tip_label_size", label = "Tip label size: ", value = 0.8, min = 0.1, max = 2),
+                                    sliderInput("support_value_size", label = "Support value size: ", value = 1, min = 0.1, max = 5),
+                                    sliderInput("line_width", label = "Branch line width: ", value = 1, min = 0.1, max =5),
+                                    selectInput("support_value_col", label = "Support value colour: ", choices = c("grey", "lightblue", "salmon", "lightgreen", "lightyellow"), selected = "lightgreen"),
+                                    selectInput("support_value_frame", label = "Support value frame:", choices = c("none", "circle", "rect"), selected = "circle"),
+                                    selectInput("branch_col", label = "Branch colour: ", choices = c("black", "blue", "lightblue", "red", "green", "orange"), selected = "blue"),
+                                    br(),
+                                    actionButton("plot_gmyc_tree", label = strong("Plot GMYC tree result"), style="color: black; background-color: lightpink; border-color: black", icon("drafting-compass")),
+                                    br(), br(),
+                                    plotOutput("gmyc_tree", height = "600px")
+                          ),
+                      
+                          tabPanel(strong("Percentage Matches", style = "color:darkblue"),
+                                    br(), br(),
+                                    actionButton("view_match_data", label = strong("View Matches"), style="color: black; background-color: lightgreen; border-color: green", icon("edit")),
+                                    actionButton("view_summary_match_data", label = strong("View Matches Summary"), style="color: black; background-color: lightblue; border-color: darkblue", icon("edit")),
+                                    br(), br(),
+                                    tableOutput("matches")
+                          
+                        )
                             
                 )
 )
