@@ -380,9 +380,28 @@ server = function(input, output, session) {
             plot.result.gmyc(tree_container[[file_index]], cex = tip_label_size, edge.width = branch_width)
             nodelabels(round(support, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
             
+            ################################################################################################
+            # Download GMYC tree
+            ################################################################################################
+            
+            
+            output$download_gmyc_tree <- downloadHandler(
+                
+                filename = function (){paste(files[file_index], "svg", sep = '.')},
+                
+                content = function (file){svg(file)
+                    plot.result.gmyc(tree_container[[file_index]], cex = tip_label_size, edge.width = branch_width)
+                    nodelabels(round(support, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
+                    dev.off()
+                }
+            )
+            
+            
+            
             })
             
         })
+        
         
         ################################################################################################
         # Download clusters vs entities plot

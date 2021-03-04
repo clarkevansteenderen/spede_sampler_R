@@ -29,7 +29,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                     br(), br(),
                     #sidebarLayout(
                         sidebarPanel(strong("Click to view the help file:", style = "color:green; font-size: 18px")
-                            %>% helper(type = "markdown", content = "spede_sampler_help", colour = "green", icon = "question-circle"),
+                            %>% helper(type = "markdown", content = "spede_sampler_help", colour = "green", icon = "question-circle", size = "l"),
                             br(),
                             h5(strong('Select the folder containing your tree files:')),
                             shinyDirButton('directory', 'Folder select', 'Please select a folder containing your tree files', style="color: black; background-color: white; border-color: black"),
@@ -106,6 +106,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                     selectInput("branch_col", label = "Branch colour: ", choices = c("black", "blue", "lightblue", "red", "green", "orange"), selected = "blue"),
                                     br(),
                                     actionButton("plot_gmyc_tree", label = strong("Plot GMYC tree result"), style="color: black; background-color: lightpink; border-color: black", icon("drafting-compass")),
+                                    downloadButton("download_gmyc_tree", label = strong("Download"), style="color: black; background-color: lightblue; border-color: darkblue"),
                                     br(), br(),
                                     plotOutput("gmyc_tree", height = "600px")
                           ),
