@@ -50,7 +50,7 @@ The csv file needs one column for sample names, and another for their correspond
 | MN1236    | sp3   |
 
 <br />
-Where the **group** column could be, for example, morphospecies.
+Where the **group** column could be, for example, morphospecies. The order of the sample_ids do not necessarily need to match the order of their appearance in the tree.
 Select which column is the grouping, and which is the sample name column from the dropdown menus.
 
 Click the "Run" button to start the GMYC analysis. 
