@@ -67,4 +67,4 @@ When downloading these plots, add the .svg extension to the file name.
 
 The "Plot trees" tab allows for the plotting of any individual GMYC tree with support values for detected species groups from those originally uploaded. 
 
-The "Percentage matches" tab 
+The "Percentage matches" tab shows the match success of the user's predefined groups to those estimated by the GMCY species delimitation method. Species groups with only one representative sample are not included in this calculation.
