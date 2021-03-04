@@ -46,7 +46,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             br(),
                             checkboxInput("set_seed", label = "Set a seed?", value = FALSE),
                             
-                            checkboxInput("group_info", label="Check this box if you wish to upload predefined grouping information. If yes, upload a .csv file, and select the columns containing your grouping information and sample names from the dropdown menu.", value = FALSE),
+                            #checkboxInput("group_info", label="Check this box if you wish to upload predefined grouping information. If yes, upload a .csv file, and select the columns containing your grouping information and sample names from the dropdown menu.", value = FALSE),
                             br(),
                             fileInput("predefined_groups", label="Upload a .csv file containing predefined groups for your samples:", accept = ".csv"),
                             selectInput("col.group", "Select Group Column:", choices=NULL),

@@ -38,7 +38,7 @@ Select a folder, or manually input the file path containing the files created by
 Select the approapriate radio button to indicate which ML program was used to create your tree files.
 The file path will display on the screen as confirmation of your choice.
 
-To upload predefined grouping information, browse for the relevant .csv file, and check the box specifiying that this information is to be included in the analysis. 
+To upload predefined grouping information, browse for the relevant .csv file. 
 
 The csv file needs one column for sample names, and another for their corresponding predefined groups. For example:
 
@@ -50,7 +50,7 @@ The csv file needs one column for sample names, and another for their correspond
 | MN1236    | sp3   |
 
 <br />
-Where the **group** column could be, for example, morphospecies. The order of the sample_ids do not necessarily need to match the order of their appearance in the tree.
+Where the **group** column could be, for example, morphospecies.
 Select which column is the grouping, and which is the sample name column from the dropdown menus.
 
 Click the "Run" button to start the GMYC analysis. 

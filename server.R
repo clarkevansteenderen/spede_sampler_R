@@ -23,10 +23,13 @@ server = function(input, output, session) {
     
         infile = input$predefined_groups
         if (is.null(infile)) {
+            predefined_groups_uploaded <<- FALSE
             return(NULL)
         } 
         
         groups <<- read.csv(infile$datapath)
+        predefined_groups_uploaded <<- TRUE
+        
         
         updateSelectInput(session,"col.group", choices=colnames(groups))
         updateSelectInput(session,"sample_names", choices=colnames(groups))
@@ -128,7 +131,7 @@ server = function(input, output, session) {
             # Run the GMYC analysis
             treex.gmyc = gmyc(treex.ultra2, quiet = F, method = "multiple")
             
-            # store the gmyc in the tree_container list
+            # store the gmyc in the tree_container listC:\Users\s1000334\Documents\PhD_Tetramesa\Experiment Fasta Files\Iterations_10\FastTree_output
             tree_container[[i]] = treex.gmyc
 
             # these three lines below write the files to the same folder:
@@ -146,7 +149,7 @@ server = function(input, output, session) {
             # Do this bit only if the user uploaded a csv file with grouping data and checked the "YES" radio button
             ########################################################################################################
             
-            if (input$group_info == TRUE){ 
+            if (predefined_groups_uploaded == TRUE){ #input$group_info == TRUE
                 
                 groups_col = as.name( input$col.group )
                 sample_names_col = as.name (input$sample_names )
