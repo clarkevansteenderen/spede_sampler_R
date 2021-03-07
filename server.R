@@ -77,11 +77,12 @@ server = function(input, output, session) {
         
         ml_input_type = input$data_type
         
-        if (ml_input_type == "FastTree") files = list.files(pattern = "\\.tre$")
-        else if (ml_input_type == "RAxML") files = list.files(pattern = "bestTree") 
+        if (ml_input_type == "FastTree") files = gtools::mixedsort( list.files(pattern = "\\.tre$") ) # the gtools::mixedsort() function preserves the original order of the files, instead of ordering them 1, 10, 100 etc.
+        else if (ml_input_type == "RAxML") files = gtools::mixedsort( list.files(pattern = "bestTree") )
         
         # populate the dropdown list to show all the files inputted, so that the user can plot one if they wish
         updateSelectInput(session,"select_tree", choices=files)
+        updateSelectInput(session,"select_tree_speclist", choices=files)
         
         ################################################################################################
         # check whether there are files in the folder that contain bestTree or .tre in their names
@@ -109,6 +110,7 @@ server = function(input, output, session) {
         
         # create a list to which each gmyc tree is stored
         tree_container = vector("list", length(files))
+        gmyc_spec_container = vector("list", length = length(files))
             
         ################################################################################################
         # Loop through the files in the chosen directory to create an ultrametric tree for each,
@@ -166,6 +168,8 @@ server = function(input, output, session) {
                             gmyc.spec$ids[j] = groups[[groups_col]][k]
                     }
                 }
+                
+                gmyc_spec_container[[i]] = gmyc.spec
                 
                 # split the data by the species group numbers assigned by the GMYC
                 
@@ -229,9 +233,70 @@ server = function(input, output, session) {
         
         shinyalert::shinyalert("Complete", "Please click on the tabs at the top of the window to view the results.", type = "success")
         
+        ################################################################################################
+        # View the GMYC species table with the predefined grouping information appended as the last column
+        ################################################################################################
+        
+        observeEvent(input$view_gmyc_spec, {
+            
+            gmyc_spec_to_show = input$select_tree_speclist # get the tree file name selected from the drop down menu
+            file_i = which(files == gmyc_spec_to_show) # get the index of that file to match up with the trees stored in the spec_list_container list
+            
+            output$matches = renderTable(gmyc_spec_container[[file_i]], rownames = FALSE, colnames = TRUE, digits = 0)
+            
+            
+            ################################################################################################
+            # Download GMYC species table
+            ################################################################################################
+            
+            output$download_gmyc_spec = downloadHandler(
+                
+                filename = function (){paste('gmyc_spec_data', 'csv', sep = '.')},
+                content = function (file){write.csv(gmyc_spec_container[[file_i]], file, row.names = FALSE)}
+            )
+            
+        })
+        
+        ################################################################################################
+        # View the match data for each file
+        ################################################################################################
+        
         observeEvent(input$view_match_data, {
             output$matches = renderTable(record, rownames = FALSE, colnames = TRUE, digits = 0)
+            
+            ################################################################################################
+            # Download match data for each file
+            ################################################################################################
+            
+            output$download_match_data = downloadHandler(
+                
+                filename = function (){paste('match_data', 'csv', sep = '.')},
+                content = function (file){write.csv(record, file, row.names = FALSE)}
+            )
+            
         })
+        
+        ################################################################################################
+        # Plot percentage match data for all files as a ggplot
+        ################################################################################################
+        
+        observeEvent(input$plot_matches, {
+            
+            output$match_plot = renderPlot({
+                ggplot(record, aes(x=1:nrow(record), y=percentage_match)) + 
+                    geom_line(color = input$plot_matches_line_colour) + 
+                    geom_point(color = input$plot_matches_point_colours)  + 
+                    theme_classic() +
+                    xlab("ML tree file/iteration number") + 
+                    ylab("Percentage match") + 
+                    ggtitle("GMCY species match to predefined groups vs ML tree/iteration file")
+            })
+        })
+        
+        
+        ################################################################################################
+        # view the match data summary for all files (mean, stdev etc.)
+        ################################################################################################
         
         observeEvent(input$view_summary_match_data, {
             
@@ -262,6 +327,18 @@ server = function(input, output, session) {
             match_stats.df$percentage_single_sample_GMYC_species = single_summary
             
             output$matches =  renderTable(match_stats.df, rownames = FALSE, colnames = TRUE, digits = 2)
+            
+            ################################################################################################
+            # Download summary match data for all files
+            ################################################################################################
+            
+            output$download_match_data_summary = downloadHandler(
+                
+                filename = function (){paste('match_data_summary', 'csv', sep = '.')},
+                content = function (file){write.csv(match_stats.df, file, row.names = FALSE)}
+            )
+            
+            
         })
         
         
@@ -398,7 +475,6 @@ server = function(input, output, session) {
                     dev.off()
                 }
             )
-            
             
             
             })

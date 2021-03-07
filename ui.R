@@ -1,5 +1,5 @@
 
-mypackages <- c("ape", "shiny", "shinyhelper", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
+mypackages <- c("ape", "shiny", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -14,6 +14,7 @@ library(reshape2)
 library(shinyalert)
 library(phytools)
 library(ggplot2)
+library(gtools)
 
 ui <- fluidPage(theme = shinytheme("flatly"),
                 
@@ -28,7 +29,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 tabsetPanel(tabPanel(strong("Home: multiple ML trees", style = "color:darkblue"),
                     br(), br(),
                     #sidebarLayout(
-                        sidebarPanel(strong("Click to view the help file:", style = "color:green; font-size: 18px")
+                        sidebarPanel(width = 15, strong("Click to view the help file:", style = "color:green; font-size: 18px")
                             %>% helper(type = "markdown", content = "spede_sampler_help", colour = "green", icon = "question-circle", size = "l"),
                             br(),
                             h5(strong('Select the folder containing your tree files:')),
@@ -43,11 +44,10 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
                             br(),
                             radioButtons("data_type", label="Maximum Likelihood program used to produce tree files:", choices = c("FastTree", "RAxML")),
-                            br(),
                             checkboxInput("set_seed", label = "Set a seed?", value = FALSE),
                             
                             #checkboxInput("group_info", label="Check this box if you wish to upload predefined grouping information. If yes, upload a .csv file, and select the columns containing your grouping information and sample names from the dropdown menu.", value = FALSE),
-                            br(),
+                            
                             fileInput("predefined_groups", label="Upload a .csv file containing predefined groups for your samples:", accept = ".csv"),
                             selectInput("col.group", "Select Group Column:", choices=NULL),
                             selectInput("sample_names", "Select Sample Name Column:", choices=NULL),
@@ -83,7 +83,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                      actionButton("plot_clusts_vs_iterations", label = strong("Plot clusters vs iteration file"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")), 
                                      downloadButton("download_clusts_vs_iterations", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
                                      selectInput("plot_clusts_vs_iterations_point_colours", "Point colour: ", choices = c("black", "blue", "red", "darkgreen")),
-                                     selectInput("plot_clusts_vs_iterations_line_colour", "Line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen")),
+                                     selectInput("plot_clusts_vs_iterations_line_colour", "Line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen", "white")),
                                      br(), br(),
                                      actionButton("plot_ents_vs_iterations", label = strong("Plot entities vs iteration file"), style="color: black; background-color: lightpink; border-color: black", icon("drafting-compass")), 
                                      downloadButton("download_ents_vs_iterations", label = strong("Download"), style="color: black; background-color: lightpink; border-color: black"),
@@ -101,23 +101,41 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                     sliderInput("tip_label_size", label = "Tip label size: ", value = 0.8, min = 0.1, max = 2),
                                     sliderInput("support_value_size", label = "Support value size: ", value = 1, min = 0.1, max = 5),
                                     sliderInput("line_width", label = "Branch line width: ", value = 1, min = 0.1, max =5),
-                                    selectInput("support_value_col", label = "Support value colour: ", choices = c("grey", "lightblue", "salmon", "lightgreen", "lightyellow"), selected = "lightgreen"),
-                                    selectInput("support_value_frame", label = "Support value frame:", choices = c("none", "circle", "rect"), selected = "circle"),
+                                    selectInput("support_value_col", label = "Support value colour: ", choices = c("grey", "lightblue", "salmon", "lightgreen", "lightyellow", "white"), selected = "lightgreen"),
+                                    selectInput("support_value_frame", label = "Support value frame:", choices = c("none", "circle", "rect"), selected = "rect"),
                                     selectInput("branch_col", label = "Branch colour: ", choices = c("black", "blue", "lightblue", "red", "green", "orange"), selected = "blue"),
                                     br(),
                                     actionButton("plot_gmyc_tree", label = strong("Plot GMYC tree result"), style="color: black; background-color: lightpink; border-color: black", icon("drafting-compass")),
                                     downloadButton("download_gmyc_tree", label = strong("Download"), style="color: black; background-color: lightblue; border-color: darkblue"),
                                     br(), br(),
-                                    plotOutput("gmyc_tree", height = "600px")
+                                    plotOutput("gmyc_tree", height = "1250px")
                           ),
                       
                           tabPanel(strong("Percentage Matches", style = "color:darkblue"),
                                     br(), br(),
+                                    selectInput("select_tree_speclist", label = "Select a tree file", choices = NULL),
+                                    actionButton("view_gmyc_spec", label = strong("View GMYC species list"), style="color: black; background-color: lightyellow; border-color: black", icon("edit")),
+                                    downloadButton("download_gmyc_spec", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
+                                    br(), br(),
                                     actionButton("view_match_data", label = strong("View Matches"), style="color: black; background-color: lightgreen; border-color: green", icon("edit")),
+                                    downloadButton("download_match_data", label = strong("Download"), style="color: black; background-color: lightgreen; border-color: green"),
+                                    br(), br(),
                                     actionButton("view_summary_match_data", label = strong("View Matches Summary"), style="color: black; background-color: lightblue; border-color: darkblue", icon("edit")),
+                                    downloadButton("download_match_data_summary", label = strong("Download"), style="color: black; background-color: lightblue; border-color: darkblue"), 
                                     br(), br(),
                                     tableOutput("matches")
                           
+                        ),
+                    
+                          tabPanel(strong("Plot Percentage matches", style = "color:darkblue"),
+                                   br(), br(),
+                                   actionButton("plot_matches", label = strong("Plot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
+                                   downloadButton("download_match_plot", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
+                                   selectInput("plot_matches_point_colours", "Point colour: ", choices = c("black", "blue", "red", "darkgreen")),
+                                   selectInput("plot_matches_line_colour", "Line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen", "white")),
+                                   br(), br(),
+                                   plotOutput("match_plot", height = "600px")
+                                   
                         )
                             
                 )
