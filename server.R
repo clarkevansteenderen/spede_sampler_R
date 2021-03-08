@@ -38,6 +38,11 @@ server = function(input, output, session) {
     }) # end of observe
     ################################################################################################
     
+    
+    ################################################################################################
+    # Run the GMYC analysis
+    ################################################################################################
+    
     observeEvent(input$run_gmyc, {
         
         manual_file_path = input$raw_file_path
@@ -104,8 +109,8 @@ server = function(input, output, session) {
         colnames(clust_ent) = c("filename", "clusters", "entities")
         
         # this initialises the dataframe below, even if the user doesn't input grouping info. Doesn't seem to work when these three lines are within the if statemetn for group_info
-        record = data.frame(matrix(nrow = length(files), ncol = 3))
-        colnames(record) = c("filename", "percentage_match", "percentage_single_sample_GMYC_species")
+        record = data.frame(matrix(nrow = length(files), ncol = 4))
+        colnames(record) = c("filename", "percentage_match", "percentage_single_sample_GMYC_species", "oversplitting_ratio")
         record$filename = files
         
         # create a list to which each gmyc tree is stored
@@ -174,7 +179,9 @@ server = function(input, output, session) {
                 # split the data by the species group numbers assigned by the GMYC
                 
                 spec_split = split(gmyc.spec, gmyc.spec$GMYC_spec)
-                gmyc.spec$GMYC_spec = as.factor(gmyc.spec$GMYC_spec)
+                
+                gmyc.spec$GMYC_spec = as.factor(gmyc.spec$GMYC_spec) # make the GMYC species a factor
+                gmyc.spec$ids = as.factor(gmyc.spec$ids) # make the user's predefined groups a factor
                 
                 matches.df = data.frame(matrix(nrow = length(levels(gmyc.spec$GMYC_spec)), ncol = 2)) 
                 colnames(matches.df) = c("GMYC_spec", "match(y/n)") 
@@ -213,6 +220,10 @@ server = function(input, output, session) {
                 record[i,2] = success
                 record[i,3] = prop_single_samples
                 
+                num_predefined_groups = length(levels(gmyc.spec$ids))
+                num_gmyc_groups = length(levels(gmyc.spec$GMYC_spec))
+                
+                record[i,4] = round( num_gmyc_groups/num_predefined_groups, 2 )
                 
             }# end of if statement
            
@@ -262,7 +273,7 @@ server = function(input, output, session) {
         ################################################################################################
         
         observeEvent(input$view_match_data, {
-            output$matches = renderTable(record, rownames = FALSE, colnames = TRUE, digits = 0)
+            output$matches = renderTable(record, rownames = FALSE, colnames = TRUE, digits = 2)
             
             ################################################################################################
             # Download match data for each file
@@ -289,7 +300,7 @@ server = function(input, output, session) {
                     theme_classic() +
                     xlab("ML tree file/iteration number") + 
                     ylab("Percentage match") + 
-                    ggtitle("GMCY species match to predefined groups vs ML tree/iteration file")
+                    ggtitle("GMYC species match to predefined groups vs ML tree/iteration file")
             })
         })
         
@@ -318,13 +329,21 @@ server = function(input, output, session) {
             max_single = max(record$percentage_single_sample_GMYC_species)
             single_summary = round( c(avg_single, stdev_single, min_single, max_single) ,2 )
             
+            # stats for percentage of GMYC:predefined_species
+            avg_oversplit_ratio = mean(record$oversplitting_ratio)
+            stdev_oversplit_ratio = sd(record$oversplitting_ratio)
+            min_oversplit_ratio = min(record$oversplitting_ratio)
+            max_oversplit_ratio = max(record$oversplitting_ratio)
+            oversplit_ratio_summary = round( c(avg_oversplit_ratio, stdev_oversplit_ratio, min_oversplit_ratio, max_oversplit_ratio) ,2 )
+            # 
             # create a data frame housing summary statistics, called 'match_stats.df'
-            match_stats.df = data.frame(matrix(nrow=4, ncol = 3)) 
-            colnames(match_stats.df) = c("statistic", "percentage_matches", "percentage_single_sample_GMYC_species")
+            match_stats.df = data.frame(matrix(nrow=4, ncol = 4)) 
+            colnames(match_stats.df) = c("statistic", "percentage_matches", "percentage_single_sample_GMYC_species", "oversplitting_ratio")
             categories = c("Average", "Standard deviation", "Minimum", "Maximum")
             match_stats.df$statistic = categories
             match_stats.df$percentage_matches = match_summary
             match_stats.df$percentage_single_sample_GMYC_species = single_summary
+            match_stats.df$oversplitting_ratio = oversplit_ratio_summary
             
             output$matches =  renderTable(match_stats.df, rownames = FALSE, colnames = TRUE, digits = 2)
             
@@ -454,11 +473,17 @@ server = function(input, output, session) {
             
             ####################################################################################################################################
             
-            support = splits::gmyc.support(tree_container[[file_index]]) 
-            is.na(support[support == 0]) = TRUE
+            support_gmyc = splits::gmyc.support(tree_container[[file_index]]) # get the support values as estimated by the GMYC analysis
+            is.na(support_gmyc[support_gmyc == 0]) = TRUE
+            
+            support_original_tree = as.numeric(treex.ultra2$node.label) # get the original support values straight from the ML tree read in
             
             plot.result.gmyc(tree_container[[file_index]], cex = tip_label_size, edge.width = branch_width)
-            nodelabels(round(support, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
+            
+            if (input$support_value_type == "GMYC estimate") nodelabels(round(support_gmyc, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
+            
+            else nodelabels(round(support_original_tree, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
+            
             
             ################################################################################################
             # Download GMYC tree
@@ -550,7 +575,7 @@ server = function(input, output, session) {
                 theme_classic() +
                 xlab("ML tree file/iteration number") + 
                 ylab("Number of GMYC clusters") + 
-                ggtitle("GMCY number of clusters vs ML tree/iteration file")
+                ggtitle("GMYC number of clusters vs ML tree/iteration file")
             })
         })
         
@@ -569,7 +594,7 @@ server = function(input, output, session) {
                     theme_classic() +
                     xlab("ML tree file/iteration number") + 
                     ylab("Number of GMYC clusters") + 
-                    ggtitle("GMCY number of clusters vs ML tree/iteration file") )
+                    ggtitle("GMYC number of clusters vs ML tree/iteration file") )
             }
         )
         
@@ -586,7 +611,7 @@ server = function(input, output, session) {
                     theme_classic() +
                     xlab("ML tree file/iteration number") + 
                     ylab("Number of GMYC entities") + 
-                    ggtitle("GMCY number of entities vs ML tree/iteration file")
+                    ggtitle("GMYC number of entities vs ML tree/iteration file")
             })
         })
         
@@ -605,7 +630,7 @@ server = function(input, output, session) {
                     theme_classic() +
                     xlab("ML tree file/iteration number") + 
                     ylab("Number of GMYC entities") + 
-                    ggtitle("GMCY number of entities vs ML tree/iteration file") )
+                    ggtitle("GMYC number of entities vs ML tree/iteration file") )
             }
         )
         
@@ -641,8 +666,74 @@ server = function(input, output, session) {
         }# end of else 2
         
     })
+    
+    ################################################################################################
+    # Read in a csv file with multiple columns for the match percentages for each resampled data set
+    ################################################################################################
+    
+    observe({
+        
+        infile_multiple = input$multiple_input
+        if (is.null(infile_multiple)) {
+            multiple_match_data_uploaded <<- FALSE
+            return(NULL)
+        } 
+        
+        multiple_match_data = read.csv(infile_multiple$datapath, check.names = F)
+        multiple_match_data_uploaded <<- TRUE
+        multiple_match_data =  reshape2::melt(multiple_match_data)
+        colnames(multiple_match_data) = c("file_name", "data_percentage", "match_percentage")
+        stats_multiple_match_data = Rmisc::summarySE(multiple_match_data, measurevar = "match_percentage", groupvars = "data_percentage")
+        
+    
 
-    #})# end of first observe
+    observeEvent(input$plot_multiple_input, {
+        
+        if(multiple_match_data_uploaded == FALSE) shinyalert::shinyalert("No file uploaded. Please select a .csv file.", type = "error")
+        
+        else{
+            
+            # the eval(as.name()) method solved the issue of passing a string paramater to one without quotes for use in ggpplot
+        
+        output$multiple_input_plot = renderPlot({
+            
+        ggplot(stats_multiple_match_data, aes(x=data_percentage, y=match_percentage)) + 
+            geom_errorbar(aes(ymin=match_percentage - eval(as.name( input$error_bar_type )), ymax=match_percentage + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_color) +
+            geom_line(aes(group = 1), lty = as.numeric( input$multiple_input_line_type ), color = input$multiple_input_line_col, lwd = input$multiple_input_line_width) +
+            geom_point(size = input$multiple_input_point_size) + 
+            xlab("Percentage of resampled data") +
+            ylab("Percentage match of GMYC species to predefined groups") +
+            ggtitle("Percetage matches (GMYC species to predefined groups) vs percentage resampled data") +
+            theme_classic()
+            
+        })
+        
+        output$download_multiple_input_plot = downloadHandler(
+            
+            filename = function (){paste("multiple_data", "svg", sep = '.')},
+            
+            content = function (file){
+                ggsave(file, 
+                       ggplot(stats_multiple_match_data, aes(x=data_percentage, y=match_percentage)) + 
+                           geom_errorbar(aes(ymin=match_percentage - eval(as.name( input$error_bar_type )), ymax=match_percentage + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_color) +
+                           geom_line(aes(group = 1), lty = as.numeric( input$multiple_input_line_type ), color = input$multiple_input_line_col, lwd = input$multiple_input_line_width) +
+                           geom_point(size = input$multiple_input_point_size) + 
+                           xlab("Percentage of resampled data") +
+                           ylab("Percentage match of GMYC species to predefined groups") +
+                           ggtitle("Percetage matches (GMYC species to predefined groups) vs percentage resampled data") +
+                           theme_classic()
+                )
+            }
+            
+        )
+        
+        } # end of else 
+        
+    })
+    
+    }) # end of observe
+    
+    
     
 }
 
