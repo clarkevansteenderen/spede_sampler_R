@@ -668,42 +668,36 @@ server = function(input, output, session) {
     })
     
     ################################################################################################
-    # Read in a csv file with multiple columns for the match percentages for each resampled data set
+    # Read in a csv file with multiple columns of data
     ################################################################################################
     
     observe({
         
         infile_multiple = input$multiple_input
+        
         if (is.null(infile_multiple)) {
-            multiple_match_data_uploaded <<- FALSE
             return(NULL)
         } 
         
-        multiple_match_data = read.csv(infile_multiple$datapath, check.names = F)
-        multiple_match_data_uploaded <<- TRUE
-        multiple_match_data =  reshape2::melt(multiple_match_data)
-        colnames(multiple_match_data) = c("file_name", "data_percentage", "match_percentage")
-        stats_multiple_match_data = Rmisc::summarySE(multiple_match_data, measurevar = "match_percentage", groupvars = "data_percentage")
+        multiple_data = read.csv(infile_multiple$datapath, check.names = F)
+        multiple_data =  reshape2::melt(multiple_data)
+        colnames(multiple_data) = c("file_name", "data_percentage", "measure")
+        stats_multiple_data = Rmisc::summarySE(multiple_data, measurevar = "measure", groupvars = "data_percentage")
         
     
-
     observeEvent(input$plot_multiple_input, {
         
-        if(multiple_match_data_uploaded == FALSE) shinyalert::shinyalert("No file uploaded. Please select a .csv file.", type = "error")
-        
-        else{
-            
-            # the eval(as.name()) method solved the issue of passing a string paramater to one without quotes for use in ggpplot
+        # the eval(as.name()) method solved the issue of passing a string parameter to one without quotes for use in ggpplot
         
         output$multiple_input_plot = renderPlot({
             
-        ggplot(stats_multiple_match_data, aes(x=data_percentage, y=match_percentage)) + 
-            geom_errorbar(aes(ymin=match_percentage - eval(as.name( input$error_bar_type )), ymax=match_percentage + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_color) +
+        ggplot(stats_multiple_data, aes(x=data_percentage, y=measure)) + 
+            geom_errorbar(aes(ymin=measure - eval(as.name( input$error_bar_type )), ymax=measure + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_color) +
             geom_line(aes(group = 1), lty = as.numeric( input$multiple_input_line_type ), color = input$multiple_input_line_col, lwd = input$multiple_input_line_width) +
             geom_point(size = input$multiple_input_point_size) + 
-            xlab("Percentage of resampled data") +
-            ylab("Percentage match of GMYC species to predefined groups") +
-            ggtitle("Percetage matches (GMYC species to predefined groups) vs percentage resampled data") +
+            xlab(input$x_lab_multiple_input) +
+            ylab(input$y_lab_multiple_input) +
+            ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
             theme_classic()
             
         })
@@ -714,8 +708,8 @@ server = function(input, output, session) {
             
             content = function (file){
                 ggsave(file, 
-                       ggplot(stats_multiple_match_data, aes(x=data_percentage, y=match_percentage)) + 
-                           geom_errorbar(aes(ymin=match_percentage - eval(as.name( input$error_bar_type )), ymax=match_percentage + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_color) +
+                       ggplot(stats_multiple_data, aes(x=data_percentage, y=measure)) + 
+                           geom_errorbar(aes(ymin=measure - eval(as.name( input$error_bar_type )), ymax=measure + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_color) +
                            geom_line(aes(group = 1), lty = as.numeric( input$multiple_input_line_type ), color = input$multiple_input_line_col, lwd = input$multiple_input_line_width) +
                            geom_point(size = input$multiple_input_point_size) + 
                            xlab("Percentage of resampled data") +
@@ -726,8 +720,6 @@ server = function(input, output, session) {
             }
             
         )
-        
-        } # end of else 
         
     })
     

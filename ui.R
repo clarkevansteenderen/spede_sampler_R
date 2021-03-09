@@ -27,7 +27,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 titlePanel(h4("Created by Clarke van Steenderen")),
                 br(),
                 
-                tabsetPanel(tabPanel(strong("Home: multiple ML trees", style = "color:darkblue"),
+                tabsetPanel(tabPanel(strong("Home: multiple ML trees"),
                     br(), br(),
                     #sidebarLayout(
                         sidebarPanel(width = 15, strong("Click to view the help file:", style = "color:green; font-size: 18px")
@@ -45,8 +45,9 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
                             br(),
                             radioButtons("data_type", label="Maximum Likelihood program used to produce tree files:", choices = c("FastTree", "RAxML")),
+                          tags$div(title="Check if you want the results to be reproducible if you run this again with the same data",
                             checkboxInput("set_seed", label = "Set a seed?", value = FALSE),
-                            
+                          ),
                             #checkboxInput("group_info", label="Check this box if you wish to upload predefined grouping information. If yes, upload a .csv file, and select the columns containing your grouping information and sample names from the dropdown menu.", value = FALSE),
                             
                             fileInput("predefined_groups", label="Upload a .csv file containing predefined groups for your samples:", accept = ".csv"),
@@ -59,7 +60,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                     
                             mainPanel() ),
                     
-                            tabPanel(strong("View Data", style = "color:darkblue"),
+                            tabPanel(strong("View Data"),
                                      br(), br(),
                                      actionButton('all_data', label=strong('Show all data'), style="color: black; background-color: lightgreen; border-color: green", icon("edit")),
                                      downloadButton("download_clust_ent_data", label = strong("Download all data"), style="color: black; background-color: lightgreen; border-color: green"),
@@ -72,7 +73,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                
                             ),
          
-                            tabPanel(strong("Plot Results", style = "color:darkblue"), 
+                            tabPanel(strong("Plot Results"), 
                                      br(), br(),
                                      actionButton("plot_clusts", label = strong("Plot clusters vs entities"), style="color: black; background-color: lightgreen; border-color: green", icon("drafting-compass")), 
                                      downloadButton("download_clust_plot", label = strong("Download"), style="color: black; background-color: lightgreen; border-color: green"),
@@ -99,7 +100,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                      
                                      ),
                     
-                          tabPanel(strong("Plot Trees", style = "color:darkblue"),
+                          tabPanel(strong("Plot Trees"),
                                     br(), br(),
                                     selectInput("select_tree", label = "Select a tree to plot", choices = NULL),
                                     sliderInput("tip_label_size", label = "Tip label size: ", value = 0.8, min = 0.1, max = 2),
@@ -117,24 +118,36 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                     br(), br()
                           ),
                       
-                          tabPanel(strong("Percentage Matches", style = "color:forestgreen"),
+                          tabPanel(strong("Percentage Matches"),
                                     br(), br(),
                                     selectInput("select_tree_speclist", label = "Select a tree file", choices = NULL),
-                                    actionButton("view_gmyc_spec", label = strong("View GMYC species list"), style="color: black; background-color: lightyellow; border-color: black", icon("edit")),
+                                   
+                                  tags$div(title="View the GMYC analysis output for each tree file uploaded",
+                                    actionButton("view_gmyc_spec", label = strong("View GMYC species list"), style="color: black; background-color: lightyellow; border-color: black", icon("edit")), 
+                                    br(), br(),
+                                  ),
+                                    
                                     downloadButton("download_gmyc_spec", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
                                     br(), br(),
+                                  tags$div(title="View the % match between what the GMYC analysis considers a species, to the predefined groups you uploaded",
                                     actionButton("view_match_data", label = strong("View Matches"), style="color: black; background-color: lightgreen; border-color: green", icon("edit")),
+                                    br(), br(),
+                                  ),
+                                    
                                     downloadButton("download_match_data", label = strong("Download"), style="color: black; background-color: lightgreen; border-color: green"),
                                     br(), br(),
+                                  tags$div(title="View the average, standard deviation, minimum and maximum values for the GMYC data and % matches",
                                     actionButton("view_summary_match_data", label = strong("View Matches Summary"), style="color: black; background-color: lightblue; border-color: darkblue", icon("edit")),
-                                    downloadButton("download_match_data_summary", label = strong("Download"), style="color: black; background-color: lightblue; border-color: darkblue"), 
                                     br(), br(),
+                                  ),
+                                    downloadButton("download_match_data_summary", label = strong("Download"), style="color: black; background-color: lightblue; border-color: darkblue"), 
+                                    br(),br(),
                                     tableOutput("matches"),
                                     br(), br()
                           
                         ),
                     
-                          tabPanel(strong("Plot Percentage matches", style = "color:forestgreen"),
+                          tabPanel(strong("Plot Percentage matches"),
                                    br(), br(),
                                    actionButton("plot_matches", label = strong("Plot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
                                    downloadButton("download_match_plot", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
@@ -147,18 +160,22 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                    
                         ),
                     
-                        tabPanel(strong("Plot Percentage matches for multiple datasets", style = "color:purple"),
+                        tabPanel(strong("Plot line graph for multiple column data"),
                                  br(), br(),
-                                 fileInput("multiple_input", label = "Upload a .csv file with multiple columns of match data for different percentages of resampled data:", accept = ".csv"),
+                                 fileInput("multiple_input", label = "Upload a .csv file with multiple columns of output data:", accept = ".csv"),
                                  actionButton("plot_multiple_input", label = strong("Plot"), style="color: black; background-color: lightblue; border-color: darkblue", icon("drafting-compass")),
                                  downloadButton("download_multiple_input_plot", label = strong("Download"), style="color: black; background-color: lightblue; border-color: darkblue"),
                                  br(), br(),
                                  selectInput("error_bar_type", label = "Select what error bars should represent: ", choices = c("ci", "sd", "se")),
                                  selectInput("multiple_input_line_type", label = 'Select a line type: ', choices = c("blank" = 0, "solid" = 1, "dashed" = 2, "dotted" = 3), selected = 1),
                                  selectInput('multiple_input_line_col', label = "Select a line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen")),
-                                 sliderInput("multiple_input_line_width", label = "Line width: ", value = 1, min = 1, max = 5, step = 0.5),
+                                 sliderInput("multiple_input_line_width", label = "Line width: ", value = 1, min = 0.5, max = 5, step = 0.5),
                                  selectInput("multiple_input_error_bar_color", label = "Select a colour for the error bars: ", choices = c("grey", "lightblue", "black", "white")),
                                  sliderInput("multiple_input_point_size", label = "Point size: ", value = 1, min = 1, max = 5, step = 0.5),
+                                 textInput("x_lab_multiple_input", label = "X-axis label: ", value = "Resampled data (%)", width = "600px"),
+                                 textInput("y_lab_multiple_input", label = "Y-axis label: ", value = "Measure variable", width = "600px"),
+                                 textInput("title_multiple_input", label = "Title: ", value = "Title", width = "600px"),
+                                 br(), br(),
                                  plotOutput("multiple_input_plot", height = "600px"),
                                  br(), br()
                         )
