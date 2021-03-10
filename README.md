@@ -11,3 +11,5 @@ To run this app through R, type the following into the console:
 `shiny::runGitHub("spede-sampler", "CJMvS", ref="main") # run the app`
 
 ![alt text](https://github.com/CJMvS/spede-sampler/blob/main/HelpFile/spede_sampler_overview.png)
+
+
