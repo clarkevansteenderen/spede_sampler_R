@@ -684,7 +684,38 @@ server = function(input, output, session) {
         colnames(multiple_data) = c("file_name", "data_percentage", "measure")
         stats_multiple_data = Rmisc::summarySE(multiple_data, measurevar = "measure", groupvars = "data_percentage")
         
+    observeEvent(input$multiple_input_boxplot, {
+        
+        output$multiple_input_plot = renderPlot({
+            
+        ggplot(multiple_data, aes(x = data_percentage, y = measure)) + 
+            geom_boxplot() + 
+            xlab("Resampled data (%)") + 
+            ylab(input$y_lab_multiple_input) +
+            ggtitle(input$title_multiple_input) + 
+            theme_classic()
+            
+        })
+        
+        output$download_multiple_input_boxplot = downloadHandler(
+            
+            filename = function (){paste("multiple_data_boxplot", "svg", sep = '.')},
+            
+            content = function (file){
+                ggsave(file, 
+                       ggplot(multiple_data, aes(x = data_percentage, y = measure)) + 
+                           geom_boxplot() + 
+                           xlab("Resampled data (%)") + 
+                           ylab(input$y_lab_multiple_input) +
+                           ggtitle(input$title_multiple_input) + 
+                           theme_classic()
+                )
+            }
+        )
+        
+    })
     
+        
     observeEvent(input$plot_multiple_input, {
         
         # the eval(as.name()) method solved the issue of passing a string parameter to one without quotes for use in ggpplot
@@ -704,7 +735,7 @@ server = function(input, output, session) {
         
         output$download_multiple_input_plot = downloadHandler(
             
-            filename = function (){paste("multiple_data", "svg", sep = '.')},
+            filename = function (){paste("multiple_data_line_plot", "svg", sep = '.')},
             
             content = function (file){
                 ggsave(file, 

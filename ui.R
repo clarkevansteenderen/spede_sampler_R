@@ -160,21 +160,31 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                    
                         ),
                     
-                        tabPanel(strong("Plot line graph for multiple column data"),
+                        tabPanel(strong("Plot for multiple-column data"),
                                  br(), br(),
                                  fileInput("multiple_input", label = "Upload a .csv file with multiple columns of output data:", accept = ".csv"),
-                                 actionButton("plot_multiple_input", label = strong("Plot"), style="color: black; background-color: lightblue; border-color: darkblue", icon("drafting-compass")),
+                                 
+                                 textInput("title_multiple_input", label = "Title: ", value = "Title", width = "600px"),
+                                 textInput("x_lab_multiple_input", label = "X-axis label: ", value = "Resampled data (%)", width = "600px"),
+                                 textInput("y_lab_multiple_input", label = "Y-axis label: ", value = "Measure variable", width = "600px"),
+                                 hr(),
+                                 actionButton("multiple_input_boxplot", label = strong("Boxplot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
+                                 downloadButton("download_multiple_input_boxplot", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
+                                 br(), br(),
+                                 actionButton("plot_multiple_input", label = strong("Line Plot"), style="color: black; background-color: lightblue; border-color: darkblue", icon("drafting-compass")),
                                  downloadButton("download_multiple_input_plot", label = strong("Download"), style="color: black; background-color: lightblue; border-color: darkblue"),
                                  br(), br(),
+                                 
+                                 h4("Line plot tweaks:"),
+                                 
+                                 br(), 
                                  selectInput("error_bar_type", label = "Select what error bars should represent: ", choices = c("ci", "sd", "se")),
                                  selectInput("multiple_input_line_type", label = 'Select a line type: ', choices = c("blank" = 0, "solid" = 1, "dashed" = 2, "dotted" = 3), selected = 1),
                                  selectInput('multiple_input_line_col', label = "Select a line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen")),
                                  sliderInput("multiple_input_line_width", label = "Line width: ", value = 1, min = 0.5, max = 5, step = 0.5),
                                  selectInput("multiple_input_error_bar_color", label = "Select a colour for the error bars: ", choices = c("grey", "lightblue", "black", "white")),
                                  sliderInput("multiple_input_point_size", label = "Point size: ", value = 1, min = 1, max = 5, step = 0.5),
-                                 textInput("x_lab_multiple_input", label = "X-axis label: ", value = "Resampled data (%)", width = "600px"),
-                                 textInput("y_lab_multiple_input", label = "Y-axis label: ", value = "Measure variable", width = "600px"),
-                                 textInput("title_multiple_input", label = "Title: ", value = "Title", width = "600px"),
+                                 
                                  br(), br(),
                                  plotOutput("multiple_input_plot", height = "600px"),
                                  br(), br()
