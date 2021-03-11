@@ -109,8 +109,8 @@ server = function(input, output, session) {
         colnames(clust_ent) = c("filename", "clusters", "entities")
         
         # this initialises the dataframe below, even if the user doesn't input grouping info. Doesn't seem to work when these three lines are within the if statemetn for group_info
-        record = data.frame(matrix(nrow = length(files), ncol = 4))
-        colnames(record) = c("filename", "percentage_match", "percentage_single_sample_GMYC_species", "oversplitting_ratio")
+        record = data.frame(matrix(nrow = length(files), ncol = 5))
+        colnames(record) = c("filename", "percentage_match", "percentage_single_sample_GMYC_species", "oversplitting_ratio", "oversplitting_ratio_excl_single_sample_spp")
         record$filename = files
         
         # create a list to which each gmyc tree is stored
@@ -222,8 +222,12 @@ server = function(input, output, session) {
                 
                 num_predefined_groups = length(levels(gmyc.spec$ids))
                 num_gmyc_groups = length(levels(gmyc.spec$GMYC_spec))
+                num_gmyc_groups_excluding_single_spp = num_gmyc_groups - single_sample_count
                 
+                # oversplitting ratio (ie. GMYC species to predefined groups)
                 record[i,4] = round( num_gmyc_groups/num_predefined_groups, 2 )
+                
+                record[i,5] = round( num_gmyc_groups_excluding_single_spp/num_predefined_groups, 2 )
                 
             }# end of if statement
            
@@ -335,15 +339,24 @@ server = function(input, output, session) {
             min_oversplit_ratio = min(record$oversplitting_ratio)
             max_oversplit_ratio = max(record$oversplitting_ratio)
             oversplit_ratio_summary = round( c(avg_oversplit_ratio, stdev_oversplit_ratio, min_oversplit_ratio, max_oversplit_ratio) ,2 )
-            # 
+            
+            # stats for percentage of GMYC:predefined_species excluding all single sample representatives
+            avg_oversplit_ratio_excl_single = mean(record$oversplitting_ratio_excl_single_sample_spp)
+            stdev_oversplit_ratio_excl_single = sd(record$oversplitting_ratio_excl_single_sample_spp)
+            min_oversplit_ratio_excl_single = min(record$oversplitting_ratio_excl_single_sample_spp)
+            max_oversplit_ratio_excl_single = max(record$oversplitting_ratio_excl_single_sample_spp)
+            oversplit_ratio_summary_excl_single = round( c(avg_oversplit_ratio_excl_single, stdev_oversplit_ratio_excl_single, min_oversplit_ratio_excl_single, max_oversplit_ratio_excl_single) ,2 )
+            
+            
             # create a data frame housing summary statistics, called 'match_stats.df'
-            match_stats.df = data.frame(matrix(nrow=4, ncol = 4)) 
-            colnames(match_stats.df) = c("statistic", "percentage_matches", "percentage_single_sample_GMYC_species", "oversplitting_ratio")
+            match_stats.df = data.frame(matrix(nrow=4, ncol = 5)) 
+            colnames(match_stats.df) = c("statistic", "percentage_matches", "percentage_single_sample_GMYC_species", "oversplitting_ratio", "oversplitting_ratio_excl_single_sample_spp")
             categories = c("Average", "Standard deviation", "Minimum", "Maximum")
             match_stats.df$statistic = categories
             match_stats.df$percentage_matches = match_summary
             match_stats.df$percentage_single_sample_GMYC_species = single_summary
             match_stats.df$oversplitting_ratio = oversplit_ratio_summary
+            match_stats.df$oversplitting_ratio_excl_single_sample_spp = oversplit_ratio_summary_excl_single
             
             output$matches =  renderTable(match_stats.df, rownames = FALSE, colnames = TRUE, digits = 2)
             
@@ -690,7 +703,7 @@ server = function(input, output, session) {
             
         ggplot(multiple_data, aes(x = data_percentage, y = measure)) + 
             geom_boxplot() + 
-            xlab("Resampled data (%)") + 
+            xlab(input$x_lab_multiple_input) +
             ylab(input$y_lab_multiple_input) +
             ggtitle(input$title_multiple_input) + 
             theme_classic()
@@ -705,7 +718,7 @@ server = function(input, output, session) {
                 ggsave(file, 
                        ggplot(multiple_data, aes(x = data_percentage, y = measure)) + 
                            geom_boxplot() + 
-                           xlab("Resampled data (%)") + 
+                           xlab(input$x_lab_multiple_input) +
                            ylab(input$y_lab_multiple_input) +
                            ggtitle(input$title_multiple_input) + 
                            theme_classic()
@@ -725,9 +738,10 @@ server = function(input, output, session) {
         ggplot(stats_multiple_data, aes(x=data_percentage, y=measure)) + 
             geom_errorbar(aes(ymin=measure - eval(as.name( input$error_bar_type )), ymax=measure + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_color) +
             geom_line(aes(group = 1), lty = as.numeric( input$multiple_input_line_type ), color = input$multiple_input_line_col, lwd = input$multiple_input_line_width) +
-            geom_point(size = input$multiple_input_point_size) + 
+            geom_point(size = input$multiple_input_point_size, shape = as.numeric( input$multiple_input_point_shape), colour = input$multiple_input_point_colour ) + 
             xlab(input$x_lab_multiple_input) +
             ylab(input$y_lab_multiple_input) +
+            scale_y_continuous(breaks = seq(floor(min(stats_multiple_data$measure)), ceiling(max(stats_multiple_data$measure)), by = input$y_interval_multiple_input)) +
             ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
             theme_classic()
             
@@ -742,10 +756,11 @@ server = function(input, output, session) {
                        ggplot(stats_multiple_data, aes(x=data_percentage, y=measure)) + 
                            geom_errorbar(aes(ymin=measure - eval(as.name( input$error_bar_type )), ymax=measure + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_color) +
                            geom_line(aes(group = 1), lty = as.numeric( input$multiple_input_line_type ), color = input$multiple_input_line_col, lwd = input$multiple_input_line_width) +
-                           geom_point(size = input$multiple_input_point_size) + 
-                           xlab("Percentage of resampled data") +
-                           ylab("Percentage match of GMYC species to predefined groups") +
-                           ggtitle("Percetage matches (GMYC species to predefined groups) vs percentage resampled data") +
+                           geom_point(size = input$multiple_input_point_size, shape = as.numeric( input$multiple_input_point_shape), colour = input$multiple_input_point_colour ) + 
+                           xlab(input$x_lab_multiple_input) +
+                           ylab(input$y_lab_multiple_input) +
+                           scale_y_continuous(breaks = seq(floor(min(stats_multiple_data$measure)), ceiling(max(stats_multiple_data$measure)), by = input$y_interval_multiple_input)) +
+                           ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
                            theme_classic()
                 )
             }
