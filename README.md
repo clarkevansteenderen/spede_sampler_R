@@ -18,7 +18,7 @@
 
 ---
 
-# **HOW TO RUN THE APPLICATION**
+## **HOW TO RUN THE APPLICATION**
 
 This R Shiny App is the final part of the SPEDE-SAMPLER program, and allows the user to run GMYC analyes on multiple phylogenies that have been created by randomly resampling the sequences in an aligned Fasta file.
 
@@ -30,9 +30,8 @@ To run this app through R, type the following into the console:
 
 `shiny::runGitHub("spede-sampler", "CJMvS", ref="main") # run the app`
 
-# **USER GUIDE**
 
-**OVERVIEW**
+## **OVERVIEW**
 
 This R Shiny App is the final step of the analysis pipeline following from the SPEDE-SAMPLER Python program (see the diagram below). The application requires the user to input a folder directory containing all the tree files created by FastTree or RAxML. If the user wishes to run the analysis on only one tree, this tree file needs to be saved into a folder first, which can then be selected.
 Using the "ape" package, each tree is opened and converted to become fully dichotomous (**multi2di()** function) and ultrametric (**chronos()** function).
