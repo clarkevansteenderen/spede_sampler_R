@@ -36,8 +36,6 @@ Using the "ape" package, each tree is opened and converted to become fully dicho
 The GMYC species delimitation algorithm is then run on each tree using the R "splits" package. The number of clusters and entities for each tree is recorded in a dataframe, and can be downloaded and/or plotted in the application under the "Plot Results" tab.
 Each GMYC clustering tree can be viewed and downloaded.
 If the user has predefined grouping data for their samples, this can be uploaded as an Excel csv file. These predefined groups are then compared to the groups estimated by the GMYC analysis, and a percentage match is calculated.
- 
----
 
 <img src="spede_sampler_overview.png" alt="drawing" width="850"/>
 
