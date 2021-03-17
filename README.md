@@ -93,3 +93,12 @@ Plot the percentage match (GMYC species to predefined groups) for each tree file
 ## Tab: GMYC Oversplitting
 The "View Summary Table" button displays the mean, standard deviation, and minimum and maximum values for the predefined groups that have been split into more than one species/groups by the GMYC algorithm. 
 This data can be plotted as a box-and-whisker or bar plot.
+
+## Tab: Plot for multiple-column data
+Upload a prepared file with a desired output type for each resampled dataset. For example, percentage matches excluding single-sample GMYC species:
+
+| filename        | 10    | 20   | 30   |
+|-----------      |-------|----- |----- |
+| iteration1.tre  | 0.25  | 0.3  | 0.36 |
+| iteration2.tre  | 0.4   | 0.5  | 0.48 |
+| iteration3.tre  | 0.35  | 0.28 | 0.23 |
