@@ -42,7 +42,9 @@ If the user has predefined grouping data for their samples, this can be uploaded
 
 <img src="spede_sampler_overview.png" alt="drawing" width="850"/>
 
-**USAGE**
+# **USAGE**
+
+## Tab: Home:multiple ML trees
 
 Select a folder, or manually input the file path containing the files created by either FastTree or RAxML. 
 Select the approapriate radio button to indicate which ML program was used to create your tree files.
@@ -51,7 +53,6 @@ The file path will display on the screen as confirmation of your choice.
 To upload predefined grouping information, browse for the relevant .csv file. 
 
 The csv file needs one column for sample names, and another for their corresponding predefined groups. For example:
-
 
 | sample_id | group |
 |-----------|-------|
@@ -65,9 +66,15 @@ Select which column is the grouping, and which is the sample name column from th
 
 Click the "Run" button to start the GMYC analysis. 
 
-Once the analysis is complete, the "View Data" tab allows for the viewing and downloading of data tables for the estimated number of clusters and entities. When downloading, add the .csv extension manually to the file name.
+## Tab: View Data
 
-The "Plot Results" tab allows for the viewing, editing (line and point colours), and downloading of plots for:
+"Show all data" prints the number of clusters and entities and clusters for each tree file, and "Show summary table" displays the mean, standard deviation, and minimum and maximum values for all the data.
+
+When downloading, add the .csv extension manually to the file name.
+
+## Tab: Plot Results
+
+Display and plot the results for:
 
 - The number of clusters vs the number of entities as a scatter plot
 - A boxplot for the numbers of clusters and entities
@@ -75,8 +82,17 @@ The "Plot Results" tab allows for the viewing, editing (line and point colours),
 
 When downloading these plots, add the .svg extension to the file name.
 
-The "Plot trees" tab allows for the plotting of any individual GMYC tree with support values for detected species groups from those originally uploaded. 
+## Tab: Plot Trees
+Plot any individual GMYC tree with GMYC support values, or original bootstrap support values.
 
-The "Percentage matches" tab allows the user to select any input tree file, and view 1) the GMYC results table with the appended predefined groups (as uploaded by the user), the percentage matches, percentage of single-sample GMYC species, and the oversplitting ratio. 
+## Tab: Percentage Matches
+Select any input tree file, and click on the "View GMYC species list" button to view the GMYC results table with the appended predefined groups (as uploaded by the user).
+Click on "View Matches" to view the percentage match including and excluding single-sample GMYC-species, the percentage of single-sample GMYC species, and the oversplitting ratio including and excluding single-sample GMYC-species. 
+The "View Matches Summary" button displays the average, standard deviation, and minimum and maximum values for the above statistics.
 
+## Tab: Plot Percentage Matches
+Plot the percentage match (GMYC species to predefined groups) for each tree file as a line graph.
 
+## Tab: GMYC oversplitting
+The "View Summary Table" button displays the mean, standard deviation, and minimum and maximum values for the predefined groups that have been split into more than one species/groups by the GMYC algorithm. 
+This data can be plotted as a box-and-whisker or bar plot.
