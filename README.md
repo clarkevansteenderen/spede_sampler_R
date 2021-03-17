@@ -16,6 +16,8 @@
 
 *e-mail:* vsteenderen@gmail.com
 
+---
+
 This R Shiny App is the final part of the SPEDE-SAMPLER program, and allows the user to run GMYC analyes on multiple phylogenies that have been created by randomly resampling the sequences in an aligned Fasta file.
 
 To run this app through R, type the following into the console:
