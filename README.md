@@ -95,10 +95,13 @@ The "View Summary Table" button displays the mean, standard deviation, and minim
 This data can be plotted as a box-and-whisker or bar plot.
 
 ## Tab: Plot for multiple-column data
-Upload a prepared file with a desired output type for each resampled dataset. For example, percentage matches excluding single-sample GMYC species:
+Upload a prepared file with a desired output type for each resampled dataset. For example, percentage matches excluding single-sample GMYC species for a dataset that has been resampled four times to contain 10 - 40% of the original sequences:
 
-| filename        | 10    | 20   | 30   |
-|-----------      |-------|----- |----- |
-| iteration1.tre  | 0.25  | 0.3  | 0.36 |
-| iteration2.tre  | 0.4   | 0.5  | 0.48 |
-| iteration3.tre  | 0.35  | 0.28 | 0.23 |
+| filename        | 10    | 20   | 30   | 40   |
+|-----------      |-------|----- |----- |----- |
+| iteration1.tre  | 0.25  | 0.3  | 0.36 | 0.35 |
+| iteration2.tre  | 0.4   | 0.5  | 0.48 | 0.54 |
+| iteration3.tre  | 0.35  | 0.28 | 0.23 | 0.36 |
+| iteration4.tre  | 0.3   | 0.58 | 0.21 | 0.33 |
+
+Prepare the file such that each column contains the percentage match data for each of the subsampled categories (here 10 to 40 %). This data comes from each separate GMYC run in the application on a desired subsampled dataset. 
