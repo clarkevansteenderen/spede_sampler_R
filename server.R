@@ -1,11 +1,17 @@
 
-library(shiny)
+ggthemes = list("Classic" = theme_classic(),
+                "Dark" = theme_dark(),
+                "Minimal" = theme_minimal(),
+                "Grey" = theme_grey(),
+                "Light" = theme_light(),
+                "Black/White" = theme_bw(),
+                "Void" = theme_void())
 
 
 server = function(input, output, session) {
     
     # tell the shinyhelper package what the file name of the help file is
-    observe_helpers(help_dir = "HelpFile")
+    # observe_helpers(help_dir = "HelpFile")
    
     volumes =  getVolumes()() # this presents all the folders on the user's PC
     
@@ -27,15 +33,14 @@ server = function(input, output, session) {
             return(NULL)
         } 
         
-        groups <<- read.csv(infile$datapath)
+        groups = read.csv(infile$datapath)
         predefined_groups_uploaded <<- TRUE
-        
         
         updateSelectInput(session,"col.group", choices=colnames(groups))
         updateSelectInput(session,"sample_names", choices=colnames(groups))
         
         
-    }) # end of observe
+   
     ################################################################################################
     
     
@@ -109,13 +114,16 @@ server = function(input, output, session) {
         colnames(clust_ent) = c("filename", "clusters", "entities")
         
         # this initialises the dataframe below, even if the user doesn't input grouping info. Doesn't seem to work when these three lines are within the if statemetn for group_info
-        record = data.frame(matrix(nrow = length(files), ncol = 5))
-        colnames(record) = c("filename", "percentage_match", "percentage_single_sample_GMYC_species", "oversplitting_ratio", "oversplitting_ratio_excl_single_sample_spp")
+        record = data.frame(matrix(nrow = length(files), ncol = 6))
+        colnames(record) = c("filename", "percentage_match", "percentage_match_excl_singles", "percentage_single_sample_GMYC_species", "oversplitting_ratio", "oversplitting_excl_singles")
         record$filename = files
         
         # create a list to which each gmyc tree is stored
         tree_container = vector("list", length(files))
+        # create a list with gmyc.spec output for each file
         gmyc_spec_container = vector("list", length = length(files))
+        # create a list of which predefined species are being oversplit by the gmyc algorithm
+        oversplitting_species = vector("list")
             
         ################################################################################################
         # Loop through the files in the chosen directory to create an ultrametric tree for each,
@@ -212,22 +220,54 @@ server = function(input, output, session) {
                     }
                 }
                 
-                total = y_count + n_count 
+                # this total excludes single samples
+                total_excl_singles = y_count + n_count 
                 
-                success = round(y_count/total * 100, 2) # this is only taking the matches for GMYC species groups that had more than one sample in it
+                # this total includes single samples
+                total_incl_singles = y_count + n_count + single_sample_count
+                #or just total_incl_singles = nrow(matches.df)
+                
+                # this is only taking the matches for GMYC species groups that had more than one sample in it
+                success_excl_singles = round(y_count/total_excl_singles * 100, 2) 
+                
+                # this treats all single sample GMYC species as equivalent to a "yes" match, and will therefore be a larger value than the estimate
+                # that excludes them
+                success_incl_singles = round((y_count + single_sample_count)/total_incl_singles * 100, 2)
+                
                 prop_single_samples = round(single_sample_count/nrow(matches.df) * 100, 2)
                 
-                record[i,2] = success
-                record[i,3] = prop_single_samples
+                record[i,2] = success_incl_singles
+                record[i,3] = success_excl_singles
+                record[i,4] = prop_single_samples
                 
                 num_predefined_groups = length(levels(gmyc.spec$ids))
                 num_gmyc_groups = length(levels(gmyc.spec$GMYC_spec))
                 num_gmyc_groups_excluding_single_spp = num_gmyc_groups - single_sample_count
                 
                 # oversplitting ratio (ie. GMYC species to predefined groups)
-                record[i,4] = round( num_gmyc_groups/num_predefined_groups, 2 )
+                record[i,5] = round( num_gmyc_groups/num_predefined_groups, 2 )
+                # oversplitting ratio excluding single species
+                record[i,6] = round( num_gmyc_groups_excluding_single_spp/num_predefined_groups, 2 )
                 
-                record[i,5] = round( num_gmyc_groups_excluding_single_spp/num_predefined_groups, 2 )
+                # find which species are being oversplit
+                
+                # find which species are being oversplit
+                
+                yes_indices = which(matches.df$`match(y/n)` == "y")
+                
+                    if(length(yes_indices) > 0){
+                        
+                        predef_unique = c()
+                        for (v in 1:length(yes_indices)){
+                            predef_unique[v] = unique(spec_split[[yes_indices[v]]]$ids)
+                        }
+                        
+                        predef_unique_table = table(predef_unique)
+                        predef_unique_table = predef_unique_table
+                        predef_unique_table = as.data.frame(predef_unique_table)
+                        
+                        oversplitting_species[[i]] = predef_unique_table
+                    }
                 
             }# end of if statement
            
@@ -245,8 +285,11 @@ server = function(input, output, session) {
             
         }) # end of progress bar bracket
         
-        
         shinyalert::shinyalert("Complete", "Please click on the tabs at the top of the window to view the results.", type = "success")
+        
+        oversplitting_species = oversplitting_species[!is.na(oversplitting_species)] # remove the NA lists
+        oversplitting_species_bound = dplyr::bind_rows(oversplitting_species)
+        oversplitting_species_bound = oversplitting_species_bound[oversplitting_species_bound$Freq > 1,] # remove rows with species that had a frequency of only one (ie those that were not oversplit)
         
         ################################################################################################
         # View the GMYC species table with the predefined grouping information appended as the last column
@@ -273,6 +316,75 @@ server = function(input, output, session) {
         })
         
         ################################################################################################
+        # View which predefined groups were oversplit by the GMYC
+        ################################################################################################
+        
+        observeEvent(input$GMYC_oversplit_table_view, {
+            
+            
+            if(nrow(oversplitting_species_bound) > 0){
+                mean_oversplits_per_grp = 
+                    oversplitting_species_bound %>% 
+                    group_by(predef_unique) %>%
+                    summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
+                    colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
+                    
+                    output$GMYC_oversplit_table = renderTable(mean_oversplits_per_grp, rownames = FALSE, colnames = TRUE, digits = 2)
+            }
+            
+            else shinyalert::shinyalert("No oversplits", "None of your predefined groups were oversplit by the GMYC algorithm", type = "info")
+            
+        })
+        
+        ################################################################################################
+        # Boxplot of which predefined groups were oversplit by the GMYC
+        ################################################################################################
+        
+        observeEvent(input$GMYC_oversplit_boxplot, {
+            
+            if(nrow(oversplitting_species_bound) > 0){
+                output$GMYC_oversplit_plot = renderPlot({
+                    ggplot(data = oversplitting_species_bound, aes(x = predef_unique, y = Freq)) + 
+                        geom_boxplot() +
+                        ggthemes[[input$GMYC_oversplit_ggtheme]] +
+                        xlab("Predefined group") +
+                        ylab("Mean frequency")
+                })
+            }
+            
+            else shinyalert::shinyalert("No oversplits", "None of your predefined groups were oversplit by the GMYC algorithm", type = "info")
+            
+        })
+        
+        ################################################################################################
+        # Barplot of which predefined groups were oversplit by the GMYC
+        ################################################################################################
+        observeEvent(input$GMYC_oversplit_barplot, {
+            
+            if(nrow(oversplitting_species_bound) > 0){
+                        mean_oversplits_per_grp = 
+                            oversplitting_species_bound %>% 
+                            group_by(predef_unique) %>%
+                            summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
+                            colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
+                        
+                        
+                    output$GMYC_oversplit_plot = renderPlot({
+                        
+                        ggplot(data = mean_oversplits_per_grp, aes(x=predefined_group, y=mean)) + 
+                            geom_bar(stat = "identity", colour = input$GMYC_barchart_outline, fill = input$GMYC_barchart_fill) + 
+                            geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1) + 
+                            xlab("Predefined group") +
+                            ylab("Mean frequency") +
+                            ggthemes[[input$GMYC_oversplit_ggtheme]] 
+                    })
+            }
+            
+            else shinyalert::shinyalert("No oversplits", "None of your predefined groups were oversplit by the GMYC algorithm", type = "info")
+            
+        }) 
+        
+        ################################################################################################
         # View the match data for each file
         ################################################################################################
         
@@ -285,7 +397,7 @@ server = function(input, output, session) {
             
             output$download_match_data = downloadHandler(
                 
-                filename = function (){paste('match_data', 'csv', sep = '.')},
+                filename = function (){paste('match_data_full', 'csv', sep = '.')},
                 content = function (file){write.csv(record, file, row.names = FALSE)}
             )
             
@@ -301,7 +413,7 @@ server = function(input, output, session) {
                 ggplot(record, aes(x=1:nrow(record), y=percentage_match)) + 
                     geom_line(color = input$plot_matches_line_colour) + 
                     geom_point(color = input$plot_matches_point_colours)  + 
-                    theme_classic() +
+                    ggthemes[[input$ggtheme_matches]] +
                     xlab("ML tree file/iteration number") + 
                     ylab("Percentage match") + 
                     ggtitle("GMYC species match to predefined groups vs ML tree/iteration file")
@@ -319,12 +431,19 @@ server = function(input, output, session) {
             # Get summary statistics for the success record and number of single samples assigned to a GMYC species
             ################################################################################################
             
-            # stats for percentage matches
+            # stats for percentage matches including single samples
             avg_match = mean(record$percentage_match)
             stdev_match = sd(record$percentage_match)
             min_match = min(record$percentage_match)
             max_match = max(record$percentage_match)
             match_summary = round( c(avg_match, stdev_match, min_match, max_match) ,2 )
+            
+            # stats for percentage matches excluding single samples
+            avg_match_excl_singles = mean(record$percentage_match_excl_singles)
+            stdev_match_excl_singles = sd(record$percentage_match_excl_singles)
+            min_match_excl_singles = min(record$percentage_match_excl_singles)
+            max_match_excl_singles = max(record$percentage_match_excl_singles)
+            match_excl_singles_summary = round( c(avg_match_excl_singles, stdev_match_excl_singles, min_match_excl_singles, max_match_excl_singles) ,2 )
             
             # stats for percentage of single-ssample gmyc species
             avg_single = mean(record$percentage_single_sample_GMYC_species)
@@ -341,19 +460,20 @@ server = function(input, output, session) {
             oversplit_ratio_summary = round( c(avg_oversplit_ratio, stdev_oversplit_ratio, min_oversplit_ratio, max_oversplit_ratio) ,2 )
             
             # stats for percentage of GMYC:predefined_species excluding all single sample representatives
-            avg_oversplit_ratio_excl_single = mean(record$oversplitting_ratio_excl_single_sample_spp)
-            stdev_oversplit_ratio_excl_single = sd(record$oversplitting_ratio_excl_single_sample_spp)
-            min_oversplit_ratio_excl_single = min(record$oversplitting_ratio_excl_single_sample_spp)
-            max_oversplit_ratio_excl_single = max(record$oversplitting_ratio_excl_single_sample_spp)
+            avg_oversplit_ratio_excl_single = mean(record$oversplitting_excl_singles)
+            stdev_oversplit_ratio_excl_single = sd(record$oversplitting_excl_singles)
+            min_oversplit_ratio_excl_single = min(record$oversplitting_excl_singles)
+            max_oversplit_ratio_excl_single = max(record$oversplitting_excl_singles)
             oversplit_ratio_summary_excl_single = round( c(avg_oversplit_ratio_excl_single, stdev_oversplit_ratio_excl_single, min_oversplit_ratio_excl_single, max_oversplit_ratio_excl_single) ,2 )
             
             
             # create a data frame housing summary statistics, called 'match_stats.df'
-            match_stats.df = data.frame(matrix(nrow=4, ncol = 5)) 
-            colnames(match_stats.df) = c("statistic", "percentage_matches", "percentage_single_sample_GMYC_species", "oversplitting_ratio", "oversplitting_ratio_excl_single_sample_spp")
+            match_stats.df = data.frame(matrix(nrow=4, ncol = 6)) 
+            colnames(match_stats.df) = c("statistic", "percentage_matches", "percentage_matches_excl_single_samples", "percentage_single_sample_GMYC_species", "oversplitting_ratio", "oversplitting_ratio_excl_single_sample_spp")
             categories = c("Average", "Standard deviation", "Minimum", "Maximum")
             match_stats.df$statistic = categories
             match_stats.df$percentage_matches = match_summary
+            match_stats.df$percentage_matches_excl_single_samples = match_excl_singles_summary
             match_stats.df$percentage_single_sample_GMYC_species = single_summary
             match_stats.df$oversplitting_ratio = oversplit_ratio_summary
             match_stats.df$oversplitting_ratio_excl_single_sample_spp = oversplit_ratio_summary_excl_single
@@ -418,13 +538,11 @@ server = function(input, output, session) {
             
             output$clust_ent_plot = renderPlot({
                 
-                plot(clust_ent$clusters, 
-                     clust_ent$entities, 
-                     pch = 16, 
-                     ylab = "Entities",
-                     xlab = "Clusters",  
-                     main = "Number of Clusters vs Entities for GMYC",
-                     col=input$clust_vs_ent_plot_point_colours)
+                ggplot(clust_ent, aes(x=clusters, y=entities)) + geom_point(colour = input$clust_vs_ent_plot_point_colours) +
+                    xlab("Clusters") + 
+                    ylab("Entities") +
+                    ggthemes[[input$ggtheme_plots]] +
+                    ggtitle("Number of Clusters vs Entities for GMYC")
                 
             })
         })
@@ -526,17 +644,15 @@ server = function(input, output, session) {
         
         output$download_clust_plot <- downloadHandler(
             
-            filename = function (){paste("clust_ent_plot", "svg", sep = '.')},
+            filename = function (){paste("clust_vs_ent_plot", "svg", sep = '.')},
             
-            content = function (file){svg(file)
-                plot(clust_ent$clusters, 
-                     clust_ent$entities, 
-                     pch = 16, 
-                     ylab = "Entities", 
-                     xlab = "Clusters",  
-                     main = "Number of Clusters vs Entities for GMYC",
-                     col=input$clust_vs_ent_plot_point_colours)
-                dev.off()
+            content = function (file){
+                ggplot(clust_ent, aes(x=clusters, y=entities)) + geom_point(colour = input$clust_vs_ent_plot_point_colours) +
+                    xlab("Clusters") + 
+                    ylab("Entities") +
+                    ggthemes[[input$ggtheme_plots]] +
+                    ggtitle("Number of Clusters vs Entities for GMYC")
+                
             }
         )
         
@@ -553,7 +669,7 @@ server = function(input, output, session) {
             output$clust_ent_plot = renderPlot({
                 
                 ggplot(gg_clust_ent, aes(x=gmyc_cat, y=count)) + geom_boxplot() +
-                    theme_classic() + 
+                    ggthemes[[input$ggtheme_plots]] +
                     xlab("GMYC Category") + 
                     ylab("Count") 
             })
@@ -569,7 +685,7 @@ server = function(input, output, session) {
             
             content = function (file){
                 ggsave(file, ggplot( gg_clust_ent, aes(x=gmyc_cat, y=count)) + geom_boxplot() +
-                    theme_classic() + 
+                    ggthemes[[input$ggtheme_plots]] +
                     xlab("GMYC Category") + 
                     ylab("Count") )
             }
@@ -585,7 +701,7 @@ server = function(input, output, session) {
             ggplot(clust_ent, aes(x=1:nrow(clust_ent), y=clusters)) + 
                 geom_line(color = input$plot_clusts_vs_iterations_line_colour) + 
                 geom_point(color = input$plot_clusts_vs_iterations_point_colours)  + 
-                theme_classic() +
+                ggthemes[[input$ggtheme_plots]] +
                 xlab("ML tree file/iteration number") + 
                 ylab("Number of GMYC clusters") + 
                 ggtitle("GMYC number of clusters vs ML tree/iteration file")
@@ -604,7 +720,7 @@ server = function(input, output, session) {
                 ggsave(file, ggplot( clust_ent, aes(x=1:nrow(clust_ent), y=clusters)) + 
                     geom_line(color = input$plot_clusts_vs_iterations_line_colour) + 
                     geom_point(color = input$plot_clusts_vs_iterations_point_colours)  + 
-                    theme_classic() +
+                    ggthemes[[input$ggtheme_plots]] +
                     xlab("ML tree file/iteration number") + 
                     ylab("Number of GMYC clusters") + 
                     ggtitle("GMYC number of clusters vs ML tree/iteration file") )
@@ -621,7 +737,7 @@ server = function(input, output, session) {
                 ggplot(clust_ent, aes(x=1:nrow(clust_ent), y=entities)) + 
                     geom_line(color = input$plot_ents_vs_iterations_line_colour) + 
                     geom_point(color = input$plot_ents_vs_iterations_point_colours)  + 
-                    theme_classic() +
+                    ggthemes[[input$ggtheme_plots]] +
                     xlab("ML tree file/iteration number") + 
                     ylab("Number of GMYC entities") + 
                     ggtitle("GMYC number of entities vs ML tree/iteration file")
@@ -640,7 +756,7 @@ server = function(input, output, session) {
                 ggsave(file, ggplot( clust_ent, aes(x=1:nrow(clust_ent), y=entities)) + 
                     geom_line(color = input$plot_ents_vs_iterations_line_colour) + 
                     geom_point(color = input$plot_ents_vs_iterations_point_colours)  + 
-                    theme_classic() +
+                    ggthemes[[input$ggtheme_plots]] +
                     xlab("ML tree file/iteration number") + 
                     ylab("Number of GMYC entities") + 
                     ggtitle("GMYC number of entities vs ML tree/iteration file") )
@@ -706,7 +822,7 @@ server = function(input, output, session) {
             xlab(input$x_lab_multiple_input) +
             ylab(input$y_lab_multiple_input) +
             ggtitle(input$title_multiple_input) + 
-            theme_classic()
+            ggthemes[[input$ggtheme_multiple]] 
             
         })
         
@@ -721,7 +837,7 @@ server = function(input, output, session) {
                            xlab(input$x_lab_multiple_input) +
                            ylab(input$y_lab_multiple_input) +
                            ggtitle(input$title_multiple_input) + 
-                           theme_classic()
+                           ggthemes[[input$ggtheme]] 
                 )
             }
         )
@@ -743,7 +859,7 @@ server = function(input, output, session) {
             ylab(input$y_lab_multiple_input) +
             scale_y_continuous(breaks = seq(floor(min(stats_multiple_data$measure)), ceiling(max(stats_multiple_data$measure)), by = input$y_interval_multiple_input)) +
             ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
-            theme_classic()
+            ggthemes[[input$ggtheme_multiple]] 
             
         })
         
@@ -761,7 +877,7 @@ server = function(input, output, session) {
                            ylab(input$y_lab_multiple_input) +
                            scale_y_continuous(breaks = seq(floor(min(stats_multiple_data$measure)), ceiling(max(stats_multiple_data$measure)), by = input$y_interval_multiple_input)) +
                            ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
-                           theme_classic()
+                           ggthemes[[input$ggtheme]] 
                 )
             }
             
@@ -771,7 +887,7 @@ server = function(input, output, session) {
     
     }) # end of observe
     
-    
+    }) # end of observe of input of predefined group file
     
 }
 

@@ -1,5 +1,5 @@
 
-mypackages <- c("ape", "shiny", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
+mypackages <- c("ape", "dplyr", "shiny", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -16,6 +16,15 @@ library(phytools)
 library(ggplot2)
 library(gtools)
 library(Rmisc)
+library(dplyr)
+
+ggthemes = list("Classic" = theme_classic(),
+                "Dark" = theme_dark(),
+                "Minimal" = theme_minimal(),
+                "Grey" = theme_grey(),
+                "Light" = theme_light(),
+                "Black/White" = theme_bw(),
+                "Void" = theme_void())
 
 ui <- fluidPage(theme = shinytheme("flatly"),
                 
@@ -28,12 +37,11 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                 titlePanel(h4("Created by Clarke van Steenderen")),
                 br(),
                 
-                tabsetPanel(tabPanel(strong("Home: multiple ML trees"),
-                    br(), br(),
+                tabsetPanel(
+                          tabPanel(strong("Home: multiple ML trees"),
+                          br(), br(),
                     #sidebarLayout(
-                        sidebarPanel(width = 15, strong("Click to view the help file:", style = "color:green; font-size: 18px")
-                            %>% helper(type = "markdown", content = "spede_sampler_help", colour = "green", icon = "question-circle", size = "l"),
-                            br(),
+                        sidebarPanel(
                             h5(strong('Select the folder containing your tree files:')),
                             shinyDirButton('directory', 'Folder select', 'Please select a folder containing your tree files', style="color: black; background-color: white; border-color: black"),
                             br(), br(),
@@ -76,6 +84,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
          
                             tabPanel(strong("Plot Results"), 
                                      br(), br(),
+                                     selectInput("ggtheme_plots", "Select ggplot Theme:", choices = names(ggthemes), selected = ggthemes["Classic"]),
                                      actionButton("plot_clusts", label = strong("Plot clusters vs entities"), style="color: black; background-color: lightgreen; border-color: green", icon("drafting-compass")), 
                                      downloadButton("download_clust_plot", label = strong("Download"), style="color: black; background-color: lightgreen; border-color: green"),
                                      br(), br(),
@@ -155,10 +164,28 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                    br(), br(),
                                    selectInput("plot_matches_point_colours", "Point colour: ", choices = c("black", "blue", "red", "darkgreen")),
                                    selectInput("plot_matches_line_colour", "Line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen", "white")),
+                                   selectInput("ggtheme_matches", "Select ggplot Theme:", choices = names(ggthemes), selected = ggthemes["Classic"]),
                                    br(), br(),
                                    plotOutput("match_plot", height = "600px"),
                                    br(), br()
                                    
+                        ),
+                    
+                        tabPanel(strong("GMYC oversplitting"),
+                                 br(), br(),
+                                 actionButton("GMYC_oversplit_table_view", label = strong("View Summary Table"), style="color: black; background-color: lightblue; border-color: darkblue"),
+                                 actionButton("GMYC_oversplit_boxplot", label = strong("Boxplot"), style="color: black; background-color: lightyellow; border-color: black"),
+                                 actionButton("GMYC_oversplit_barplot", label = strong("Bar chart"), style="color: black; background-color: lightgreen; border-color: darkgreen"),
+                                 br(), br(),
+                                 selectInput("GMYC_oversplit_ggtheme", "Select ggplot Theme:", choices = names(ggthemes), selected = ggthemes["Classic"]),
+                                 selectInput("GMYC_barchart_fill", "Barchart fill: ", choices = c("black", "lightgrey", "white", "lightblue", "lightgreen"), selected = "white"),
+                                 selectInput("GMYC_barchart_outline", "Barchart outline: ", choices = c("black", "darkblue", "white", "darkgreen"), selected = "black"),
+                                 br(), br(),
+                                 tableOutput("GMYC_oversplit_table"),
+                                 br(), br(),
+                                 plotOutput("GMYC_oversplit_plot"),
+                                 br(), br()
+                                 
                         ),
                     
                         tabPanel(strong("Plot for multiple-column data"),
@@ -170,6 +197,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                  textInput("y_lab_multiple_input", label = "Y-axis label: ", value = "Measure variable", width = "600px"),
                                  #textInput("y_interval_multiple_input", label = "Y-axis tick-mark interval: ", value = "10", width = "200px"),
                                  numericInput("y_interval_multiple_input", label = "Y-axis tick-mark interval: ", value = 1, min = 1),
+                                 selectInput("ggtheme_multiple", "Select ggplot Theme:", choices = names(ggthemes), selected = ggthemes["Classic"]),
                                  hr(),
                                  actionButton("multiple_input_boxplot", label = strong("Boxplot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
                                  downloadButton("download_multiple_input_boxplot", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
