@@ -291,6 +291,14 @@ server = function(input, output, session) {
         oversplitting_species_bound = dplyr::bind_rows(oversplitting_species)
         oversplitting_species_bound = oversplitting_species_bound[oversplitting_species_bound$Freq > 1,] # remove rows with species that had a frequency of only one (ie those that were not oversplit)
         
+        mean_oversplits_per_grp = 
+            oversplitting_species_bound %>% 
+            group_by(predef_unique) %>%
+            summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
+        
+        colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
+        
+        
         ################################################################################################
         # View the GMYC species table with the predefined grouping information appended as the last column
         ################################################################################################
@@ -321,20 +329,21 @@ server = function(input, output, session) {
         
         observeEvent(input$GMYC_oversplit_table_view, {
             
+            if(nrow(mean_oversplits_per_grp) > 0){
             
-            if(nrow(oversplitting_species_bound) > 0){
-                mean_oversplits_per_grp = 
-                    oversplitting_species_bound %>% 
-                    group_by(predef_unique) %>%
-                    summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
-                    colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
-                    
-                    output$GMYC_oversplit_table = renderTable(mean_oversplits_per_grp, rownames = FALSE, colnames = TRUE, digits = 2)
+                output$GMYC_oversplit_table = renderTable(mean_oversplits_per_grp, rownames = FALSE, colnames = TRUE, digits = 2)
             }
             
             else shinyalert::shinyalert("No oversplits", "None of your predefined groups were oversplit by the GMYC algorithm", type = "info")
             
         })
+        
+        # download the table
+        output$GMYC_oversplit_table_download = downloadHandler(
+            
+            filename = function (){paste('mean_oversplits_per_group', 'csv', sep = '.')},
+            content = function (file){write.csv(mean_oversplits_per_grp, file, row.names = FALSE)}
+        )
         
         ################################################################################################
         # Boxplot of which predefined groups were oversplit by the GMYC
@@ -343,6 +352,7 @@ server = function(input, output, session) {
         observeEvent(input$GMYC_oversplit_boxplot, {
             
             if(nrow(oversplitting_species_bound) > 0){
+                
                 output$GMYC_oversplit_plot = renderPlot({
                     ggplot(data = oversplitting_species_bound, aes(x = predef_unique, y = Freq)) + 
                         geom_boxplot() +
@@ -356,33 +366,59 @@ server = function(input, output, session) {
             
         })
         
+        # download the boxplot
+        output$GMYC_oversplit_boxplot_download = downloadHandler(
+            
+            filename = function (){paste("oversplitting_species_boxplot", "svg", sep = '.')},
+            
+            content = function (file){
+                ggsave(file, ggplot(data = oversplitting_species_bound, aes(x = predef_unique, y = Freq)) + 
+                    geom_boxplot() +
+                    ggthemes[[input$GMYC_oversplit_ggtheme]] +
+                    xlab("Predefined group") +
+                    ylab("Mean frequency")
+            )}
+        )
+        
         ################################################################################################
         # Barplot of which predefined groups were oversplit by the GMYC
         ################################################################################################
         observeEvent(input$GMYC_oversplit_barplot, {
             
             if(nrow(oversplitting_species_bound) > 0){
-                        mean_oversplits_per_grp = 
-                            oversplitting_species_bound %>% 
-                            group_by(predef_unique) %>%
-                            summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
-                            colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
                         
                         
-                    output$GMYC_oversplit_plot = renderPlot({
+            output$GMYC_oversplit_plot = renderPlot({
                         
-                        ggplot(data = mean_oversplits_per_grp, aes(x=predefined_group, y=mean)) + 
-                            geom_bar(stat = "identity", colour = input$GMYC_barchart_outline, fill = input$GMYC_barchart_fill) + 
-                            geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1) + 
-                            xlab("Predefined group") +
-                            ylab("Mean frequency") +
-                            ggthemes[[input$GMYC_oversplit_ggtheme]] 
-                    })
-            }
+                ggplot(data = mean_oversplits_per_grp, aes(x=predefined_group, y=mean)) + 
+                    geom_bar(stat = "identity", colour = input$GMYC_barchart_outline, fill = input$GMYC_barchart_fill) + 
+                    geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1) + 
+                    xlab("Predefined group") +
+                    ylab("Mean frequency") +
+                    ggthemes[[input$GMYC_oversplit_ggtheme]] 
+            })
+                    
+                    
+            }# end of if
             
             else shinyalert::shinyalert("No oversplits", "None of your predefined groups were oversplit by the GMYC algorithm", type = "info")
             
         }) 
+        
+        # download the barplot
+        output$GMYC_oversplit_barplot_download = downloadHandler(
+            
+            filename = function (){paste("oversplitting_species_barplot", "svg", sep = '.')},
+            
+            content = function (file){
+                ggsave(file, ggplot(data = mean_oversplits_per_grp, aes(x=predefined_group, y=mean)) + 
+                           geom_bar(stat = "identity", colour = input$GMYC_barchart_outline, fill = input$GMYC_barchart_fill) + 
+                           geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1) + 
+                           xlab("Predefined group") +
+                           ylab("Mean frequency") +
+                           ggthemes[[input$GMYC_oversplit_ggtheme]] 
+                )}
+        )
         
         ################################################################################################
         # View the match data for each file
