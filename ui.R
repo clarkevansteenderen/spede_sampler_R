@@ -1,5 +1,5 @@
 
-mypackages <- c("ape", "dplyr", "shiny", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
+mypackages <- c("ape", "data.table", "dplyr", "shiny", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -17,6 +17,7 @@ library(ggplot2)
 library(gtools)
 library(Rmisc)
 library(dplyr)
+library(data.table)
 
 ggthemes = list("Classic" = theme_classic(),
                 "Dark" = theme_dark(),
@@ -41,7 +42,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                           tabPanel(strong("Home: multiple ML trees"),
                           br(), br(),
                     #sidebarLayout(
-                        sidebarPanel(
+                        sidebarPanel(width = 10,
                             h5(strong('Select the folder containing your tree files:')),
                             shinyDirButton('directory', 'Folder select', 'Please select a folder containing your tree files', style="color: black; background-color: white; border-color: black"),
                             br(), br(),
@@ -195,7 +196,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                     
                         tabPanel(strong("Plot for multiple-column data"),
                                  br(), br(),
-                                 fileInput("multiple_input", label = "Upload a .csv file with multiple columns of output data:", accept = ".csv"),
+                                 fileInput("multiple_input", label = "Upload a .csv file with multiple columns of output data:", accept = ".csv", multiple = TRUE),
                                  
                                  textInput("title_multiple_input", label = "Title: ", value = "Title", width = "600px"),
                                  textInput("x_lab_multiple_input", label = "X-axis label: ", value = "Resampled data (%)", width = "600px"),
@@ -227,6 +228,8 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                  br(), br(),
                                  plotOutput("multiple_input_plot", height = "600px"),
                                  br(), br()
+                                
+                                 
                         )
                             
                 )
