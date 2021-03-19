@@ -113,7 +113,7 @@ And an example of the output from a 60% resampled dataset:
 | iteration3.tre  | 0.5   | 0.38 | 0.26 | 0.66 | 0.42 |
 | iteration4.tre  | 0.45  | 0.68 | 0.28 | 0.35 | 0.2  |
 
-Select which data column you wish to extract from the dropdown menu. The algorithm pulls the desired column data from each uploaded file and binds them into one dataframe. This can then be plotted as a line graph with standard deviations. The **percentage_match** column data from the 50% and 60% resampled data will look like this:
+Select which data column you wish to extract from the dropdown menu. The algorithm pulls the desired column data from each uploaded file and binds them into one dataframe. This can then be plotted as a line graph with standard deviations. The **percentage_match** data (first column in the above examples) from the 50% and 60% resampled data will look like this:
 
 | filename        | 50    | 60   | 
 |-----------      |-------|----- |
