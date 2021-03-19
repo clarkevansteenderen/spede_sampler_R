@@ -963,6 +963,11 @@ server = function(input, output, session) {
             # output$colname = renderText(c("the column selected is ", chosen_col))
             output$amalgamate_table = renderTable(desired_data, rownames = TRUE)
             
+            output$download_amalg = downloadHandler(
+                filename = function (){paste(chosen_col, 'csv', sep = '.')},
+                content = function (file){write.csv(desired_data, file, row.names = TRUE)}
+            )
+            
         })
         
     
