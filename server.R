@@ -841,16 +841,16 @@ server = function(input, output, session) {
         observe({
             
             infile_multiple = input$multiple_input
-            
+
             if (is.null(infile_multiple)) {
                 return(NULL)
-            } 
+            }
             
             multiple_data = read.csv(infile_multiple$datapath, check.names = F)
             multiple_data =  reshape2::melt(multiple_data)
             colnames(multiple_data) = c("file_name", "data_percentage", "measure")
             stats_multiple_data = Rmisc::summarySE(multiple_data, measurevar = "measure", groupvars = "data_percentage")
-            
+
             observeEvent(input$multiple_input_boxplot, {
                 
                 output$multiple_input_plot = renderPlot({
@@ -926,5 +926,48 @@ server = function(input, output, session) {
         }) # end of observe
         
    
+    ###############################
+    
+    observe({
+        
+        infile_multiple = input$amalgamate_multiple
+        if (is.null( infile_multiple)) {
+            return(NULL)
+        } 
+        
+            nfiles = nrow(infile_multiple) 
+            csv = list()
+            column_names = c()
+            
+            for (i in 1:nfiles)
+            {
+                csv[[i]] = read.csv(infile_multiple$datapath[i])
+                column_names[i] = i
+            }
+            
+            updateSelectInput(session, "amalg_col", choices=colnames(csv[[1]][-1])) # the -1 removes the filename from the columns to choose from
+            
+        observeEvent(input$view_amalg, {
+            
+            chosen_col = as.name( input$amalg_col )
+            
+            desired_data = data.frame(matrix(nrow = nrow(csv[[1]]), ncol = nfiles))
+            colnames(desired_data) = column_names
+            rownames(desired_data) = csv[[1]]$filename
+            
+            # percentage match including singles
+            for (i in 1:nfiles){
+                desired_data[,i] = csv[[i]][[chosen_col]]
+            }
+            
+            # output$colname = renderText(c("the column selected is ", chosen_col))
+            output$amalgamate_table = renderTable(desired_data, rownames = TRUE)
+            
+        })
+        
+    
+    }) 
+    ###############################
+    
     
 }
