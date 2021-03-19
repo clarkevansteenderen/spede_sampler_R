@@ -94,14 +94,36 @@ Plot the percentage match (GMYC species to predefined groups) for each tree file
 The "View Summary Table" button displays the mean, standard deviation, and minimum and maximum values for the predefined groups that have been split into more than one species/groups by the GMYC algorithm. 
 This data can be plotted as a box-and-whisker or bar plot.
 
+## Tab: Amalgamate
+Upload multiple .csv files containing the output downloaded from the **Percentage Matches** tab. These have the following column layout (e.g. the output for a 50% resampled dataset):
+
+| filename        | percentage_match    | percentage_match_excl_singles   | percentage_single_sample_GMYC_species   | oversplitting_ratio   | oversplitting_excl_singles |
+|-----------      |-------|----- |----- |----- | ----- |
+| iteration1.tre  | 0.25  | 0.3  | 0.36 | 0.35 | 0.18 |
+| iteration2.tre  | 0.4   | 0.5  | 0.48 | 0.35 | 0.25 |
+| iteration3.tre  | 0.35  | 0.28 | 0.23 | 0.56 | 0.36 |
+| iteration4.tre  | 0.3   | 0.58 | 0.21 | 0.33 | 0.25 |
+
+And an example of the output from a 60% resampled dataset:
+
+| filename        | percentage_match    | percentage_match_excl_singles   | percentage_single_sample_GMYC_species   | oversplitting_ratio   | oversplitting_excl_singles |
+|-----------      |-------|----- |----- |----- | ----- |
+| iteration1.tre  | 0.35  | 0.36 | 0.40 | 0.45 | 0.28 |
+| iteration2.tre  | 0.45  | 0.58 | 0.65 | 0.85 | 0.36 |
+| iteration3.tre  | 0.5   | 0.38 | 0.26 | 0.66 | 0.42 |
+| iteration4.tre  | 0.45  | 0.68 | 0.28 | 0.35 | 0.2  |
+
+Select which data column you wish to extract from the dropdown menu. The algorithm pulls the desired column data from each uploaded file and binds them into one dataframe. This can then be plotted as a line graph with standard deviations. The **percentage_match** column data from the 50% and 60% resampled data will look like this:
+
+| filename        | 50    | 60   | 
+|-----------      |-------|----- |
+| iteration1.tre  | 0.25  | 0.35 | 
+| iteration2.tre  | 0.4   | 0.45 | 
+| iteration3.tre  | 0.35  | 0.5  | 
+| iteration4.tre  | 0.3   | 0.45 | 
+
+Download this as a .csv file.
+
 ## Tab: Plot for multiple-column data
-Upload a prepared file with a desired output type for each resampled dataset. For example, percentage matches excluding single-sample GMYC species for a dataset that has been resampled four times to contain 10 - 40% of the original sequences:
+Upload the dataframe downloaded from the **Amalgamate** tab and apply the desired plot settings/tweaks. Plot a boxplot and/or barplot of the data and download as a .svg file.
 
-| filename        | 10    | 20   | 30   | 40   |
-|-----------      |-------|----- |----- |----- |
-| iteration1.tre  | 0.25  | 0.3  | 0.36 | 0.35 |
-| iteration2.tre  | 0.4   | 0.5  | 0.48 | 0.54 |
-| iteration3.tre  | 0.35  | 0.28 | 0.23 | 0.36 |
-| iteration4.tre  | 0.3   | 0.58 | 0.21 | 0.33 |
-
-Prepare the file such that each column contains the percentage match data for each of the subsampled categories (here 10 to 40 %). This data comes from each separate GMYC run in the application on a desired subsampled dataset. 
