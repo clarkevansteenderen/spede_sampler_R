@@ -37,6 +37,8 @@ The GMYC species delimitation algorithm is then run on each tree using the R "sp
 Each GMYC clustering tree can be viewed and downloaded.
 If the user has predefined grouping data for their samples, this can be uploaded as an Excel csv file. These predefined groups are then compared to the groups estimated by the GMYC analysis, and a percentage match is calculated.
 
+## **FUNCTIONALITY FLOW DIAGRAM**
+
 <img src="spede_sampler_diagram.png" alt="drawing" width="1000"/>
 
 # **USAGE**
@@ -127,3 +129,4 @@ Download this as a .csv file.
 ## :memo: Tab: Plot for multiple-column data
 Upload the dataframe downloaded from the **Amalgamate** tab and apply the desired plot settings/tweaks. Plot a boxplot and/or barplot of the data and download as a .svg file.
 
+## :pencil2: **WORKED EXAMPLE**
