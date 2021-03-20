@@ -60,6 +60,7 @@ The csv file needs one column for sample names, and another for their correspond
 | MN1236    | sp3   |
 
 <br />
+
 Where the **group** column could be, for example, morphospecies.
 Select which column is the grouping, and which is the sample name column from the dropdown menus.
 
