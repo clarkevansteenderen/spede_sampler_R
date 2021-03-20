@@ -39,11 +39,11 @@ If the user has predefined grouping data for their samples, this can be uploaded
 
 ## **FUNCTIONALITY FLOW DIAGRAM**
 
-<img src="spede_sampler_diagram.png" alt="drawing" width="1000"/>
+<img src="spede_sampler_diagram.png" alt="drawing" width="900"/>
 
 # **USAGE, TAB-BY-TAB**
 
-## :green_book: Home:multiple ML trees
+## :green_book: Home: multiple ML trees
 
 Select a folder, or manually input the file path containing the files created by either FastTree or RAxML. 
 Select the approapriate radio button to indicate which ML program was used to create your tree files.
