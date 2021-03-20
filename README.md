@@ -94,7 +94,7 @@ The "View Matches Summary" button displays the average, standard deviation, and 
 Plot the percentage match (GMYC species to predefined groups) for each tree file as a line graph.
 
 ## :green_book: GMYC Oversplitting
-The "View Summary Table" button displays the mean, standard deviation, and minimum and maximum values for the predefined groups that have been split into more than one species/groups by the GMYC algorithm. 
+The "View Summary Table" button displays the mean, standard deviation, and minimum and maximum values for the predefined groups that have been split into more than one species/groups by the GMYC algorithm. A high oversplitting ratio might be due to the presence 
 This data can be plotted as a box-and-whisker or bar plot.
 
 ## :green_book: Amalgamate
@@ -128,6 +128,6 @@ Select which data column you wish to extract from the dropdown menu. The algorit
 Download this as a .csv file.
 
 ## :green_book: Plot for multiple-column data
-Upload the dataframe downloaded from the **Amalgamate** tab and apply the desired plot settings/tweaks. Plot a boxplot and/or barplot of the data and download as a .svg file.
+Upload the dataframe downloaded from the **Amalgamate** tab and apply the desired plot settings/tweaks. Plot a boxplot and/or barplot of the data and download as an .svg file.
 
 ## :pencil2: **WORKED EXAMPLE**
