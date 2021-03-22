@@ -198,4 +198,10 @@ The **View Matches** button displays the percentage matches including and exclud
 
 The output above means, for example, that the GMYC method oversplit the *Dactylopius opuntiae* predefined group into an average of 3.63 times more 'species' than expected (i.e. all the samples with the predefined group labelled "opuntiae" are expected to be grouped into one species by the GMYC method). The *D. opuntiae* sequences in this dataset were collected from various localities in the USA, and are likely different lineages/biotypes. The high value of 3.63 may therefore not be a case of incorrect 'oversplitting', but rather genuine intraspecific divisions. Each dataset needs to be analysed in the context of what is known about the organism's biology.
 
+A barplot and boxplot for this data can be created and downloaded: 
+
 <img src="worked_example_images/oversplitting_species_barplot.png" alt="drawing" width="900"/>
+
+16. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. This worked example only looked at a 50% resampled dataset, but this could be repeated on many other resampled datasets of different sizes. The **worked_example.zip** file contains a folder called **Multiple_data**, with the output from 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% resampled data.
+17. In the **Amalgamate** tab, select **Browse** under the **upload multiple .csv files with multiple columns of output data:**. Select the 10 **match_data** files, and select the desired column to extract from each file and combine into one output.
+18. In the **Plot for multiple-column data** tab, upload the amalgamated dataframe downloaded in step 17. These are all in the same **Multiple_data** folder for reference. Upload the **percent_exclu-singles.csv** file. 
