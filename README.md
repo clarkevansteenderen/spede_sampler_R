@@ -158,6 +158,14 @@ The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GU
 
 <img src="worked_example_images/plot_results.png" alt="drawing" width="900"/>
 
-12. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
+12. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. For example, select **iteration50.tre** from the dropdown menu:
 
 <img src="worked_example_images/iteration50.png" alt="drawing" width="900"/>
+
+13. The **Percentage Matches** tab shows the results of how the GMYC species designations compare to the predefined groups in the **cochineal-ids.csv** file.
+The **View GMYC species list** button shows a datatable containing each sample name with the assigned GMYC species. The corresponding predefined group given to that particular sample is appended as a third column.
+
+| GMYC_spec | sample_name | ids | 
+| ----------- | ----------- | ----------- |
+| 1 | VS086uOE | opuntiae |
+| 1 | VS086uOE | opuntiae |
