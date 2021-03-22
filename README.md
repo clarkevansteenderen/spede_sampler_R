@@ -130,4 +130,28 @@ Download this as a .csv file.
 ## :green_book: Plot for multiple-column data
 Upload the dataframe downloaded from the **Amalgamate** tab and apply the desired plot settings/tweaks. Plot a boxplot and/or barplot of the data and download as an .svg file.
 
-## :pencil2: **WORKED EXAMPLE**
+## :pencil2: **Worked Example using cochineal 12S sequences**
+
+The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GUI program that randomly resampled 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% of the 142 sequences in the 12S_aligned FASTA file. Each subsampled dataset contains 100 iterations (performed with a set seed for reproducibility). The 'cochineal_ids' csv file contains predefined species designations for easch sequence based on the host plant the specimen was collected from (the cochineal insects display high host-specificity, where a particular species will typically only feed on one cactus species). 
+
+**Steps:**
+
+1. Download the worked_example.zip and cochineal.csv files, and unzip the former.
+2. Open the SPEDE-SAMPLER-GMYC R Shiny application using the runGitHub() function as detailed in the beginning of this README file.
+3. Use the **Folder select** button or paste the file path to the **Iterations_50** folder located in the now-unzipped **worked_example** folder. This folder contains 100 tree files created from randomly resampling 50% of the 142 cochineal 12S sequences, repeated 100 times.
+4. Leave the **FastTree** radio button selected, as these example tree files were created using FastTree.
+5. Check the **Set a seed?** radio button. 
+6. Under **Upload a .csv file containing predefined groups for your samples:**, click **Browse**, and select the **cochineal_ids.csv** file.
+7. Under the **Select Group Column:** dropdown menu, select **predefined_group**. Leave the **Select Smaple Name Column** selected from the second dropdown menu.
+8. Click the **RUN** button.
+9. Once the analysis is complete, select the **View Data** tab. 
+10. The **Show all data** button displays the number of clusters and entities recorded for each of the 100 iteration files, and the **Show summary table** button displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files. 
+
+| statistic        | clusters    | entities   | 
+|-----------      |-------|----- |
+| Average  | 4.58  | 13.84 | 
+| Standard deviation  | 2.37   | 13.05 | 
+| Minimum  | 1.00  | 2.00  | 
+| Maximum  | 12.00   | 43.00 | 
+
+11. 
