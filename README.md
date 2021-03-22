@@ -154,6 +154,10 @@ The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GU
 | Minimum  | 1.00  | 2.00  | 
 | Maximum  | 12.00   | 43.00 | 
 
-11. The **Plot Results** tab allows for the plotting of the A) the number of clusters vs entities for each tree file, B) box-and-whisker plot for the clusters and entities (showing Q1, Q4, median, minimum, maximuma, and outlier values), and a line graph for the number of GMYC C) clusters and D) entities for each tree file uploaded.
+11. The **Plot Results** tab allows for the plotting of the A) the number of clusters vs entities for each tree file, B) box-and-whisker plot for the clusters and entities (showing Q1, Q3, median, minimum, maximum, and outlier values), and a line graph for the number of GMYC C) clusters and D) entities for each tree file uploaded.
 
 <img src="worked_example_images/plot_results.png" alt="drawing" width="900"/>
+
+12. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
+
+
