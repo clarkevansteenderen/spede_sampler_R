@@ -186,4 +186,14 @@ The **View Matches** button displays the percentage matches including and exclud
 
 <img src="worked_example_images/match_data_plots.png" alt="drawing" width="900"/>
 
-15. The **GMYC Oversplitting** tab displays GMYC species oversplitting relative to the user's predefined groups.
+15. The **GMYC Oversplitting** tab displays GMYC species oversplitting relative to the user's predefined groups. The **View Summary Table** button allows the user to download the mean, standard deviation, minimum and maximum oversplitting values for each predefined group.
+
+| predefined_group        | mean    | sd   | min | max |
+|-----------      |-------|----- |----- |----- |
+| opuntiae  | 3.63  | 1.65 | 2 | 9 |
+| confusus  | 2.18   | 0.40 | 2 | 3 |
+| tomentosus  | 2.73  | 0.79  | 2 | 4 |
+| austrinus  | 2.00   | NA | 2 | 4 |
+| ceylonicus  | 2.00   | NA | 2 | 2 |
+
+The output above means, for example, that the GMYC method oversplit the *Dactylopius opuntiae* predefined group into 3.63 times more 'species' than expected (i.e. all the samples with the predefined group labelled "opuntiae" are expected to be grouped into one species by the GMYC method). 
