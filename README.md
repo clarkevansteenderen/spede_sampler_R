@@ -182,5 +182,6 @@ The **View Matches** button displays the percentage matches including and exclud
 | Minimum             | 50.00  | 0.00  | 0.00  | 0.40 | 0.20 |
 | Maximum             | 100.00 | 100.00 | 94.29| 8.60 | 2.40 |
 
-14. 
+14. The **Plot Percentage matches** tab allows for the plotting of the percentage match (with or without GMYC single-sample species) for each tree file.
 
+15. The **GMYC Oversplitting** tab loo
