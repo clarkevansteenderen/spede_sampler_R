@@ -163,9 +163,24 @@ The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GU
 <img src="worked_example_images/iteration50.png" alt="drawing" width="900"/>
 
 13. The **Percentage Matches** tab shows the results of how the GMYC species designations compare to the predefined groups in the **cochineal-ids.csv** file.
-The **View GMYC species list** button shows a datatable containing each sample name with the assigned GMYC species. The corresponding predefined group given to that particular sample is appended as a third column.
+The **View GMYC species list** button shows a datatable containing each sample name with the assigned GMYC species. The corresponding predefined group given to that particular sample is appended as a third column. The first 5 rows are:
 
 | GMYC_spec | sample_name | ids | 
 | ----------- | ----------- | ----------- |
 | 1 | VS086uOE | opuntiae |
 | 1 | VS086uOE | opuntiae |
+| 1 | VS017Ofi | opuntiae |
+| 1 | VS015Ofi | opuntiae |
+| 1 | CSW004E | opuntiae |
+
+The **View Matches** button displays the percentage matches including and excluding single-sample representatives, the percentage of GMYC species represented by a single sample, and the oversplitting ratio including and excluding single-sample GMYC species. The **View Matches Summary** shows the average, standard deviation, minimum, and maximum values for these measures. 
+
+| statistic        | percentage_matches    | percentage_matches_excl_single_samples   | percentage_single_sample_GMYC_species | oversplitting_ratio | oversplitting_ratio_excl_single_sample_spp |
+|--------             |-------|----- |----- |----- |----- |
+| Average             | 83.14  | 72.34 | 45.28 | 2.77 | 0.92 |
+| Standard deviation  | 16.19  | 17.87 | 27.79 | 2.61 | 0.47 |
+| Minimum             | 50.00  | 0.00  | 0.00  | 0.40 | 0.20 |
+| Maximum             | 100.00 | 100.00 | 94.29| 8.60 | 2.40 |
+
+14. 
+
