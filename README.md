@@ -155,3 +155,5 @@ The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GU
 | Maximum  | 12.00   | 43.00 | 
 
 11. The **Plot Results** tab allows for the plotting of the A) the number of clusters vs entities for each tree file, B) box-and-whisker plot for the clusters and entities (showing Q1, Q4, median, minimum, maximuma, and outlier values), and a line graph for the number of GMYC C) clusters and D) entities for each tree file uploaded.
+
+<img src="worked_example_images/plot_results.png" alt="drawing" width="900"/>
