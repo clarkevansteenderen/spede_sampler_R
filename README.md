@@ -160,4 +160,4 @@ The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GU
 
 12. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
 
-
+<img src="worked_example_images/iteration50.png" alt="drawing" width="900"/>
