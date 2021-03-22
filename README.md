@@ -196,6 +196,6 @@ The **View Matches** button displays the percentage matches including and exclud
 | austrinus  | 2.00   | NA | 2 | 4 |
 | ceylonicus  | 2.00   | NA | 2 | 2 |
 
-The output above means, for example, that the GMYC method oversplit the *Dactylopius opuntiae* predefined group into 3.63 times more 'species' than expected (i.e. all the samples with the predefined group labelled "opuntiae" are expected to be grouped into one species by the GMYC method). 
+The output above means, for example, that the GMYC method oversplit the *Dactylopius opuntiae* predefined group into an average of 3.63 times more 'species' than expected (i.e. all the samples with the predefined group labelled "opuntiae" are expected to be grouped into one species by the GMYC method). The *D. opuntiae* sequences in this dataset were collected from various localities in the USA, and are likely different lineages/biotypes. The high value of 3.63 may therefore not be a case of incorrect 'oversplitting', but rather genuine intraspecific divisions. Each dataset needs to be analysed in the context of what is known about the organism's biology.
 
 <img src="worked_example_images/oversplitting_species_barplot.png" alt="drawing" width="900"/>
