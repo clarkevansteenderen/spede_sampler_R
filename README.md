@@ -197,3 +197,5 @@ The **View Matches** button displays the percentage matches including and exclud
 | ceylonicus  | 2.00   | NA | 2 | 2 |
 
 The output above means, for example, that the GMYC method oversplit the *Dactylopius opuntiae* predefined group into 3.63 times more 'species' than expected (i.e. all the samples with the predefined group labelled "opuntiae" are expected to be grouped into one species by the GMYC method). 
+
+<img src="worked_example_images/oversplitting_species_barplot.png" alt="drawing" width="900"/>
