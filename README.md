@@ -220,4 +220,4 @@ Below is the output from plotting two lines for A) percentage matches and B) ove
 
 <img src="worked_example_images/multiple_data_line_plot_twolines.png" alt="drawing" width="900"/>
 
-From these graphs, excluding the GMYC species represented by single samples gives consistently lower average matchs and oversplitting ratios which are more conservative.
+From these graphs, excluding the GMYC species represented by single samples gives consistently lower average matches and oversplitting ratios, which are more conservative.
