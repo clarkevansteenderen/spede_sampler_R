@@ -216,3 +216,5 @@ The first two rows of the **percentage_matches.csv** result should be:
 
 <img src="worked_example_images/multiple_data_plots.png" alt="drawing" width="900"/>
 
+Below is the output from plotting two lines for A) percentage matches and B) oversplitting ratios with and without single-sample GMYC species.
+
