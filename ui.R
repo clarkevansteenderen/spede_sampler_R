@@ -209,8 +209,6 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                     
                         tabPanel(strong("Plot for multiple-column data"),
                                  br(), br(),
-                                 textOutput("file.info"),
-                                 fileInput("multiple_input", label = "Upload a .csv file with multiple columns of output data:", accept = ".csv"),
                                  
                                  textInput("title_multiple_input", label = "Title: ", value = "Title", width = "600px"),
                                  textInput("x_lab_multiple_input", label = "X-axis label: ", value = "Resampled data (%)", width = "600px"),
@@ -218,28 +216,55 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                  #textInput("y_interval_multiple_input", label = "Y-axis tick-mark interval: ", value = "10", width = "200px"),
                                  numericInput("y_interval_multiple_input", label = "Y-axis tick-mark interval: ", value = 1, min = 1),
                                  selectInput("ggtheme_multiple", "Select ggplot Theme:", choices = names(ggthemes), selected = ggthemes["Classic"]),
+                                
                                  hr(),
+                                 h4(strong("LINE PLOT TWEAKS:")),
+                                 
+                                 selectInput("error_bar_type", label = "Select what error bars should represent: ", choices = c("ci", "sd", "se")),
+                                 selectInput("multiple_input_error_bar_colour", label = "Select a colour for the error bars: ", choices = c("grey", "lightblue", "black", "white")),
+                                 hr(),
+                                 
+                                 fluidRow(
+                                   
+                                   column(6,
+                                 br(), 
+                                 h4(strong("LINE 1")),
+                                 br(),
+                                 fileInput("multiple_input", label = "Upload a .csv file with multiple columns of output data:", accept = ".csv"),
+                                 
+                                 selectInput("multiple_input_line_type", label = 'Select a line type: ', choices = c("blank" = 0, "solid" = 1, "dashed" = 2, "dotted" = 3), selected = 1),
+                                 selectInput('multiple_input_line_col', label = "Select a line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen")),
+                                 sliderInput("multiple_input_line_width", label = "Line width: ", value = 1, min = 0.5, max = 5, step = 0.5),
+                                 sliderInput("multiple_input_point_size", label = "Point size: ", value = 1, min = 1, max = 10, step = 0.5),
+                                 selectInput("multiple_input_point_shape", label = "Point shape: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18)),
+                                 selectInput("multiple_input_point_colour", label = "Point colour: ", choices = c("blue", "lightblue", "red", "green", "forestgreen", "black", "grey"), selected = "black"),
+                                   ),
+                                 
+                                 column(6,
+                                        br(),
+                                        h4(strong("LINE 2")),
+                                        br(),
+                                        fileInput("multiple_input2", label = "Upload a .csv file with multiple columns of output data:", accept = ".csv"),
+                                        
+                                        #selectInput("error_bar_type2", label = "Select what error bars should represent: ", choices = c("ci", "sd", "se")),
+                                        selectInput("multiple_input_line_type2", label = 'Select a line type: ', choices = c("blank" = 0, "solid" = 1, "dashed" = 2, "dotted" = 3), selected = 1),
+                                        selectInput('multiple_input_line_col2', label = "Select a line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen")),
+                                        sliderInput("multiple_input_line_width2", label = "Line width: ", value = 1, min = 0.5, max = 5, step = 0.5),
+                                        sliderInput("multiple_input_point_size2", label = "Point size: ", value = 1, min = 1, max = 10, step = 0.5),
+                                        selectInput("multiple_input_point_shape2", label = "Point shape: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18)),
+                                        selectInput("multiple_input_point_colour2", label = "Point colour: ", choices = c("blue", "lightblue", "red", "green", "forestgreen", "black", "grey"), selected = "black"),
+                                 )),  
+                                 
+                                 br(), 
                                  actionButton("multiple_input_boxplot", label = strong("Boxplot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
                                  downloadButton("download_multiple_input_boxplot", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
                                  br(), br(),
                                  actionButton("plot_multiple_input", label = strong("Line Plot"), style="color: black; background-color: lightblue; border-color: steelblue", icon("drafting-compass")),
                                  downloadButton("download_multiple_input_plot", label = strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"),
+                                 br(),
+                                 checkboxInput("include_line2", label = "Include second line on line plot?"),
                                  br(), br(),
                                  
-                                 hr(),
-                                 h4(strong("LINE PLOT TWEAKS:")),
-                                 
-                                 br(), 
-                                 selectInput("error_bar_type", label = "Select what error bars should represent: ", choices = c("ci", "sd", "se")),
-                                 selectInput("multiple_input_line_type", label = 'Select a line type: ', choices = c("blank" = 0, "solid" = 1, "dashed" = 2, "dotted" = 3), selected = 1),
-                                 selectInput('multiple_input_line_col', label = "Select a line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen")),
-                                 sliderInput("multiple_input_line_width", label = "Line width: ", value = 1, min = 0.5, max = 5, step = 0.5),
-                                 selectInput("multiple_input_error_bar_color", label = "Select a colour for the error bars: ", choices = c("grey", "lightblue", "black", "white")),
-                                 sliderInput("multiple_input_point_size", label = "Point size: ", value = 1, min = 1, max = 10, step = 0.5),
-                                 selectInput("multiple_input_point_shape", label = "Point shape: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18)),
-                                 selectInput("multiple_input_point_colour", label = "Point colour: ", choices = c("blue", "lightblue", "red", "green", "forestgreen", "black", "grey"), selected = "black"),
-                                 
-                                 br(), br(),
                                  plotOutput("multiple_input_plot", height = "600px"),
                                  br(), br()
                                 
