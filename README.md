@@ -203,9 +203,18 @@ A barplot and boxplot for this data can be created and downloaded:
 <img src="worked_example_images/oversplitting_species_barplot.png" alt="drawing" width="900"/>
 
 16. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. This worked example only looked at a 50% resampled dataset, but this could be repeated on many other resampled datasets of different sizes. The **worked_example.zip** file contains a folder called **Multiple_data**, with the output from 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% resampled data.
-17. In the **Amalgamate** tab, select **Browse** under the **upload multiple .csv files with multiple columns of output data:**. Select the 10 **match_data** files, and select the desired column to extract from each file and combine into one output. Download the resulting .csv files, and rename the column headings to 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100.
-18. In the **Plot for multiple-column data** tab, upload the amalgamated dataframe downloaded in step 17. These are all in the same **Multiple_data** folder for reference. Upload the **percent_excl_singles.csv** file. Change the title to "Percentage match excluding single-sample GMYC species", and edit the y-axis label to "Match (%)". Set the y-axis tick-mark interval to 10. Plot the boxplot and line plot, with the desired tweaks (e.g. point colour, ggplot theme).
-19. Do the same to plot the **oversplitting_excl_singles.csv** file, and change the title to "Oversplitting ratio exluding single-sample GMYC species", the y-axis label to "Oversplitting ratio", and the y-axis tick-mark interval to 1.
+17. In the **Amalgamate** tab, select **Browse** under the **upload multiple .csv files with multiple columns of output data:**. Select the 10 **match_data** files, and select the desired column (e.g. **percentage_matches** and **percentage_matches_excl_single_samples**) to extract from each file and combine into one output. Download the resulting .csv files, and rename the column headings to 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100.
+The first three rows of the **percentage_matches.csv** result should be:
+
+| |15|20|30|40|50|60|70|80|90|100|
+|-------|-------|-----|-----|-----|-----|-----|-----|-----|-----|-----|
+|iteration1.tre| 83.33 | 50| 90| 95.83| 87.5|50|100|100|100|98.51|
+|iteration2.tre| 50 | 50| 85.71| 85.71| 97.22|92.31|97.06|90|90|100|
+
+
+
+19. In the **Plot for multiple-column data** tab, upload the amalgamated dataframe downloaded in step 17. These are all in the same **Multiple_data** folder for reference. Upload the **percent_excl_singles.csv** file. Change the title to "Percentage match excluding single-sample GMYC species", and edit the y-axis label to "Match (%)". Set the y-axis tick-mark interval to 10. Plot the boxplot and line plot, with the desired tweaks (e.g. point colour, ggplot theme).
+20. Do the same to plot the **oversplitting_excl_singles.csv** file, and change the title to "Oversplitting ratio exluding single-sample GMYC species", the y-axis label to "Oversplitting ratio", and the y-axis tick-mark interval to 1.
 
 <img src="worked_example_images/multiple_data_plots.png" alt="drawing" width="900"/>
 
