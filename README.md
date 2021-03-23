@@ -208,3 +208,5 @@ A barplot and boxplot for this data can be created and downloaded:
 19. Do the same to plot the **oversplitting_excl_singles.csv** file, and change the title to "Oversplitting ratio exluding single-sample GMYC species", the y-axis label to "Oversplitting ratio", and the y-axis tick-mark interval to 1.
 
 <img src="worked_example_images/multiple_data_plots.png" alt="drawing" width="900"/>
+
+If you would like the percentage matches including and excluding single-sample species
