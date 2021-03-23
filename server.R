@@ -287,6 +287,10 @@ server = function(input, output, session) {
                     
                     shinyalert::shinyalert("Complete", "Please click on the tabs at the top of the window to view the results.", type = "success")
                     
+                    gg_clust_ent = reshape2::melt(clust_ent) # get into the format the ggplot can work with
+                    colnames(gg_clust_ent) = c("filename", "gmyc_cat", "count")
+                    gg_clust_ent$gmyc_cat %>% as.factor()
+                    
                     oversplitting_species = oversplitting_species[!is.na(oversplitting_species)] # remove the NA lists
                     oversplitting_species_bound = dplyr::bind_rows(oversplitting_species)
                     oversplitting_species_bound = oversplitting_species_bound[oversplitting_species_bound$Freq > 1,] # remove rows with species that had a frequency of only one (ie those that were not oversplit)
@@ -445,16 +449,56 @@ server = function(input, output, session) {
                     
                     observeEvent(input$plot_matches, {
                         
+                        chosen_match_type = ""
+                        if( input$plot_matches_type == 1) {
+                            chosen_match_type = as.name("percentage_match")
+                            ggtit = "GMYC species match to predefined groups vs ML tree/iteration file (including single-sample species)"
+                        }
+                        else if (input$plot_matches_type == 2) {
+                            chosen_match_type = as.name("percentage_match_excl_singles")
+                            ggtit = ggtit = "GMYC species match to predefined groups vs ML tree/iteration file (excluding single-sample species)"
+                        }
+                        
                         output$match_plot = renderPlot({
-                            ggplot(record, aes(x=1:nrow(record), y=percentage_match)) + 
+                            ggplot(record, aes(x=1:nrow(record), y= .data[[chosen_match_type]])) + 
                                 geom_line(color = input$plot_matches_line_colour) + 
                                 geom_point(color = input$plot_matches_point_colours)  + 
                                 ggthemes[[input$ggtheme_matches]] +
                                 xlab("ML tree file/iteration number") + 
                                 ylab("Percentage match") + 
-                                ggtitle("GMYC species match to predefined groups vs ML tree/iteration file")
+                                ggtitle(ggtit)
                         })
                     })
+                    
+                    ################################################################################################
+                    # Download Plot of percentage match data for all files as a ggplot
+                    ################################################################################################
+                    
+                    output$download_match_plot = downloadHandler(
+                        filename = function (){paste("match_data_plot", "svg", sep = '.')},
+                        
+                        content = function (file){
+                            
+                            chosen_match_type = ""
+                            if( input$plot_matches_type == 1) {
+                                chosen_match_type = as.name("percentage_match")
+                                ggtit = "GMYC species match to predefined groups vs ML tree/iteration file (including single-sample species)"
+                            }
+                            else if (input$plot_matches_type == 2) {
+                                chosen_match_type = as.name("percentage_match_excl_singles")
+                                ggtit = ggtit = "GMYC species match to predefined groups vs ML tree/iteration file (excluding single-sample species)"
+                            }
+                            
+                            ggsave(file, ggplot(record, aes(x=1:nrow(record), y=.data[[chosen_match_type]])) + 
+                                       geom_line(color = input$plot_matches_line_colour) + 
+                                       geom_point(color = input$plot_matches_point_colours)  + 
+                                       ggthemes[[input$ggtheme_matches]] +
+                                       xlab("ML tree file/iteration number") + 
+                                       ylab("Percentage match") + 
+                                       ggtitle(ggtit))
+                        }
+                        
+                    )
                     
                     
                     ################################################################################################
@@ -663,7 +707,10 @@ server = function(input, output, session) {
                                 
                                 content = function (file){svg(file)
                                     plot.result.gmyc(tree_container[[file_index]], cex = tip_label_size, edge.width = branch_width)
-                                    nodelabels(round(support, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
+                                    if (input$support_value_type == "GMYC estimate") nodelabels(round(support_gmyc, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
+                                    
+                                    else nodelabels(round(support_original_tree, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
+                                    
                                     dev.off()
                                 }
                             )
@@ -678,16 +725,16 @@ server = function(input, output, session) {
                     # Download clusters vs entities plot
                     ################################################################################################
                     
-                    output$download_clust_plot <- downloadHandler(
+                    output$download_clust_plot = downloadHandler(
                         
                         filename = function (){paste("clust_vs_ent_plot", "svg", sep = '.')},
                         
                         content = function (file){
-                            ggplot(clust_ent, aes(x=clusters, y=entities)) + geom_point(colour = input$clust_vs_ent_plot_point_colours) +
+                            ggsave(file, ggplot(clust_ent, aes(x=clusters, y=entities)) + geom_point(colour = input$clust_vs_ent_plot_point_colours) +
                                 xlab("Clusters") + 
                                 ylab("Entities") +
                                 ggthemes[[input$ggtheme_plots]] +
-                                ggtitle("Number of Clusters vs Entities for GMYC")
+                                ggtitle("Number of Clusters vs Entities for GMYC") )
                             
                         }
                     )
@@ -697,10 +744,6 @@ server = function(input, output, session) {
                     ################################################################################################
                     
                     observeEvent(input$plot_boxplot, {
-                        
-                        gg_clust_ent = reshape2::melt(clust_ent) # get into the format the ggplot can work with
-                        colnames(gg_clust_ent) = c("filename", "gmyc_cat", "count")
-                        gg_clust_ent$gmyc_cat %>% as.factor()
                         
                         output$clust_ent_plot = renderPlot({
                             
@@ -875,13 +918,12 @@ server = function(input, output, session) {
                                    xlab(input$x_lab_multiple_input) +
                                    ylab(input$y_lab_multiple_input) +
                                    ggtitle(input$title_multiple_input) + 
-                                   ggthemes[[input$ggtheme]] 
+                                   ggthemes[[input$ggtheme_multiple]] 
                         )
                     }
                 )
                 
             })
-            
             
             observeEvent(input$plot_multiple_input, {
                 
@@ -915,7 +957,7 @@ server = function(input, output, session) {
                                    ylab(input$y_lab_multiple_input) +
                                    scale_y_continuous(breaks = seq(floor(min(stats_multiple_data$measure)), ceiling(max(stats_multiple_data$measure)), by = input$y_interval_multiple_input)) +
                                    ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
-                                   ggthemes[[input$ggtheme]] 
+                                   ggthemes[[input$ggtheme_multiple]] 
                         )
                     }
                     
