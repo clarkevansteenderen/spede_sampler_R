@@ -222,7 +222,7 @@ Below is the output from plotting two lines for A) percentage matches and B) ove
 
 From these graphs, excluding the GMYC species represented by single samples gives consistently lower average matches and oversplitting ratios, which are more conservative.
 
-20. The **Amalgamate** tab can also be used to merge the clusters and entities output. In this tab, upload all ten **clust_ent_data.csv** files in the **Clusters_entities** folder. First select **clusters** fromn the dropdown menu and download the result, and then do the same for the **entities** column. These have been saved as **clusters_comnbo.csv** and **entities_combo.csv** in the **Amalgamated** folder.
+20. The **Amalgamate** tab can also be used to merge the clusters and entities output. In this tab, upload all ten **clust_ent_data.csv** files in the **Clusters_entities** folder. First select **clusters** fromn the dropdown menu and download the result, and then do the same for the **entities** column. These have been saved as **clusters_comnbo.csv** and **entities_combo.csv** in the **Amalgamated** folder. Change the column headings to 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100.
 21. In the **Plot for multiple-column data** tab, change the title to "Clusters and entities", and the y-axis label to "Number of clusters or entities". For Line 1 and Line 2, upload the clusters_combo and entities_combo in any order. Select the "Include second line on line plot?" checkbox, and change the line labels accordingly. Plot the chart.
 
-23. Upload each amalgamated dataset separately (**clusters** as Line 1, and then re-upload **entities** as Line 1 thereafter) in the **Plot for multiple-column data** tab.
+<img src="worked_example_images/multiple_data_line_plot_clust_ent.png" alt="drawing" width="900"/>
