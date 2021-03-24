@@ -125,7 +125,7 @@ Upload the dataframe downloaded from the **Amalgamate** tab and apply the desire
 
 ## :pencil2: **Worked Example using cochineal 12S sequences**
 
-The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GUI program that randomly resampled 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% of the 142 sequences in the 12S_aligned FASTA file. Each subsampled dataset contains 100 iterations (performed with a set seed for reproducibility). The 'cochineal_ids' csv file contains predefined species designations for easch sequence based on the host plant the specimen was collected from (the cochineal insects display high host-specificity, where a particular species will typically only feed on one cactus species). 
+The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GUI program that randomly resampled 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% of the 142 sequences in the 12S_aligned FASTA file. Each subsampled dataset contains 100 iterations (performed with a set seed for reproducibility). The 'cochineal_ids' csv file contains predefined species designations for easch sequence based on the host plant the specimen was collected from (the cochineal insects display high host-specificity, where a particular species will typically only feed on one cactus species). See the associated [journal article](https://www.sciencedirect.com/science/article/pii/S1049964420306538) for more information about these insects and genetic sequences.
 
 **Steps:**
 
