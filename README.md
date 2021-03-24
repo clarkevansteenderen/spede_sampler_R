@@ -24,7 +24,7 @@ To run this app through R, type the following into the console:
 
 ## **OVERVIEW**
 
-This R Shiny App is the final step of the analysis pipeline following from the SPEDE-SAMPLER Python program (see the diagram below). The application requires the user to input a folder directory containing all the tree files created by FastTree or RAxML. If the user wishes to run the analysis on only one tree, this tree file needs to be saved into a folder first, which can then be selected.
+This R Shiny App is the final step of the analysis pipeline following from the [SPEDE-SAMPLER Python program](https://github.com/CJMvS/spede-sampler-py) (see the diagram below). The application requires the user to input a folder directory containing all the tree files created by FastTree or RAxML. If the user wishes to run the analysis on only one tree, this tree file needs to be saved into a folder first, which can then be selected.
 Using the "ape" package, each tree is opened and converted to become fully dichotomous (**multi2di()** function) and ultrametric (**chronos()** function).
 The GMYC species delimitation algorithm is then run on each tree using the R "splits" package. The number of clusters and entities for each tree is recorded in a dataframe, and can be downloaded and/or plotted in the application under the "Plot Results" tab.
 Each GMYC clustering tree can be viewed and downloaded.
