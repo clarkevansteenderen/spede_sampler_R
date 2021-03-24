@@ -26,9 +26,14 @@ To run this app through R, type the following into the console:
 
 This R Shiny App is the final step of the analysis pipeline following from the [SPEDE-SAMPLER Python program](https://github.com/CJMvS/spede-sampler-py) (see the diagram below). The application requires the user to input a folder directory containing all the tree files created by FastTree or RAxML. If the user wishes to run the analysis on only one tree, this tree file needs to be saved into a folder first, which can then be selected.
 Using the "ape" package, each tree is opened and converted to become fully dichotomous (**multi2di()** function) and ultrametric (**chronos()** function).
-The GMYC species delimitation algorithm is then run on each tree using the R "splits" package. The number of clusters and entities for each tree is recorded in a dataframe, and can be downloaded and/or plotted in the application under the "Plot Results" tab.
-Each GMYC clustering tree can be viewed and downloaded.
-If the user has predefined grouping data for their samples, this can be uploaded as an Excel csv file. These predefined groups are then compared to the groups estimated by the GMYC analysis, and a percentage match is calculated.
+The GMYC species delimitation algorithm is then run on each tree using the R "splits" package. 
+If the user has predefined grouping data for their samples, this can be uploaded as an Excel .csv file. These predefined groups are then compared to the groups estimated by the GMYC analysis, and a percentage match is calculated.
+This application outputs:
+1. The number of clusters and entities estimated by the GMYC method for the uploaded data
+2. The percentage matches between predefined groupings and GMYC species estimates; with and without GMYC species represented by single-samples
+3. Oversplitting ratios (the ratio of the number of GMYC species to predefined groups)
+4. Which predefined groups were split into more than one GMYC species 
+5. Summary plots for the results of multiple GMYC results 
 
 ## **FUNCTIONALITY FLOW DIAGRAM**
 
