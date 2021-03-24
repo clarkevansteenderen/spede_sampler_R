@@ -2,12 +2,11 @@
 
 # SPEDE-SAMPLER (GMYC)
 
-*Created by:*
-*Clarke van Steenderen*
-*Department of Zoology and Entomology*
-[*The Centre for Biological Control*](https://www.ru.ac.za/centreforbiologicalcontrol/)
-*Rhodes University, Grahamstown, Eastern Cape, South Africa*
-*2021*
+*Clarke van Steenderen* <br />
+*Department of Zoology and Entomology* <br />
+[*The Centre for Biological Control*](https://www.ru.ac.za/centreforbiologicalcontrol/) <br />
+*Rhodes University, Grahamstown, Eastern Cape, South Africa* <br />
+*2021* <br />
 *e-mail:* vsteenderen@gmail.com
 
 ---
