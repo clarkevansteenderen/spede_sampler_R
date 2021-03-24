@@ -891,12 +891,11 @@ server = function(input, output, session) {
                 return(NULL)
             }
             
-            
             multiple_data = read.csv(infile_multiple$datapath, check.names = F)
             multiple_data =  reshape2::melt(multiple_data)
             colnames(multiple_data) = c("file_name", "data_percentage", "measure1")
             stats_multiple_data = Rmisc::summarySE(multiple_data, measurevar = "measure1", groupvars = "data_percentage")
-
+            
             observeEvent(input$multiple_input_boxplot, {
                 
                 output$multiple_input_plot = renderPlot({
@@ -928,14 +927,6 @@ server = function(input, output, session) {
                 
             })
             
-            # data for line graph 2
-            
-            infile_multiple2 = input$multiple_input2
-            
-            if (is.null(infile_multiple2)) {
-                return(NULL)
-            }
-            
             
             observeEvent(input$plot_multiple_input, {
                 
@@ -952,8 +943,18 @@ server = function(input, output, session) {
                     ggthemes[[input$ggtheme_multiple]] 
                 
                 }
+                
                     
                 else if(input$include_line2 == TRUE){
+                    
+                    # data for line graph 2
+                    
+                    infile_multiple2 = input$multiple_input2
+                    
+                    if (is.null(infile_multiple2)) {
+                        return(NULL)
+                    }
+                    
                     
                     multiple_data2 = read.csv(infile_multiple2$datapath, check.names = F)
                     multiple_data2 =  reshape2::melt(multiple_data2)
@@ -969,19 +970,21 @@ server = function(input, output, session) {
                     multi_plot = ggplot(match_summ, aes(x=data_percentage, y=measure1)) +
                         
                         geom_errorbar(aes(ymin=measure1 - eval(as.name(paste( input$error_bar_type, "_1", sep = "") )), ymax=measure1 + eval(as.name(paste( input$error_bar_type, "_1", sep = "") ))), width=.1, color = input$multiple_input_error_bar_colour) +
-                        geom_line(aes(group = 1), lty = as.numeric( input$multiple_input_line_type ), color = input$multiple_input_line_col, lwd = input$multiple_input_line_width) +
+                        geom_line(aes(group = 1, color = "measure1"), lty = as.numeric( input$multiple_input_line_type ), lwd = input$multiple_input_line_width) +
                         geom_point(size = input$multiple_input_point_size, shape = as.numeric( input$multiple_input_point_shape), colour = input$multiple_input_point_colour ) + 
                         
                         geom_errorbar(aes(ymin=measure2 - eval(as.name(paste( input$error_bar_type, "_2", sep = "") )), ymax=measure2 + eval(as.name(paste( input$error_bar_type, "_2", sep = "") ))), width=.1, color = input$multiple_input_error_bar_colour) +
-                        geom_line(group = 1, aes(x=data_percentage, y=measure2), lty = as.numeric( input$multiple_input_line_type2 ), color = input$multiple_input_line_col2, lwd = input$multiple_input_line_width2) +
+                        geom_line(group = 1, aes(x=data_percentage, y=measure2, color = "measure2"), lty = as.numeric( input$multiple_input_line_type2 ), lwd = input$multiple_input_line_width2) +
                         geom_point(aes(x=data_percentage, y=measure2), size = input$multiple_input_point_size2, shape = as.numeric( input$multiple_input_point_shape2), colour = input$multiple_input_point_colour2 ) + 
                         
                         xlab(input$x_lab_multiple_input) +
                         ylab(input$y_lab_multiple_input) +
                         #scale_y_continuous(breaks = seq(floor(min(match_summ$measure1)), ceiling(max(match_summ$measure1)), by = input$y_interval_multiple_input)) +
                         ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
-                        ggthemes[[input$ggtheme_multiple]] 
-                    
+                        ggthemes[[input$ggtheme_multiple]] +
+                        
+                        scale_colour_manual(values = c(input$multiple_input_line_col, input$multiple_input_line_col2), labels = c(input$line1_lab, input$line2_lab)) +
+                        guides(color=guide_legend("Key"))
                 }
                 
                 # the eval(as.name()) method solved the issue of passing a string parameter to one without quotes for use in ggpplot
@@ -999,7 +1002,7 @@ server = function(input, output, session) {
                     filename = function (){paste("multiple_data_line_plot", "svg", sep = '.')},
                     
                     content = function (file){
-                        ggsave(file, multi_plot
+                        ggsave(file, multi_plot, width = input$ggplot_width, height = input$ggplot_height, units = "cm"
                         )
                     }
                     

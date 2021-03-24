@@ -214,7 +214,7 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                  textInput("x_lab_multiple_input", label = "X-axis label: ", value = "Resampled data (%)", width = "600px"),
                                  textInput("y_lab_multiple_input", label = "Y-axis label: ", value = "Measure variable", width = "600px"),
                                  #textInput("y_interval_multiple_input", label = "Y-axis tick-mark interval: ", value = "10", width = "200px"),
-                                 numericInput("y_interval_multiple_input", label = "Y-axis tick-mark interval: ", value = 1, min = 1),
+                                 #numericInput("y_interval_multiple_input", label = "Y-axis tick-mark interval: ", value = 1, min = 1),
                                  selectInput("ggtheme_multiple", "Select ggplot Theme:", choices = names(ggthemes), selected = ggthemes["Classic"]),
                                 
                                  hr(),
@@ -256,13 +256,24 @@ ui <- fluidPage(theme = shinytheme("flatly"),
                                  )),  
                                  
                                  br(), 
+                                 
+                                 
                                  actionButton("multiple_input_boxplot", label = strong("Boxplot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
                                  downloadButton("download_multiple_input_boxplot", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
+                                 
                                  br(), br(),
                                  actionButton("plot_multiple_input", label = strong("Line Plot"), style="color: black; background-color: lightblue; border-color: steelblue", icon("drafting-compass")),
                                  downloadButton("download_multiple_input_plot", label = strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"),
+                                 
+                                 br(), br(),
+                                 strong(h4("Plot dimensions if downloading: ")),
+                                 numericInput("ggplot_width", "Plot width (cm): ", min = 1, value = 20),
+                                 numericInput("ggplot_height", "Plot height (cm): ", min = 1, value = 15),
+                                 
                                  br(),
                                  checkboxInput("include_line2", label = "Include second line on line plot?"),
+                                 textInput("line1_lab", "Line 1 label: ", value = "Line 1"),
+                                 textInput("line2_lab", "Line 2 label: ", value = "Line 2"),
                                  br(), br(),
                                  
                                  plotOutput("multiple_input_plot", height = "600px"),
