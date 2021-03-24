@@ -145,7 +145,7 @@ The 'worked_example' zip file contains the output of the SPEDE-SAMPLER Python GU
 7. Under the **Select Group Column:** dropdown menu, select **predefined_group**. Leave the **Select Smaple Name Column** selected from the second dropdown menu.
 8. Click the **RUN** button.
 9. Once the analysis is complete, select the **View Data** tab. 
-10. The **Show all data** button displays the number of clusters and entities recorded for each of the 100 iteration files, and the **Show summary table** button displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files. 
+10. The **Show all data** button displays the number of clusters and entities recorded for each of the 100 iteration files, and the **Show summary table** button displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files. The **Clusters_entities** folder (**worked_example** --> **Multiple_data**) contains the number of clusters and entities for each tree file for the 15 - 100% resampled datasets. 
 
 | statistic        | clusters    | entities   | 
 |-----------      |-------|----- |
@@ -212,7 +212,7 @@ The first two rows of the **percentage_matches.csv** result should be:
 |iteration2.tre| 50 | 50| 85.71| 85.71| 97.22|92.31|97.06|90|90|100|
 
 18. In the **Plot for multiple-column data** tab, upload the amalgamated dataframe downloaded in step 17. These are all in the same **Multiple_data** folder for reference. Upload the **percent_excl_singles.csv** file under **LINE 1** and **oversplitting_excl_singles.csv** under **LINE 2**. Change the title to "Percentage match excluding single-sample GMYC species", and edit the y-axis label to "Match (%)". Set the y-axis tick-mark interval to 10. Plot the boxplot and line plot, with the desired tweaks (e.g. point colour, ggplot theme). 
-19. Plot a boxplot, or the line plot with either one or both lines displayed. To add the second line, select the **Include second line on line plot** check box.
+19. Plot a boxplot, or the line plot with either one or both lines displayed. To add the second line, select the **Include second line on line plot** check box. Note that the boxplot button plots the data that was uploaded as Line 1. 
 
 <img src="worked_example_images/multiple_data_plots.png" alt="drawing" width="900"/>
 
@@ -221,3 +221,8 @@ Below is the output from plotting two lines for A) percentage matches and B) ove
 <img src="worked_example_images/multiple_data_line_plot_twolines.png" alt="drawing" width="900"/>
 
 From these graphs, excluding the GMYC species represented by single samples gives consistently lower average matches and oversplitting ratios, which are more conservative.
+
+20. The **Amalgamate** tab can also be used to merge the clusters and entities output. In this tab, upload all ten **clust_ent_data.csv** files in the **Clusters_entities** folder. First select **clusters** fromn the dropdown menu and download the result, and then do the same for the **entities** column. These have been saved as **clusters_comnbo.csv** and **entities_combo.csv** in the **Amalgamated** folder.
+21. In the **Plot for multiple-column data** tab, change the title to "Clusters and entities", and the y-axis label to "Number of clusters or entities". For Line 1 and Line 2, upload the clusters_combo and entities_combo in any order. Select the "Include second line on line plot?" checkbox, and change the line labels accordingly. Plot the chart.
+
+23. Upload each amalgamated dataset separately (**clusters** as Line 1, and then re-upload **entities** as Line 1 thereafter) in the **Plot for multiple-column data** tab.
