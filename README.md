@@ -1,6 +1,4 @@
-<img src="https://github.com/CJMvS/spede-sampler/blob/main/spede_sampler_gmyc_logo.png" height="200" align="right">
-
-# SPEDE-SAMPLER (GMYC)
+<img src="https://github.com/CJMvS/spede-sampler/blob/main/spede_sampler_gmyc_logo.png" height="200" align="center">
 
 *Clarke van Steenderen* <br />
 *Department of Zoology and Entomology* <br />
