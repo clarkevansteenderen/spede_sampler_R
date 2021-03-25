@@ -7,7 +7,6 @@ ggthemes = list("Classic" = theme_classic(),
                 "Black/White" = theme_bw(),
                 "Void" = theme_void())
 
-
 server = function(input, output, session) {
     
     # tell the shinyhelper package what the file name of the help file is
@@ -68,7 +67,6 @@ server = function(input, output, session) {
                 ################################################################################################
                 
                 if (length(path()) == 0 && manual_file_path != "") {
-                    
                     path = manual_file_path
                     setwd(path)
                 }
@@ -126,7 +124,6 @@ server = function(input, output, session) {
                     ################################################################################################
                     
                     withProgress(message = 'Running GMYC', value = 0, {
-                        
                         
                         for(i in seq(along=files)) {
                             
@@ -269,15 +266,12 @@ server = function(input, output, session) {
                             
                             ################################################################################################
                             
-                            ################################################################################################
-                            
                             # Increment the progress bar, and update the detail text.
                             incProgress(1/length(files), detail = paste("Processing tree file ", i, " of ", length(files)))
                             # Pause for 0.1 seconds to simulate a long computation.
                             Sys.sleep(0.1)
                             
                         } # end of for loop
-                        
                         
                     }) # end of progress bar bracket
                     
@@ -298,7 +292,6 @@ server = function(input, output, session) {
                     
                     colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
                     
-                    
                     ################################################################################################
                     # View the GMYC species table with the predefined grouping information appended as the last column
                     ################################################################################################
@@ -309,7 +302,6 @@ server = function(input, output, session) {
                         file_i = which(files == gmyc_spec_to_show) # get the index of that file to match up with the trees stored in the spec_list_container list
                         
                         output$matches = renderTable(gmyc_spec_container[[file_i]], rownames = FALSE, colnames = TRUE, digits = 0)
-                        
                         
                         ################################################################################################
                         # Download GMYC species table
@@ -387,7 +379,6 @@ server = function(input, output, session) {
                         
                         if(nrow(oversplitting_species_bound) > 0){
                             
-                            
                             output$GMYC_oversplit_plot = renderPlot({
                                 
                                 ggplot(data = mean_oversplits_per_grp, aes(x=predefined_group, y=mean)) + 
@@ -397,7 +388,6 @@ server = function(input, output, session) {
                                     ylab("Mean frequency") +
                                     ggthemes[[input$GMYC_oversplit_ggtheme]] 
                             })
-                            
                             
                         }
                         
@@ -496,7 +486,6 @@ server = function(input, output, session) {
                         
                     )
                     
-                    
                     ################################################################################################
                     # view the match data summary for all files (mean, stdev etc.)
                     ################################################################################################
@@ -566,9 +555,7 @@ server = function(input, output, session) {
                             content = function (file){write.csv(match_stats.df, file, row.names = FALSE)}
                         )
                         
-                        
                     })
-                    
                     
                     observeEvent(input$all_data, {
                         output$data_table =  renderTable(clust_ent, rownames = FALSE, colnames = TRUE, digits = 0)
@@ -605,7 +592,6 @@ server = function(input, output, session) {
                         output$data_table =  renderTable(stats.df, rownames = FALSE, colnames = TRUE, digits = 2)
                     })
                     
-                    
                     ################################################################################################
                     # Plot entities vs clusters
                     ################################################################################################
@@ -640,7 +626,6 @@ server = function(input, output, session) {
                             support_value_col = input$support_value_col
                             support_value_frame = input$support_value_frame
                             branch_col = input$branch_col
-                            
                             
                             ####################################################################################################################################
                             # Function to plot the gmyc as an alternative to plot_gmyc()
@@ -691,22 +676,17 @@ server = function(input, output, session) {
                             
                             else nodelabels(round(support_original_tree, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
                             
-                            
                             ################################################################################################
                             # Download GMYC tree
                             ################################################################################################
                             
-                            
                             output$download_gmyc_tree <- downloadHandler(
                                 
                                 filename = function (){paste(files[file_index], "svg", sep = '.')},
-                                
                                 content = function (file){svg(file)
                                     plot.result.gmyc(tree_container[[file_index]], cex = tip_label_size, edge.width = branch_width)
                                     if (input$support_value_type == "GMYC estimate") nodelabels(round(support_gmyc, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
-                                    
                                     else nodelabels(round(support_original_tree, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
-                                    
                                     dev.off()
                                 }
                             )
@@ -753,9 +733,7 @@ server = function(input, output, session) {
                     ################################################################################################
                     
                     output$download_boxplot <- downloadHandler(
-                        
                         filename = function (){paste("clust_ent_boxplot", "svg", sep = '.')},
-                        
                         content = function (file){
                             ggsave(file, ggplot( gg_clust_ent, aes(x=gmyc_cat, y=count)) + geom_boxplot() +
                                        ggthemes[[input$ggtheme_plots]] +
@@ -994,14 +972,11 @@ server = function(input, output, session) {
                         ggsave(file, multi_plot, width = input$ggplot_width, height = input$ggplot_height, units = "cm"
                 )
                     }
-                    
                 )
-                
             })
             
         }) # end of observe
         
-   
     #########################################################################################################################
     # Upload multiple .csv files to extract a chosen column from each, and merge all those columns into one amalgamated file
     #########################################################################################################################
