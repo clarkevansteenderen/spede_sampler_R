@@ -1,4 +1,4 @@
-<img src="https://github.com/CJMvS/spede-sampler/blob/main/www/spede_sampler_R_logo.png" height="200" align="right">
+<img src="https://github.com/CJMvS/spede-sampler/blob/main/spede_sampler_gmyc_logo.png" height="200" align="right">
 
 # SPEDE-SAMPLER (GMYC)
 
