@@ -26,6 +26,7 @@ This R Shiny App is the final step of the analysis pipeline following from the [
 Using the "ape" package, each tree is opened and converted to become fully dichotomous (**multi2di()** function) and ultrametric (**chronos()** function).
 The GMYC species delimitation algorithm is then run on each tree using the R "splits" package. 
 If the user has predefined grouping data for their samples, this can be uploaded as an Excel .csv file. These predefined groups are then compared to the groups estimated by the GMYC analysis, and a percentage match is calculated.
+
 This application outputs:
 1. The number of clusters and entities estimated by the GMYC method for the uploaded data
 2. The percentage matches between predefined groupings and GMYC species estimates; with and without GMYC species represented by single-samples
@@ -62,13 +63,13 @@ Select which column is the grouping, and which is the sample name column from th
 
 Click the "Run" button to start the GMYC analysis. 
 
-## :green_book: View Data
+## :blue_book: View Data
 
 "Show all data" prints the number of clusters and entities and clusters for each tree file, and "Show summary table" displays the mean, standard deviation, and minimum and maximum values for all the data.
 
 When downloading, add the .csv extension manually to the file name.
 
-## :green_book: Plot Results
+## :orange_book: Plot Results
 
 Display and plot the results for:
 
@@ -78,7 +79,7 @@ Display and plot the results for:
 
 When downloading these plots, add the .svg extension to the file name.
 
-## :green_book: Plot Trees
+## :closed_book: Plot Trees
 Plot any individual GMYC tree with GMYC support values, or original bootstrap support values.
 
 ## :green_book: Percentage Matches
@@ -86,14 +87,14 @@ Select any input tree file, and click on the "View GMYC species list" button to 
 Click on "View Matches" to view the percentage match including and excluding single-sample GMYC-species, the percentage of single-sample GMYC species, and the oversplitting ratio including and excluding single-sample GMYC-species. 
 The "View Matches Summary" button displays the average, standard deviation, and minimum and maximum values for the above statistics.
 
-## :green_book: Plot Percentage Matches
+## :blue_book: Plot Percentage Matches
 Plot the percentage match (GMYC species to predefined groups) for each tree file as a line graph.
 
-## :green_book: GMYC Oversplitting
+## :orange_book: GMYC Oversplitting
 The "View Summary Table" button displays the mean, standard deviation, and minimum and maximum values for the predefined groups that have been split into more than one species/groups by the GMYC algorithm. A high oversplitting ratio might be due to the presence 
 This data can be plotted as a box-and-whisker or bar plot.
 
-## :green_book: Amalgamate
+## :closed_book: Amalgamate
 Upload multiple .csv files containing the output downloaded from the **Percentage Matches** tab. These have the following column layout (e.g. the output for a 50% resampled dataset):
 
 | filename        | percentage_match    | percentage_match_excl_singles   | percentage_single_sample_GMYC_species   | oversplitting_ratio   | oversplitting_excl_singles |
