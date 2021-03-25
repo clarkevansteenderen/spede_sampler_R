@@ -39,11 +39,6 @@ server = function(input, output, session) {
         updateSelectInput(session,"col.group", choices=colnames(groups))
         updateSelectInput(session,"sample_names", choices=colnames(groups))
         
-        
-        
-        ################################################################################################
-        
-        
         ################################################################################################
         # Run the GMYC analysis
         ################################################################################################
@@ -83,7 +78,6 @@ server = function(input, output, session) {
                 ################################################################################################
                 
                 else setwd(path())
-                # output$wd = renderPrint({getwd()}) # this checks if the wd has been set accordingly
                 
                 ml_input_type = input$data_type
                 
@@ -195,6 +189,8 @@ server = function(input, output, session) {
                                 colnames(matches.df) = c("GMYC_spec", "match(y/n)") 
                                 matches.df$GMYC_spec = 1:nrow(matches.df) 
                                 
+                                # keep counts of the number of "yes", "no", and "single-sample" species:
+                                
                                 y_count = 0
                                 n_count = 0
                                 single_sample_count = 0
@@ -236,6 +232,8 @@ server = function(input, output, session) {
                                 
                                 prop_single_samples = round(single_sample_count/nrow(matches.df) * 100, 2)
                                 
+                                # populate the "record" dataframe
+                                
                                 record[i,2] = success_incl_singles
                                 record[i,3] = success_excl_singles
                                 record[i,4] = prop_single_samples
@@ -249,9 +247,7 @@ server = function(input, output, session) {
                                 # oversplitting ratio excluding single species
                                 record[i,6] = round( num_gmyc_groups_excluding_single_spp/num_predefined_groups, 2 )
                                 
-                                # find which species are being oversplit
-                                
-                                # find which species are being oversplit
+                                # find which species are being over-split:
                                 
                                 yes_indices = which(matches.df$`match(y/n)` == "y")
                                 
@@ -403,7 +399,7 @@ server = function(input, output, session) {
                             })
                             
                             
-                        }# end of if
+                        }
                         
                         else shinyalert::shinyalert("No oversplits", "None of your predefined groups were oversplit by the GMYC algorithm", type = "info")
                         
@@ -715,11 +711,9 @@ server = function(input, output, session) {
                                 }
                             )
                             
-                            
                         })
                         
                     })
-                    
                     
                     ################################################################################################
                     # Download clusters vs entities plot
@@ -867,8 +861,6 @@ server = function(input, output, session) {
                     
                     ################################################################################################
                     
-                    
-                    
                 }# end of else 1
                 
             }# end of else 2
@@ -892,9 +884,11 @@ server = function(input, output, session) {
             }
             
             multiple_data = read.csv(infile_multiple$datapath, check.names = F)
-            multiple_data =  reshape2::melt(multiple_data)
+            multiple_data =  reshape2::melt(multiple_data) # get the data into a ggplot-friendly format
             colnames(multiple_data) = c("file_name", "data_percentage", "measure1")
-            stats_multiple_data = Rmisc::summarySE(multiple_data, measurevar = "measure1", groupvars = "data_percentage")
+            stats_multiple_data = Rmisc::summarySE(multiple_data, measurevar = "measure1", groupvars = "data_percentage") # get the summary statistics for the data
+            
+            # plot a boxplot for the data uploaded for Line 1
             
             observeEvent(input$multiple_input_boxplot, {
                 
@@ -908,6 +902,8 @@ server = function(input, output, session) {
                         ggthemes[[input$ggtheme_multiple]] 
                     
                 })
+                
+                # Download the boxplot
             
                 output$download_multiple_input_boxplot = downloadHandler(
                     
@@ -927,10 +923,11 @@ server = function(input, output, session) {
                 
             })
             
+            # Plot the line chart
             
             observeEvent(input$plot_multiple_input, {
                 
-                if(input$include_line2 == FALSE){
+                if(input$include_line2 == FALSE){ # plot only Line 1 if the radio button to include the second line is not selected
                     
                 multi_plot = ggplot(stats_multiple_data, aes(x=data_percentage, y=measure1)) + 
                     geom_errorbar(aes(ymin=measure1 - eval(as.name( input$error_bar_type )), ymax=measure1 + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_colour) +
@@ -938,14 +935,12 @@ server = function(input, output, session) {
                     geom_point(size = input$multiple_input_point_size, shape = as.numeric( input$multiple_input_point_shape), colour = input$multiple_input_point_colour ) + 
                     xlab(input$x_lab_multiple_input) +
                     ylab(input$y_lab_multiple_input) +
-                    #scale_y_continuous(breaks = seq(floor(min(stats_multiple_data$measure)), ceiling(max(stats_multiple_data$measure)), by = input$y_interval_multiple_input)) +
                     ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
                     ggthemes[[input$ggtheme_multiple]] 
                 
                 }
                 
-                    
-                else if(input$include_line2 == TRUE){
+                else if(input$include_line2 == TRUE){ # if the user selected the radio button to include the second line
                     
                     # data for line graph 2
                     
@@ -955,55 +950,49 @@ server = function(input, output, session) {
                         return(NULL)
                     }
                     
-                    
                     multiple_data2 = read.csv(infile_multiple2$datapath, check.names = F)
-                    multiple_data2 =  reshape2::melt(multiple_data2)
+                    multiple_data2 =  reshape2::melt(multiple_data2) # get the data into a ggplot-friendly format
                     colnames(multiple_data2) = c("file_name", "data_percentage", "measure2")
-                    stats_multiple_data2 = Rmisc::summarySE(multiple_data2, measurevar = "measure2", groupvars = "data_percentage")
+                    stats_multiple_data2 = Rmisc::summarySE(multiple_data2, measurevar = "measure2", groupvars = "data_percentage") # get the summary statistics for the data
                     
-                    
-                    match_summ = cbind(stats_multiple_data, stats_multiple_data2[3:6])
+                    match_summ = cbind(stats_multiple_data, stats_multiple_data2[3:6]) # bind the columns for the data for line 1 with that of line 2
                     colnames(match_summ)[4:6] = c("sd_1", "se_1", "ci_1")
                     colnames(match_summ)[8:10] = c("sd_2", "se_2", "ci_2")
                     
-                    
                     multi_plot = ggplot(match_summ, aes(x=data_percentage, y=measure1)) +
-                        
+                        # the eval(as.name()) method solved the issue of passing a string parameter to one without quotes for use in ggpplot
                         geom_errorbar(aes(ymin=measure1 - eval(as.name(paste( input$error_bar_type, "_1", sep = "") )), ymax=measure1 + eval(as.name(paste( input$error_bar_type, "_1", sep = "") ))), width=.1, color = input$multiple_input_error_bar_colour) +
                         geom_line(aes(group = 1, color = "measure1"), lty = as.numeric( input$multiple_input_line_type ), lwd = input$multiple_input_line_width) +
                         geom_point(size = input$multiple_input_point_size, shape = as.numeric( input$multiple_input_point_shape), colour = input$multiple_input_point_colour ) + 
                         
+                        # add the data for the second line:
+                        ################################################################################################################
                         geom_errorbar(aes(ymin=measure2 - eval(as.name(paste( input$error_bar_type, "_2", sep = "") )), ymax=measure2 + eval(as.name(paste( input$error_bar_type, "_2", sep = "") ))), width=.1, color = input$multiple_input_error_bar_colour) +
                         geom_line(group = 1, aes(x=data_percentage, y=measure2, color = "measure2"), lty = as.numeric( input$multiple_input_line_type2 ), lwd = input$multiple_input_line_width2) +
                         geom_point(aes(x=data_percentage, y=measure2), size = input$multiple_input_point_size2, shape = as.numeric( input$multiple_input_point_shape2), colour = input$multiple_input_point_colour2 ) + 
-                        
+                        ################################################################################################################
+                    
                         xlab(input$x_lab_multiple_input) +
                         ylab(input$y_lab_multiple_input) +
-                        #scale_y_continuous(breaks = seq(floor(min(match_summ$measure1)), ceiling(max(match_summ$measure1)), by = input$y_interval_multiple_input)) +
                         ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
                         ggthemes[[input$ggtheme_multiple]] +
                         
+                        # add a legend with the line colour for each data set
                         scale_colour_manual(values = c(input$multiple_input_line_col, input$multiple_input_line_col2), labels = c(input$line1_lab, input$line2_lab)) +
                         guides(color=guide_legend("Key"))
                 }
                 
-                # the eval(as.name()) method solved the issue of passing a string parameter to one without quotes for use in ggpplot
-                
+                # output the plot to the screen
                 output$multiple_input_plot = renderPlot({
-                    
                     multi_plot
-                    
                 })
                 
-            
-                
+                # download the line plot
                 output$download_multiple_input_plot = downloadHandler(
-                    
                     filename = function (){paste("multiple_data_line_plot", "svg", sep = '.')},
-                    
                     content = function (file){
                         ggsave(file, multi_plot, width = input$ggplot_width, height = input$ggplot_height, units = "cm"
-                        )
+                )
                     }
                     
                 )
@@ -1013,7 +1002,9 @@ server = function(input, output, session) {
         }) # end of observe
         
    
-    ###############################
+    #########################################################################################################################
+    # Upload multiple .csv files to extract a chosen column from each, and merge all those columns into one amalgamated file
+    #########################################################################################################################
     
     observe({
         
@@ -1022,7 +1013,9 @@ server = function(input, output, session) {
             return(NULL)
         } 
         
+            # find how many files were uploaded, to use as a guide in a loop
             nfiles = nrow(infile_multiple) 
+            # create an empty list to store each file in
             csv = list()
             column_names = c()
             
@@ -1034,22 +1027,27 @@ server = function(input, output, session) {
             
             updateSelectInput(session, "amalg_col", choices=colnames(csv[[1]][-1])) # the -1 removes the filename from the columns to choose from
             
+            # View the output on the screen
         observeEvent(input$view_amalg, {
             
+            # store the selected column to extract from each file
             chosen_col = as.name( input$amalg_col )
             
+            # create an empty dataframe to house the extracted columns
             desired_data = data.frame(matrix(nrow = nrow(csv[[1]]), ncol = nfiles))
+            
             colnames(desired_data) = column_names
             rownames(desired_data) = csv[[1]]$filename
             
-            # percentage match including singles
+            # populate the desired_data dataframe with the merged columns from each file
             for (i in 1:nfiles){
                 desired_data[,i] = csv[[i]][[chosen_col]]
             }
             
-            # output$colname = renderText(c("the column selected is ", chosen_col))
+            # output the merged dataframe to the screen
             output$amalgamate_table = renderTable(desired_data, rownames = TRUE)
             
+            # download the merged dataframe
             output$download_amalg = downloadHandler(
                 filename = function (){paste(chosen_col, 'csv', sep = '.')},
                 content = function (file){write.csv(desired_data, file, row.names = TRUE)}
@@ -1057,9 +1055,10 @@ server = function(input, output, session) {
             
         })
         
-    
     }) 
-    ###############################
     
+    #########################################################################################################################
+    # END OF APPLICATION
+    #########################################################################################################################
     
 }
