@@ -1,5 +1,5 @@
 
-mypackages <- c("ape", "data.table", "dplyr", "shiny", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
+mypackages <- c("ape", "data.table", "dplyr", "shiny", "shinyWidgets", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -45,11 +45,11 @@ ui <- fluidPage(
   
                 navbarPage(title = "SPEDE-SAMPLER-GMYC", id = "tabset",
                           tabPanel("Home",
-                          wellPanel(align = "justify",
+                          wellPanel(align = "justify", style = "background: white",
                                             
                           div(img(src='spede_sampler_gmyc_logo.png',  height = 'auto', width = '70%'), style="display: block; margin-left: auto; margin-right: auto; text-align: center;"),
                           br(), br(),
-                          fluidRow(actionButton("app", strong("BEGIN"), style = 'font-size:150%'), align = "center"),
+                          fluidRow(actionButton("app", strong("BEGIN"), style = 'font-size:150%; color: black; background-color: lightgreen; border-color: green'), align = "center"),
                           br(), br(),
                           HTML("SPEDE-SAMPLER offers the following functionalities: 
                                                                   (1) Runs GMYC analyses on multiple Maximum Likelihood tree files and records the number of clusters and entities, 
@@ -104,7 +104,7 @@ ui <- fluidPage(
                                                  tags$style("input[type=checkbox] {transform: scale(2);}"),
                                                  
                                                             tags$div(title="Check if you want the results to be reproducible if you run this again with the same data",
-                                                                     checkboxInput("set_seed", label = strong("Set a seed?"), value = FALSE), style = "font-size: 20px",
+                                                                     checkboxInput("set_seed", label = strong("Set a seed?"), value = FALSE), style = "font-size: 16px",
                                                             ),
                                                ),  
                                                             br(),
