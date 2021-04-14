@@ -86,8 +86,10 @@ ui <- fluidPage(
                                                             h3('OR'),
                                                             br(),
                                                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
+                                                            selectInput("gmyc_method", label = "GMYC method:", choices = c("single", "multiple"), width = "150px"),
                                                             br(),
                                                ),
+                                               
                                                wellPanel(
                                                             radioButtons("data_type", label="Maximum Likelihood program used to produce tree files:", choices = c("FastTree", "RAxML")),
                                                             
