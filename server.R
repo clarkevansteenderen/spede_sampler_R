@@ -309,6 +309,8 @@ server = function(input, output, session) {
           
           shinyalert::shinyalert("Complete", "Please click on the tabs at the top of the window to view the results.", type = "success")
           
+          if (!is.null( predefined_groups_uploaded() )) output$sp.numbers = renderText(c("You have ", length(unique(groups[[groups_col]])), " predefined species."))
+          
           gg_clust_ent = reshape2::melt(clust_ent) # get into the format the ggplot can work with
           colnames(gg_clust_ent) = c("filename", "gmyc_cat", "count")
           gg_clust_ent$gmyc_cat %>% as.factor()
@@ -392,7 +394,7 @@ server = function(input, output, session) {
                   geom_boxplot() +
                   ggthemes[[input$GMYC_oversplit_ggtheme]] +
                   xlab("Predefined group") +
-                  ylab("Mean frequency")
+                  ylab("Oversplitting ratio")
               })
             }
             
@@ -417,7 +419,7 @@ server = function(input, output, session) {
                        geom_boxplot() +
                        ggthemes[[input$GMYC_oversplit_ggtheme]] +
                        xlab("Predefined group") +
-                       ylab("Mean frequency")
+                       ylab("Oversplitting ratio")
               )}
           )
           
@@ -436,7 +438,7 @@ server = function(input, output, session) {
                   geom_bar(stat = "identity", colour = input$GMYC_barchart_outline, fill = input$GMYC_barchart_fill) + 
                   geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1) + 
                   xlab("Predefined group") +
-                  ylab("Mean frequency") +
+                  ylab("Oversplitting ratio") +
                   ggthemes[[input$GMYC_oversplit_ggtheme]] 
               })
               
@@ -464,7 +466,7 @@ server = function(input, output, session) {
                        geom_bar(stat = "identity", colour = input$GMYC_barchart_outline, fill = input$GMYC_barchart_fill) + 
                        geom_errorbar(aes(ymin = mean - sd, ymax = mean + sd), width = .1) + 
                        xlab("Predefined group") +
-                       ylab("Mean frequency") +
+                       ylab("Oversplitting ratio") +
                        ggthemes[[input$GMYC_oversplit_ggtheme]] 
               )}
           )

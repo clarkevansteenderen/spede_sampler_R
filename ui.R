@@ -88,14 +88,8 @@ ui <- fluidPage(
                                                             br(),
                                                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
                                                             br(),
-                                                            fluidRow(
-                                                            column(width = 4,
                                                             numericInput("lambda", label = "Smoothing parameter (lambda): ", value = 0, min = 0, max = 10, step = 0.1, width = "250px"),
-                                                            ),
-                                                            column(width = 5,
-                                                            selectInput("chronos_model", label = "Model of substitution rate variation among branches:", choices = c("correlated", "relaxed"), selected = "correlated", width = "450px"),
-                                                            ),
-                                                            ),
+                                                            selectInput("chronos_model", label = "Model of substitution rate variation among branches:", choices = c("correlated", "relaxed"), selected = "correlated", width = "250px"),
                                                             br(),
                                                ),
                                                
@@ -128,6 +122,8 @@ ui <- fluidPage(
                                       
                                       tabPanel(strong("View Data"),
                                                br(), br(),
+                                               htmlOutput("sp.numbers"), tags$head(tags$style("#sp.numbers{color: red; font-size: 14px;}")),
+                                               br(),
                                                h3(strong("View cluster and entity data")),
                                                br(),
                                                wellPanel(align = "justify",
