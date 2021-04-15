@@ -146,7 +146,7 @@ server = function(input, output, session) {
             for(i in seq(along=files)) {
               
               treex = ape::read.tree(files[i])
-              treex.ultra = chronos(treex, lambda = input$lambda) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
+              treex.ultra = chronos(treex, lambda = input$lambda, model = input$chronos_model) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
               
               #treex.ultra = phytools::force.ultrametric(treex)
               treex.ultra2 = multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
@@ -157,10 +157,7 @@ server = function(input, output, session) {
               # tryCatch skips through any possible errors with the gmyc function (e.g. nuclear genes that are identical)
               
               tryCatch({
-                # if there is no grouping info file uploaded, then use the selected method
-                if(is.null( predefined_groups_uploaded() ))  treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = input$gmyc_method)
-                # if there is a grouping ifle uploaded, then default to the multiple method. An error comes up if the single method is used here
-                else treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = "multiple")
+                 treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = "multiple")
               }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
               
               # treex.gmyc = gmyc(treex.ultra2, quiet = F, method = "multiple")

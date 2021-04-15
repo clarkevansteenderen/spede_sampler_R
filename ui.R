@@ -70,6 +70,7 @@ ui <- fluidPage(
                                       tabPanel(strong("Multiple ML trees"),
                                                br(), br(),
                                                h3(strong("Upload multiple tree files")),
+                                               br(),
                                                wellPanel(
                                                             h5(strong('Select the folder containing your tree files:')),
                                                             shinyDirButton('directory', 'Folder select', 'Please select a folder containing your tree files', style="color: black; background-color: white; border-color: black"),
@@ -86,8 +87,15 @@ ui <- fluidPage(
                                                             h3('OR'),
                                                             br(),
                                                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
-                                                            selectInput("gmyc_method", label = "GMYC method:", choices = c("single", "multiple"), width = "150px"),
-                                                            numericInput("lambda", label = "Smoothing parameter (lambda): ", value = 0, min = 0, max = 10, step = 0.1, width = "150px"),
+                                                            br(),
+                                                            fluidRow(
+                                                            column(width = 4,
+                                                            numericInput("lambda", label = "Smoothing parameter (lambda): ", value = 0, min = 0, max = 10, step = 0.1, width = "250px"),
+                                                            ),
+                                                            column(width = 5,
+                                                            selectInput("chronos_model", label = "Model of substitution rate variation among branches:", choices = c("correlated", "relaxed"), selected = "correlated", width = "450px"),
+                                                            ),
+                                                            ),
                                                             br(),
                                                ),
                                                
