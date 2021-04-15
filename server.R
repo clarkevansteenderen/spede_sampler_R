@@ -67,6 +67,7 @@ server = function(input, output, session) {
       if (length(path()) == 0 && manual_file_path == "") shinyalert::shinyalert("No folder or path input", "You have not selected a folder or pasted in a folder path.", type = "warning")
       if (length(path()) > 0 && manual_file_path != "") shinyalert::shinyalert("Issue: Two folder inputs", "You have selected a folder and inputted a file path. Please remove the manual file path and ensure that the desired folder has been selected.", type = "warning")
       if (!is.null( predefined_groups_uploaded() ) && input$col.group == "" ) shinyalert::shinyalert("Confirm columns", "Please click the Confirm button, and then select columns for grouping and sample name informaiton for your .csv file data.", type = "warning")
+      if (input$lambda < 0 || input$lambda == "") shinyalert::shinyalert("Absent or negative lambda value not allowed", "Please input a positive lambda value.", type = "warning")
       
       ################################################################################################
       # If they have inputted one or the other, proceed:
@@ -145,7 +146,7 @@ server = function(input, output, session) {
             for(i in seq(along=files)) {
               
               treex = ape::read.tree(files[i])
-              treex.ultra = chronos(treex, lambda = 0) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
+              treex.ultra = chronos(treex, lambda = input$lambda) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
               
               #treex.ultra = phytools::force.ultrametric(treex)
               treex.ultra2 = multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
@@ -154,6 +155,7 @@ server = function(input, output, session) {
               
               # Run the GMYC analysis
               # tryCatch skips through any possible errors with the gmyc function (e.g. nuclear genes that are identical)
+              
               tryCatch({
                 # if there is no grouping info file uploaded, then use the selected method
                 if(is.null( predefined_groups_uploaded() ))  treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = input$gmyc_method)

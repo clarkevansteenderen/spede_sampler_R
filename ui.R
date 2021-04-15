@@ -87,6 +87,7 @@ ui <- fluidPage(
                                                             br(),
                                                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
                                                             selectInput("gmyc_method", label = "GMYC method:", choices = c("single", "multiple"), width = "150px"),
+                                                            numericInput("lambda", label = "Smoothing parameter (lambda): ", value = 0, min = 0, max = 10, step = 0.1, width = "150px"),
                                                             br(),
                                                ),
                                                
