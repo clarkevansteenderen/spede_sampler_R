@@ -42,6 +42,9 @@ This application outputs:
 ## :green_book: Home: multiple ML trees
 
 Select a folder, or manually input the file path containing the files created by either FastTree or RAxML. 
+Each phylogeny is first converted to become ultrametric using the *ape* package function *chronos()*, and then transformed to become fully dichotomous using the *multi2di()* function.
+Select a value between 0 and 1 for the smoothing parameter (lambda) required by the *chronos()* function. A greater lambda value corrects for rate heterogeneity and results in more clock-like trees.
+Select the desired model of substitution rate variation among branches; the choices are "correlated", "discrete", and "relaxed" (uncorrelated). 
 Select the approapriate radio button to indicate which ML program was used to create your tree files.
 The file path will display on the screen as confirmation of your choice.
 
@@ -58,9 +61,12 @@ The csv file needs one column for sample names, and another for their correspond
 <br />
 
 Where the **group** column could be, for example, morphospecies.
+Click the **Confirm file** button once the file has uploaded.
 Select which column is the grouping, and which is the sample name column from the dropdown menus.
 
 Click the "Run" button to start the GMYC analysis. 
+
+
 
 ## :blue_book: View Data
 
