@@ -196,7 +196,7 @@ The output above means, for example, that the GMYC method oversplit the *Dactylo
 
 A barplot and boxplot for this data can be created and downloaded: 
 
-<img src="worked_example_images/oversplitting_species_barplot.png" alt="drawing" width="900"/>
+<img src="worked_example_images/oversplitting_species_boxbarplot.png" alt="drawing" width="900"/>
 
 16. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. This worked example only looked at a 50% resampled dataset, but this could be repeated on many other resampled datasets of different sizes. The **worked_example.zip** file contains a folder called **Multiple_data**, with the output from 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% resampled data.
 17. In the **Amalgamate** tab, select **Browse** under the **upload multiple .csv files with multiple columns of output data:**. Select the 10 **match_data** files, and select the desired column (e.g. **percentage_matches** and **percentage_matches_excl_single_samples**) to extract from each file and combine into one output. Download the resulting .csv files, and rename the column headings to 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100.
