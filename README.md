@@ -42,7 +42,7 @@ This application outputs:
 ## :green_book: Home: multiple ML trees
 
 Select a folder, or manually input the file path containing the files created by either FastTree or RAxML. 
-Select a value between 0 and 1 for the smoothing parameter (lambda) required by the *chronos()* function. A greater lambda value corrects for rate heterogeneity and results in more clock-like trees. In other words, a lambda of zero means that branch rate variation is allowed (no smoothing), where a lambda of one applies a strict clock (high level of smoothing). 
+Select a value between 0 and 1 for the smoothing parameter (lambda) required by the *chronos()* function. A greater lambda value corrects for rate heterogeneity and results in more clock-like trees. In other words, a lambda of zero means that branch rate variation is allowed (no smoothing), where a lambda of one applies a strict clock with constant branch rate variation (high level of smoothing). 
 Select the desired model of substitution rate variation among branches; the choices are "correlated", "discrete", and "relaxed" (uncorrelated). 
 Select the approapriate radio button to indicate which ML program was used to create your tree files.
 The file path will display on the screen as confirmation of your choice.
