@@ -146,9 +146,13 @@ server = function(input, output, session) {
             for(i in seq(along=files)) {
               
               treex = ape::read.tree(files[i])
+              
+              tryCatch({
               treex.ultra = chronos(treex, lambda = input$lambda, model = input$chronos_model) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
+              }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
               
               #treex.ultra = phytools::force.ultrametric(treex)
+              
               treex.ultra2 = multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
               
               if (input$set_seed == TRUE) set.seed(1234)
@@ -1146,7 +1150,6 @@ server = function(input, output, session) {
     if (is.null( infile_multiple)) {
       return(NULL)
     } 
-    
     # find how many files were uploaded, to use as a guide in a loop
     nfiles = nrow(infile_multiple) 
     # create an empty list to store each file in
@@ -1161,8 +1164,7 @@ server = function(input, output, session) {
     
     updateSelectInput(session, "amalg_col", choices=colnames(csv[[1]][-1])) # the -1 removes the filename from the columns to choose from
     
-    # View the output on the screen
-    observeEvent(input$view_amalg, {
+    amalg_data = reactive({
       
       # store the selected column to extract from each file
       chosen_col = as.name( input$amalg_col )
@@ -1178,18 +1180,30 @@ server = function(input, output, session) {
         desired_data[,i] = csv[[i]][[chosen_col]]
       }
       
+      return(desired_data)
+      
+    })
+    
+    # View the output on the screen
+    observeEvent(input$view_amalg, {
+      
       # output the merged dataframe to the screen
-      output$amalgamate_table = renderTable(desired_data, rownames = TRUE)
+      output$amalgamate_table = renderTable(amalg_data(), rownames = TRUE)
       
       # download the merged dataframe
       output$download_amalg = downloadHandler(
-        filename = function (){paste(chosen_col, 'csv', sep = '.')},
-        content = function (file){write.csv(desired_data, file, row.names = TRUE)}
+        filename = function (){paste(input$amalg_col, 'csv', sep = '.')},
+        content = function (file){write.csv(amalg_data(), file, row.names = TRUE)}
       )
       
     })
     
-  }) 
+  }) # end of observe 
+    
+    
+    
+    
+  
   
   #########################################################################################################################
   # END OF APPLICATION

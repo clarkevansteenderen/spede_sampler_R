@@ -29,6 +29,15 @@ ggthemes = list("Classic" = theme_classic(),
                 "Void" = theme_void())
 
 ui <- fluidPage(
+  
+  # this code suppresses error warnings on the shiny console (e.g. "Warning: Error in [<-.data.frame: new columns would leave holes after existing columns")
+  tags$style(type="text/css",
+             ".shiny-output-error { visibility: hidden; }",
+             ".shiny-output-error:before { visibility: hidden; }"
+  ),
+  
+  
+  
   tags$head(tags$style(".shiny-notification {font-size: 25px; background-color: #ffffff;")),
   bootstrapPage('',
                 
@@ -88,8 +97,8 @@ ui <- fluidPage(
                                                             br(),
                                                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
                                                             br(),
-                                                            numericInput("lambda", label = "Smoothing parameter (lambda): ", value = 0, min = 0, max = 10, step = 0.1, width = "250px"),
-                                                            selectInput("chronos_model", label = "Model of substitution rate variation among branches:", choices = c("correlated", "relaxed"), selected = "correlated", width = "250px"),
+                                                            numericInput("lambda", label = "Smoothing parameter (lambda): ", value = 1, min = 0, step = 1, width = "250px"),
+                                                            selectInput("chronos_model", label = "Model of substitution rate variation among branches:", choices = c("correlated", "discrete", "relaxed"), selected = "correlated", width = "250px"),
                                                             br(),
                                                ),
                                                
@@ -122,7 +131,7 @@ ui <- fluidPage(
                                       
                                       tabPanel(strong("View Data"),
                                                br(), br(),
-                                               htmlOutput("sp.numbers"), tags$head(tags$style("#sp.numbers{color: red; font-size: 14px;}")),
+                                               textOutput("sp.numbers"),
                                                br(),
                                                h3(strong("View cluster and entity data")),
                                                br(),
@@ -599,6 +608,7 @@ ui <- fluidPage(
                                                          br(),
                                                fileInput("amalgamate_multiple", label = "Upload multiple .csv files with multiple columns of output data:", accept = ".csv", multiple = TRUE),
                                                ),
+                                               
                                                selectInput("amalg_col", "Select column data:", choices=NULL),
                                                actionButton("view_amalg", strong("View"), style="color: black; background-color: lightblue; border-color: steelblue"),
                                                downloadButton("download_amalg", strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"),
