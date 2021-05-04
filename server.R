@@ -328,7 +328,7 @@ server = function(input, output, session) {
             mean_oversplits_per_grp = 
               oversplitting_species_bound %>% 
               group_by(predef_unique) %>%
-              summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
+              dplyr::summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
             
             colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
             
