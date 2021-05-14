@@ -28,7 +28,6 @@ server = function(input, output, session) {
   # Read in an optional csv file with predefined grouping information
   ################################################################################################
   
-  
   predefined_groups_uploaded = reactive({
 
     infile = input$predefined_groups
@@ -142,24 +141,30 @@ server = function(input, output, session) {
           
           withProgress(message = 'Running GMYC', value = 0, {
             
-            
             for(i in seq(along=files)) {
               
               treex = ape::read.tree(files[i])
               
+              ################################################################################################
+              # First convert the tree to an ultrametric one using either ape's chronos(), phytool's
+              # force.ultrametric, or the PATHD8 external exe program (requires a file path to the exe file)
+              ################################################################################################
               
+              # if the user wants to use the chronos() function in the ape package:
               if(input$ultrametric_tool == "chronos (ape)") {
               tryCatch({
-              treex.ultra = ape::chronos(treex, lambda = input$lambda, model = input$chronos_model) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
+              treex.ultra = ape::chronos(treex, lambda = input$lambda, model = input$chronos_model) 
                 }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
               }
               
+              # if the user wants to use the force.ultrametric() function in the phytools package:
               else if(input$ultrametric_tool == "force.ultrametric (phytools)"){
                 tryCatch({
                 treex.ultra = phytools::force.ultrametric(treex, method = "extend")
                 }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
               }
               
+              # if the user wants to use the PATHD8 program:
               else if(input$ultrametric_tool == "PATHD8"){
                 treex_tiplabels = treex$tip.label
                 # extract the first two tip labels (could be any two labels)
@@ -176,13 +181,20 @@ server = function(input, output, session) {
                 
               }
               
-              treex.ultra2 = ape::multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
+              ################################################################################################
+              # make the tree fully dichotomous using ape's multi2di() function
+              ################################################################################################
+                
+              treex.ultra2 = ape::multi2di(treex.ultra, random = T) 
               
+              #optional: set a seed for reproducibility
               if (input$set_seed == TRUE) set.seed(1234)
               
+              ################################################################################################  
               # Run the GMYC analysis
               # tryCatch skips through any possible errors with the gmyc function (e.g. nuclear genes that are identical)
-              
+              ################################################################################################
+                
               tryCatch({
                  treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = "multiple")
               }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
@@ -587,7 +599,6 @@ server = function(input, output, session) {
             
           )
           
-          
           ################################################################################################
           # view the match data summary for all files (mean, stdev etc.)
           ################################################################################################
@@ -659,9 +670,7 @@ server = function(input, output, session) {
               content = function (file){write.csv(match_stats.df, file, row.names = FALSE)}
             )
             
-            
           })
-          
           
           observeEvent(input$all_data, {
             output$data_table =  renderTable(clust_ent, rownames = FALSE, colnames = TRUE, digits = 0)
@@ -698,7 +707,6 @@ server = function(input, output, session) {
             output$data_table =  renderTable(stats.df, rownames = FALSE, colnames = TRUE, digits = 2)
           })
           
-          
           ################################################################################################
           # Plot entities vs clusters
           ################################################################################################
@@ -733,7 +741,6 @@ server = function(input, output, session) {
               support_value_col = input$support_value_col
               support_value_frame = input$support_value_frame
               branch_col = input$branch_col
-              
               
               ####################################################################################################################################
               # Function to plot the gmyc as an alternative to plot_gmyc()
@@ -783,7 +790,6 @@ server = function(input, output, session) {
               if (input$support_value_type == "GMYC estimate") nodelabels(round(support_gmyc, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
               
               else nodelabels(round(support_original_tree, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
-              
               
               ################################################################################################
               # Download GMYC tree
@@ -998,11 +1004,9 @@ server = function(input, output, session) {
             content = function (file){write.csv(clust_ent, file, row.names = FALSE)}
           )
           
-          
           ################################################################################################
           # Download stat summary for entities and clusters data
           ################################################################################################
-          
           
           output$download_stat_summary = downloadHandler(
             
@@ -1223,7 +1227,6 @@ server = function(input, output, session) {
     )
     
   }) # end of observe 
-    
     
   #########################################################################################################################
   # END OF APPLICATION
