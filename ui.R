@@ -1,5 +1,5 @@
 
-mypackages <- c("ape", "data.table", "dplyr", "shiny", "shinyWidgets", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
+mypackages <- c("ape", "data.table", "dplyr", "shiny", "shinyWidgets", "ips", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -19,6 +19,7 @@ library(Rmisc)
 library(dplyr)
 library(data.table)
 library(shinyWidgets)
+library(ips)
 
 ggthemes = list("Classic" = theme_classic(),
                 "Dark" = theme_dark(),
@@ -97,8 +98,22 @@ ui <- fluidPage(
                                                             br(),
                                                             textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
                                                             br(),
+                                                            selectInput("ultrametric_tool", "Select ultrametric obtention method:", choices = c("chronos (ape)", "PATHD8", "force.ultrametric (phytools)"), width = "250px"),
+                                                  conditionalPanel(
+                                                  condition = "input.ultrametric_tool == 'chronos (ape)'",
                                                             numericInput("lambda", label = "Smoothing parameter (lambda): ", value = 1, min = 0, step = 1, width = "250px"),
                                                             selectInput("chronos_model", label = "Model of substitution rate variation among branches:", choices = c("correlated", "discrete", "relaxed"), selected = "correlated", width = "250px"),
+                                                  ),  
+                                               conditionalPanel(
+                                                 condition = "input.ultrametric_tool == 'PATHD8'",
+                                                 numericInput("seqlength", "Sequence length of alignment (bp):", value = 1,  min = 0, step = 1, width = "250px"),
+                                                 textInput("PATHD8_filepath", "File path for the PATHD8 executable file:"),
+                                               ),
+                                               conditionalPanel(
+                                                 condition = "input.ultrametric_tool == 'force.ultrametric (phytools)'",
+                                                 #selectInput("force.ultrametric_method", "Method", choices = c("extend", "nnls")),
+                                               ),
+                                               
                                                             br(),
                                                ),
                                                

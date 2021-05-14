@@ -147,13 +147,36 @@ server = function(input, output, session) {
               
               treex = ape::read.tree(files[i])
               
+              
+              if(input$ultrametric_tool == "chronos (ape)") {
               tryCatch({
-              treex.ultra = chronos(treex, lambda = input$lambda, model = input$chronos_model) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
-              }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+              treex.ultra = ape::chronos(treex, lambda = input$lambda, model = input$chronos_model) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
+                }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+              }
               
-              #treex.ultra = phytools::force.ultrametric(treex)
+              else if(input$ultrametric_tool == "force.ultrametric (phytools)"){
+                tryCatch({
+                treex.ultra = phytools::force.ultrametric(treex, method = "extend")
+                }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+              }
               
-              treex.ultra2 = multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
+              else if(input$ultrametric_tool == "PATHD8"){
+                treex_tiplabels = treex$tip.label
+                # extract the first two tip labels (could be any two labels)
+                label1 = treex_tiplabels[1]
+                label2 = treex_tiplabels[2]
+                pathd8_params = data.frame(matrix(nrow = 1, ncol = 4))
+                colnames(pathd8_params) = c("tax1", "tax2", "age_type", "age")
+                pathd8_params[1,] = c(label1, label2, "root", 1)
+                
+                tryCatch({
+                pathd8_result = ips::pathd8(phy = treex, exec = input$PATHD8_filepath, seql = input$seqlength, calibration = pathd8_params)
+                treex.ultra = pathd8_result$path_tree
+                }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+                
+              }
+              
+              treex.ultra2 = ape::multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
               
               if (input$set_seed == TRUE) set.seed(1234)
               
@@ -327,7 +350,7 @@ server = function(input, output, session) {
             
             mean_oversplits_per_grp = 
               oversplitting_species_bound %>% 
-              group_by(predef_unique) %>%
+              dplyr::group_by(predef_unique) %>%
               dplyr::summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
             
             colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
@@ -485,17 +508,18 @@ server = function(input, output, session) {
             else{
             output$matches = renderTable(record, rownames = FALSE, colnames = TRUE, digits = 2)
             }
-            ################################################################################################
-            # Download match data for each file
-            ################################################################################################
-            
-            output$download_match_data = downloadHandler(
-              
-              filename = function (){paste('match_data_full', 'csv', sep = '.')},
-              content = function (file){write.csv(record, file, row.names = FALSE)}
-            )
-            
+           
           })
+          
+          ################################################################################################
+          # Download match data for each file
+          ################################################################################################
+          
+          output$download_match_data = downloadHandler(
+            
+            filename = function (){paste('match_data_full', 'csv', sep = '.')},
+            content = function (file){write.csv(record, file, row.names = FALSE)}
+          )
           
           ################################################################################################
           # Plot percentage match data for all files as a ggplot
@@ -1190,15 +1214,16 @@ server = function(input, output, session) {
       # output the merged dataframe to the screen
       output$amalgamate_table = renderTable(amalg_data(), rownames = TRUE)
       
-      # download the merged dataframe
-      output$download_amalg = downloadHandler(
-        filename = function (){paste(input$amalg_col, 'csv', sep = '.')},
-        content = function (file){write.csv(amalg_data(), file, row.names = TRUE)}
-      )
-      
     })
     
+    # download the merged dataframe
+    output$download_amalg = downloadHandler(
+      filename = function (){paste(input$amalg_col, 'csv', sep = '.')},
+      content = function (file){write.csv(amalg_data(), file, row.names = TRUE)}
+    )
+    
   }) # end of observe 
+    
     
   #########################################################################################################################
   # END OF APPLICATION
