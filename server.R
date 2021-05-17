@@ -28,6 +28,7 @@ server = function(input, output, session) {
   # Read in an optional csv file with predefined grouping information
   ################################################################################################
   
+  
   predefined_groups_uploaded = reactive({
 
     infile = input$predefined_groups
@@ -141,31 +142,25 @@ server = function(input, output, session) {
           
           withProgress(message = 'Running GMYC', value = 0, {
             
+            
             for(i in seq(along=files)) {
               
               treex = ape::read.tree(files[i])
               
-              ################################################################################################
-              # First convert the tree to an ultrametric one using either ape's chronos(), phytool's
-              # force.ultrametric, or the PATHD8 external exe program (requires a file path to the exe file)
-              ################################################################################################
               
-              # if the user wants to use the chronos() function in the ape package:
               if(input$ultrametric_tool == "chronos (ape)") {
               tryCatch({
-              treex.ultra = ape::chronos(treex, lambda = input$lambda, model = input$chronos_model) 
+              treex.ultra = ape::chronos(treex, lambda = input$lambda, model = input$chronos_model) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
                 }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
               }
               
-              # if the user wants to use the force.ultrametric() function in the phytools package:
-              else if(input$ultrametric_tool == "force.ultrametric (phytools)"){
+              if(input$ultrametric_tool == "force.ultrametric (phytools)"){
                 tryCatch({
                 treex.ultra = phytools::force.ultrametric(treex, method = "extend")
                 }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
               }
               
-              # if the user wants to use the PATHD8 program:
-              else if(input$ultrametric_tool == "PATHD8"){
+              if(input$ultrametric_tool == "PATHD8"){
                 treex_tiplabels = treex$tip.label
                 # extract the first two tip labels (could be any two labels)
                 label1 = treex_tiplabels[1]
@@ -176,25 +171,18 @@ server = function(input, output, session) {
                 
                 tryCatch({
                 pathd8_result = ips::pathd8(phy = treex, exec = input$PATHD8_filepath, seql = input$seqlength, calibration = pathd8_params)
-                treex.ultra = pathd8_result$path_tree
+                treex.ultra = pathd8_result$mpl_tree
                 }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
                 
               }
               
-              ################################################################################################
-              # make the tree fully dichotomous using ape's multi2di() function
-              ################################################################################################
-                
-              treex.ultra2 = ape::multi2di(treex.ultra, random = T) 
+              treex.ultra2 = ape::multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
               
-              #optional: set a seed for reproducibility
               if (input$set_seed == TRUE) set.seed(1234)
               
-              ################################################################################################  
               # Run the GMYC analysis
               # tryCatch skips through any possible errors with the gmyc function (e.g. nuclear genes that are identical)
-              ################################################################################################
-                
+              
               tryCatch({
                  treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = "multiple")
               }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
@@ -599,6 +587,7 @@ server = function(input, output, session) {
             
           )
           
+          
           ################################################################################################
           # view the match data summary for all files (mean, stdev etc.)
           ################################################################################################
@@ -670,7 +659,9 @@ server = function(input, output, session) {
               content = function (file){write.csv(match_stats.df, file, row.names = FALSE)}
             )
             
+            
           })
+          
           
           observeEvent(input$all_data, {
             output$data_table =  renderTable(clust_ent, rownames = FALSE, colnames = TRUE, digits = 0)
@@ -707,6 +698,7 @@ server = function(input, output, session) {
             output$data_table =  renderTable(stats.df, rownames = FALSE, colnames = TRUE, digits = 2)
           })
           
+          
           ################################################################################################
           # Plot entities vs clusters
           ################################################################################################
@@ -741,6 +733,7 @@ server = function(input, output, session) {
               support_value_col = input$support_value_col
               support_value_frame = input$support_value_frame
               branch_col = input$branch_col
+              
               
               ####################################################################################################################################
               # Function to plot the gmyc as an alternative to plot_gmyc()
@@ -790,6 +783,7 @@ server = function(input, output, session) {
               if (input$support_value_type == "GMYC estimate") nodelabels(round(support_gmyc, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
               
               else nodelabels(round(support_original_tree, 2), cex = support_value_size, bg = support_value_col, frame = support_value_frame)
+              
               
               ################################################################################################
               # Download GMYC tree
@@ -854,12 +848,12 @@ server = function(input, output, session) {
             filename = function (){paste(input$file_name_clustvsent, input$plot_format_clustvsent, sep = '.')},
             
             content = function (file){
-              width = as.numeric(input$w_plot_clustvsent) 
-              height = as.numeric(input$h_plot_clustvsent) 
-              dpi = as.numeric(input$res_plot_clustvsent)
-              units = input$unit_plot_clustvsent
+              width.clustplot = as.numeric(input$w_plot_clustvsent) 
+              height.clustplot = as.numeric(input$h_plot_clustvsent) 
+              dpi.clustplot = as.numeric(input$res_plot_clustvsent)
+              units.clustplot = input$unit_plot_clustvsent
               
-              ggsave(file, width = width, height = height, dpi = dpi, units = units,
+              ggsave(file, width = width.clustplot, height = height.clustplot, dpi = dpi.clustplot, units = units.clustplot,
                      ggplot(clust_ent, aes(x=clusters, y=entities)) + geom_point(colour = input$clust_vs_ent_plot_point_colours, shape = as.numeric(input$clust_vs_ent_plot_point_shape), size = input$clust_vs_ent_plot_point_size) +
                        xlab("Clusters") + 
                        ylab("Entities") +
@@ -894,12 +888,12 @@ server = function(input, output, session) {
             
             content = function (file){
               
-              width = as.numeric(input$w_plot_clust_ent_box) 
-              height = as.numeric(input$h_plot_clust_ent_box) 
-              dpi = as.numeric(input$res_plot_clust_ent_box)
-              units = input$unit_plot_clust_ent_box
+              width.clustentboxplot = as.numeric(input$w_plot_clust_ent_box) 
+              height.clustentboxplot = as.numeric(input$h_plot_clust_ent_box) 
+              dpi.clustentboxplot = as.numeric(input$res_plot_clust_ent_box)
+              units.clustentboxplot = input$unit_plot_clust_ent_box
               
-              ggsave(file, width = width, height = height, dpi = dpi, units = units,
+              ggsave(file, width = width.clustentboxplot, height = height.clustentboxplot, dpi = dpi.clustentboxplot, units = units.clustentboxplot,
                      ggplot( gg_clust_ent, aes(x=gmyc_cat, y=count)) + geom_boxplot() +
                        ggthemes[[input$ggtheme_plots]] +
                        xlab("GMYC Category") + 
@@ -934,12 +928,12 @@ server = function(input, output, session) {
             
             content = function (file){
               
-              width = as.numeric(input$w_plot_clustvsiter) 
-              height = as.numeric(input$h_plot_clustvsiter) 
-              dpi = as.numeric(input$res_plot_clustvsiter)
-              units = input$unit_plot_clustvsiter
+              width.clustvsiter = as.numeric(input$w_plot_clustvsiter) 
+              height.clustvsiter = as.numeric(input$h_plot_clustvsiter) 
+              dpi.clustvsiter = as.numeric(input$res_plot_clustvsiter)
+              units.clustvsiter = input$unit_plot_clustvsiter
               
-              ggsave(file, width = width, height = height, dpi = dpi, units = units,
+              ggsave(file, width = width.clustvsiter, height = height.clustvsiter, dpi = dpi.clustvsiter, units = units.clustvsiter,
                      ggplot( clust_ent, aes(x=1:nrow(clust_ent), y=clusters)) + 
                        geom_line(color = input$plot_clusts_vs_iterations_line_colour) + 
                        geom_point(color = input$plot_clusts_vs_iterations_point_colours, size = input$plot_clusts_vs_iterations_point_size, shape = as.numeric(input$plot_clusts_vs_iterations_point_shape))  + 
@@ -977,12 +971,12 @@ server = function(input, output, session) {
             
             content = function (file){
               
-              width = as.numeric(input$w_plot_entvsiter) 
-              height = as.numeric(input$h_plot_entvsiter) 
-              dpi = as.numeric(input$res_plot_entvsiter)
-              units = input$unit_plot_entvsiter
+              width.entvsiter = as.numeric(input$w_plot_entvsiter) 
+              height.entvsiter = as.numeric(input$h_plot_entvsiter) 
+              dpi.entvsiter = as.numeric(input$res_plot_entvsiter)
+              units.entvsiter = input$unit_plot_entvsiter
               
-              ggsave(file, width = width, height = height, dpi = dpi, units = units,
+              ggsave(file, width = width.entvsiter, height = height.entvsiter, dpi = dpi.entvsiter, units = units.entvsiter,
                      ggplot(clust_ent, aes(x=1:nrow(clust_ent), y=entities)) + 
                        geom_line(color = input$plot_ents_vs_iterations_line_colour) + 
                        geom_point(color = input$plot_ents_vs_iterations_point_colours, size = input$plot_ents_vs_iterations_point_size, shape = as.numeric(input$plot_ents_vs_iterations_point_shape))  + 
@@ -1004,9 +998,11 @@ server = function(input, output, session) {
             content = function (file){write.csv(clust_ent, file, row.names = FALSE)}
           )
           
+          
           ################################################################################################
           # Download stat summary for entities and clusters data
           ################################################################################################
+          
           
           output$download_stat_summary = downloadHandler(
             
@@ -1066,12 +1062,12 @@ server = function(input, output, session) {
         
         content = function (file){
           
-          width = as.numeric(input$w_plot_multi_box) 
-          height = as.numeric(input$h_plot_multi_box) 
-          dpi = as.numeric(input$res_plot_multi_box)
-          units = input$unit_plot_multi_box
+          width.multiboxplot = as.numeric(input$w_plot_multi_box) 
+          height.multiboxplot = as.numeric(input$h_plot_multi_box) 
+          dpi.multiboxplot = as.numeric(input$res_plot_multi_box)
+          units.multiboxplot = input$unit_plot_multi_box
           
-          ggsave(file, width = width, height = height, dpi = dpi, units = units,
+          ggsave(file, width = width.multiboxplot, height.multiboxplot = height, dpi = dpi.multiboxplot, units = units.multiboxplot,
                  ggplot(multiple_data, aes(x = data_percentage, y = measure)) + 
                    geom_boxplot() + 
                    xlab(input$x_lab_multiple_input) +
@@ -1152,12 +1148,12 @@ server = function(input, output, session) {
         filename = function (){paste(input$file_name_multi_line, input$plot_format_multi_line, sep = '.')},
         content = function (file){
           
-          width = as.numeric(input$w_plot_multi_line) 
-          height = as.numeric(input$h_plot_multi_line) 
-          dpi = as.numeric(input$res_plot_multi_line)
-          units = input$multi.unit
+          width.multilineplot = as.numeric(input$w_plot_multi_line) 
+          height.multilineplot = as.numeric(input$h_plot_multi_line) 
+          dpi.multilineplot = as.numeric(input$res_plot_multi_line)
+          units.multilineplot = input$multi.unit
           
-          ggsave(file, width = width, height = height, dpi = dpi, units = units,
+          ggsave(file, width = width.multilineplot, height = height.multilineplot, dpi = dpi.multilineplot, units = units.multilineplot,
                  multi_plot, width = input$ggplot_width, height = input$ggplot_height, units = "cm"
           )
         }
@@ -1173,6 +1169,7 @@ server = function(input, output, session) {
   #########################################################################################################################
   
   observe({
+    
     
     infile_multiple = input$amalgamate_multiple
     if (is.null( infile_multiple)) {
@@ -1198,7 +1195,8 @@ server = function(input, output, session) {
       chosen_col = as.name( input$amalg_col )
       
       # create an empty dataframe to house the extracted columns
-      desired_data = data.frame(matrix(nrow = nrow(csv[[1]]), ncol = nfiles))
+      desired_data = data.frame(matrix(nrow = nrow(csv[[1]]), ncol = nfiles)) 
+      
       
       colnames(desired_data) = column_names
       rownames(desired_data) = csv[[1]]$filename
@@ -1227,6 +1225,7 @@ server = function(input, output, session) {
     )
     
   }) # end of observe 
+    
     
   #########################################################################################################################
   # END OF APPLICATION
