@@ -16,7 +16,7 @@ To run this app through R, type the following into the console:
 ``` r
 install.packages("shiny") # install the shiny package
 library(shiny) # load up the shiny library
-shiny::runGitHub("spede-sampler", "CJMvS", ref="main") # run the app
+shiny::runGitHub("spede_sampler_R", "CJMvS", ref="main") # run the app
 ```
 
 ## **OVERVIEW**
