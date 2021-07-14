@@ -12,7 +12,7 @@
 ## **HOW TO RUN THE APPLICATION**
 
 1. Download and unzip the **spede_sampler_R** repository
-2. Open R and install (if applicable) and load the shiny library
+2. Open R, and install (if applicable) and load the shiny library
 3. Change the working directory to the downloaded folder
 4. Run the application using the **runApp()** function
 
@@ -46,7 +46,7 @@ This application outputs:
 ## :green_book: Home: multiple ML trees
 
 Select a folder, or manually input the file path containing the files created by either FastTree or RAxML. 
-Select an ultrametric method. If PATHD8 is selected, the filepath to the PATHD8 executable file must be inserted into the field that appears. This is included in the repository download, in the **PATHd8** folder. Copy the filepath to this folder, and paste it in. 
+Select an ultrametric method. 
 If *ape chronos* method is chosen, select a value between 0 and 1 for the smoothing parameter (lambda) required by the *chronos()* function. A greater lambda value corrects for rate heterogeneity and results in more clock-like trees. In other words, a lambda of zero means that branch rate variation is allowed (no smoothing), where a lambda of one applies a strict clock with constant branch rate variation (high level of smoothing). 
 Select the desired model of substitution rate variation among branches; the choices are "correlated", "discrete", and "relaxed" (uncorrelated). 
 Select the approapriate radio button to indicate which ML program was used to create your tree files.
