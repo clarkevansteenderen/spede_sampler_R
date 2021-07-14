@@ -12,7 +12,7 @@
 ## **HOW TO RUN THE APPLICATION**
 
 1. Download and unzip the **spede_sampler_R** repository
-2. Open a new R script, install (if applicable) and load the shiny library
+2. Open R and install (if applicable) and load the shiny library
 3. Change the working directory to the downloaded folder
 4. Run the application using the **runApp()** function
 
