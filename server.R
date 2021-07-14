@@ -208,7 +208,7 @@ server = function(input, output, session) {
               clust_ent[i,3] = treex.gmyc$entity[which.max(treex.gmyc$likelihood)] # extract the number of entities
               
               ########################################################################################################
-              # Do this bit only if the user uploaded a csv file with grouping data and checked the "YES" radio button
+              # Do this bit only if the user uploaded a csv file with grouping data and clicked "CONFIRM"
               ########################################################################################################
               
               if (!is.null( predefined_groups_uploaded() )){ 
