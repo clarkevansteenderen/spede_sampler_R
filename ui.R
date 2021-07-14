@@ -106,9 +106,7 @@ ui <- fluidPage(
                                                   ),  
                                                conditionalPanel(
                                                  condition = "input.ultrametric_tool == 'PATHD8'",
-                                                 numericInput("seqlength", "Sequence length of alignment (bp):", value = 1,  min = 0, step = 1, width = "250px"),
-                                                 textInput("PATHD8_filepath", "File path for the PATHD8 executable file (exclude the .exe extension). For example: C:\\Users\\Clarke\\Documents\\MyFolder\\PATHd8"),
-                                                 
+                                                 numericInput("seqlength", "Sequence length of alignment (bp):", value = 1,  min = 0, step = 1, width = "250px")
                                                ),
                                                conditionalPanel(
                                                  condition = "input.ultrametric_tool == 'force.ultrametric (phytools)'",
