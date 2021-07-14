@@ -12,6 +12,10 @@ server = function(input, output, session) {
   #access to the app from the homepage link
   observeEvent(input$app, updateTabsetPanel(session = session, inputId = "tabset", selected = "app"))
   
+  # get the filepath for the PATHD8 executable ready, if the user chooses to select it. It is in the PATHD8 folder, in the GitHub repo
+  # that is downloaded.
+  pathd8_filepath = paste(getwd(), "/PATHd8/PATHd8", sep="")
+  
   # tell the shinyhelper package what the file name of the help file is
   # observe_helpers(help_dir = "HelpFile")
   
@@ -170,7 +174,7 @@ server = function(input, output, session) {
                 pathd8_params[1,] = c(label1, label2, "root", 1)
                 
                 tryCatch({
-                pathd8_result = ips::pathd8(phy = treex, exec = input$PATHD8_filepath, seql = input$seqlength, calibration = pathd8_params)
+                pathd8_result = ips::pathd8(phy = treex, exec = pathd8_filepath, seql = input$seqlength, calibration = pathd8_params)
                 treex.ultra = pathd8_result$mpl_tree
                 }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
                 
