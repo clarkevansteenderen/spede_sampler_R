@@ -9,7 +9,7 @@
 
 ---
 
-## **HOW TO RUN THE APPLICATION**
+## **HOW TO RUN THE R SHINY APPLICATION**
 
 1. Download and unzip the **spede_sampler_R** repository
 2. Open R, and install (if applicable) and load the shiny library
