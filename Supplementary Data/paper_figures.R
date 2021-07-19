@@ -1,7 +1,3 @@
-mypackages <- c("readxl", "dplyr", "ggplot2", "gridExtra")
-  checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
-if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
-
 library(readxl)
 library(dplyr)
 library(ggplot2)
@@ -15,6 +11,25 @@ library(gridExtra)
 ########################################################################################################
                                                     #PATHD8
 ########################################################################################################
+
+##########################################################
+# OVERSPLITTING RATIO PER SPECIES GROUP ON FULL DATASET
+##########################################################
+
+oversplitting_full_data = read.csv("PATHD8/mean_oversplits_per_group_100_percent_data.csv")
+oversplitting_full_data$predefined_group = as.factor(oversplitting_full_data$predefined_group)
+
+oversplitting_pathd8 = ggplot2::ggplot(data = oversplitting_full_data, aes(x = predefined_group, y = mean)) + 
+  geom_bar(stat = "identity", fill = "lightblue", colour = "black") +
+  theme_classic() +
+  ggtitle("A)", subtitle = "PATHD8") +
+  ylab("Mean oversplitting ratio") +
+  xlab("Predefined morphological species group") +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2,
+                position=position_dodge(.9)) +
+  scale_y_continuous(breaks = seq(0, 18, by = 2), limits = c(0, 18)) 
+  #theme(legend.position = "none")
+  
 
 ################################
 # PERCENTAGE MATCHES EXCL SINGLES
@@ -50,7 +65,7 @@ clusters_pathd8 = reshape2::melt(clusters_pathd8)
 clusters_pathd8$variable = as.factor(clusters_pathd8$variable)
 
 ###############################
-# PERCENTAGE SINGLETON GMYC SPECIE
+# PERCENTAGE SINGLETON GMYC SPECIES
 ##############################
 
 singletons_pathd8 = read.csv("PATHD8/percentage_single_sample_GMYC_species.csv", header = T, check.names = FALSE)
@@ -60,6 +75,63 @@ singletons_pathd8$variable = as.factor(singletons_pathd8$variable)
 ########################################################################################################
                                                 # CHRONOS (APE)
 ########################################################################################################
+##########################################################
+# OVERSPLITTING RATIO PER SPECIES GROUP ON FULL DATASET
+##########################################################
+
+#lambda 1
+
+oversplitting_full_data_chronos_lambda1 = read.csv("chronos/mean_oversplits_per_group_100_lambda1.csv")
+oversplitting_full_data_chronos_lambda1$predefined_group = as.factor(oversplitting_full_data_chronos_lambda1$predefined_group)
+
+oversplitting_chronos_lambda1 = ggplot2::ggplot(data = oversplitting_full_data_chronos_lambda1, aes(x = predefined_group, y = mean)) + 
+  geom_bar(stat = "identity", fill = "lightblue", colour = "black") +
+  theme_classic() +
+  ggtitle("C)", subtitle = "chronos, λ = 1") +
+  ylab("Mean oversplitting ratio") +
+  xlab("Predefined morphological species group") +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2,
+                position=position_dodge(.9)) +
+  scale_y_continuous(breaks = seq(0, 18, by = 2), limits = c(0, 18)) 
+#theme(legend.position = "none")
+
+#lambda 0
+
+oversplitting_full_data_chronos_lambda0 = read.csv("chronos/mean_oversplits_per_group_100_lambda0.csv")
+oversplitting_full_data_chronos_lambda0$predefined_group = as.factor(oversplitting_full_data_chronos_lambda0$predefined_group)
+
+oversplitting_chronos_lambda0 = ggplot2::ggplot(data = oversplitting_full_data_chronos_lambda0, aes(x = predefined_group, y = mean)) + 
+  geom_bar(stat = "identity", fill = "lightblue", colour = "black") +
+  theme_classic() +
+  ggtitle("B)", subtitle = "chronos, λ = 0") +
+  ylab("Mean oversplitting ratio") +
+  xlab("Predefined morphological species group") +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2,
+                position=position_dodge(.9)) +
+  scale_y_continuous(breaks = seq(0, 18, by = 2), limits = c(0, 18)) 
+
+#lambda 10
+
+oversplitting_full_data_chronos_lambda10 = read.csv("chronos/mean_oversplits_per_group_100_lambda10.csv")
+oversplitting_full_data_chronos_lambda10$predefined_group = as.factor(oversplitting_full_data_chronos_lambda10$predefined_group)
+
+oversplitting_chronos_lambda10 = ggplot2::ggplot(data = oversplitting_full_data_chronos_lambda10, aes(x = predefined_group, y = mean)) + 
+  geom_bar(stat = "identity", fill = "lightblue", colour = "black") +
+  theme_classic() +
+  ggtitle("D)", subtitle = "chronos, λ = 10") +
+  ylab("Mean oversplitting ratio") +
+  xlab("Predefined morphological species group") +
+  geom_errorbar(aes(ymin=mean-sd, ymax=mean+sd), width=.2,
+                position=position_dodge(.9)) +
+  scale_y_continuous(breaks = seq(0, 18, by = 2), limits = c(0, 18)) 
+
+oversplitting_bars = gridExtra::grid.arrange(oversplitting_pathd8, 
+                                             oversplitting_chronos_lambda0, 
+                                             oversplitting_chronos_lambda1, 
+                                             oversplitting_chronos_lambda10,
+                                             ncol = 4)
+
+ggsave(plot = oversplitting_bars, width = 35, height = 15, dpi = 350, filename = "oversplitting_bars2.svg", units = "cm")
 
 ###################################
 # PERCENTAGE MATCHES EXCL SINGLES
@@ -249,26 +321,26 @@ hundred_perc_data$pathd8 = subset(per_match_pathd8, variable == "100")$value
 min(hundred_perc_data$pathd8)
 max(hundred_perc_data$pathd8)
 
-h1 = hist(hundred_perc_data$pathd8, main = "", xlab = "", ylab = "")
+h1 = hist(hundred_perc_data$pathd8, main = "", xlab = "", ylab = "", ylim = c(0,100), xlim = c(50,100))
 
 
 hundred_perc_data$chronos_lambda0 = subset(chronos_per_match, Sheet=="lambda_0" & variable == "100")$value
 min(hundred_perc_data$chronos_lambda0)
 max(hundred_perc_data$chronos_lambda0)
 
-h2 = hist(hundred_perc_data$chronos_lambda0, main = "", xlab = "", ylab = "")
+h2 = hist(hundred_perc_data$chronos_lambda0, main = "", xlab = "", ylab = "", ylim = c(0,100), xlim = c(50,100))
 
 hundred_perc_data$chronos_lambda1 = subset(chronos_per_match, Sheet=="lambda_1" & variable == "100")$value
 min(hundred_perc_data$chronos_lambda1)
 max(hundred_perc_data$chronos_lambda1)
 
-h3 = hist(hundred_perc_data$chronos_lambda1, main = "", xlab = "", ylab = "")
+h3 = hist(hundred_perc_data$chronos_lambda1, main = "", xlab = "", ylab = "", ylim = c(0,100), xlim = c(50,100))
 
 hundred_perc_data$chronos_lambda10 = subset(chronos_per_match, Sheet=="lambda_10" & variable == "100")$value
 min(hundred_perc_data$chronos_lambda10 )
 max(hundred_perc_data$chronos_lambda10 )
 
-h4 = hist(hundred_perc_data$chronos_lambda10, main = "", xlab = "", ylab = "")
+h4 = hist(hundred_perc_data$chronos_lambda10, main = "", xlab = "", ylab = "", ylim = c(0,100), xlim = c(50,100))
 
 
 hundred_perc_data_melt = reshape::melt(hundred_perc_data)
@@ -284,25 +356,25 @@ hundred_perc_data_inc_singles$pathd8 = subset(per_match_inc_singles_pathd8, vari
 min(hundred_perc_data_inc_singles$pathd8)
 max(hundred_perc_data_inc_singles$pathd8)
 
-h1 = hist(hundred_perc_data_inc_singles$pathd8, main = "", xlab = "", ylab = "")
+h1 = hist(hundred_perc_data_inc_singles$pathd8, main = "", xlab = "", ylab = "", ylim = c(0,100), xlim = c(50,100))
 
 hundred_perc_data_inc_singles$chronos_lambda0 = subset(chronos_per_match_inc, Sheet=="lambda_0" & variable == "100")$value
 min(hundred_perc_data_inc_singles$chronos_lambda0)
 max(hundred_perc_data_inc_singles$chronos_lambda0)
 
-h2 = hist(hundred_perc_data_inc_singles$chronos_lambda0, main = "", xlab = "", ylab = "")
+h2 = hist(hundred_perc_data_inc_singles$chronos_lambda0, main = "", xlab = "", ylab = "",  ylim = c(0,100), xlim = c(50,100))
 
 hundred_perc_data_inc_singles$chronos_lambda1 = subset(chronos_per_match_inc, Sheet=="lambda_1" & variable == "100")$value
 min(hundred_perc_data_inc_singles$chronos_lambda1)
 max(hundred_perc_data_inc_singles$chronos_lambda1)
 
-h3 = hist(hundred_perc_data_inc_singles$chronos_lambda1, main = "", xlab = "", ylab = "")
+h3 = hist(hundred_perc_data_inc_singles$chronos_lambda1, main = "", xlab = "", ylab = "", ylim = c(0,100), xlim = c(50,100))
 
 hundred_perc_data_inc_singles$chronos_lambda10 = subset(chronos_per_match_inc, Sheet=="lambda_10" & variable == "100")$value
 min(hundred_perc_data_inc_singles$chronos_lambda10)
 max(hundred_perc_data_inc_singles$chronos_lambda10)
 
-h3 = hist(hundred_perc_data_inc_singles$chronos_lambda10, main = "", xlab = "", ylab = "")
+h3 = hist(hundred_perc_data_inc_singles$chronos_lambda10, main = "", xlab = "", ylab = "", ylim = c(0,100), xlim = c(50,100))
 
 hundred_perc_data_inc_singles_melt = reshape::melt(hundred_perc_data_inc_singles)
 
@@ -331,25 +403,25 @@ hundred_perc_data_entities$pathd8 = subset(entities_pathd8, variable == "100")$v
 max(hundred_perc_data_entities$pathd8)
 min(hundred_perc_data_entities$pathd8)
 
-h1 = hist(hundred_perc_data_entities$pathd8, main = "", xlab = "", ylab = "")
+h1 = hist(hundred_perc_data_entities$pathd8, main = "", xlab = "", ylab = "", ylim = c(0,80), xlim = c(0,100))
 
 hundred_perc_data_entities$chronos_lambda0 = subset(chronos_entities, Sheet=="lambda_0" & variable == "100")$value
 min(hundred_perc_data_entities$chronos_lambda0)
 max(hundred_perc_data_entities$chronos_lambda0)
 
-h2 = hist(hundred_perc_data_entities$chronos_lambda0, ylim = c(0,80), main = "", xlab = "", ylab = "")
+h2 = hist(hundred_perc_data_entities$chronos_lambda0, main = "", xlab = "", ylab = "", ylim = c(0,80), xlim = c(0,100))
 
 hundred_perc_data_entities$chronos_lambda1 = subset(chronos_entities, Sheet=="lambda_1" & variable == "100")$value
 min(hundred_perc_data_entities$chronos_lambda1)
 max(hundred_perc_data_entities$chronos_lambda1)
 
-h3 = hist(hundred_perc_data_entities$chronos_lambda1, ylim = c(0,150), main = "", xlab = "", ylab = "")
+h3 = hist(hundred_perc_data_entities$chronos_lambda1, main = "", xlab = "", ylab = "", ylim = c(0,80), xlim = c(0,100))
 
 hundred_perc_data_entities$chronos_lambda10 = subset(chronos_entities, Sheet=="lambda_10" & variable == "100")$value
 min(hundred_perc_data_entities$chronos_lambda10)
 max(hundred_perc_data_entities$chronos_lambda10)
 
-h4 = hist(hundred_perc_data_entities$chronos_lambda10, ylim = c(0,60), main = "", xlab = "", ylab = "")
+h4 = hist(hundred_perc_data_entities$chronos_lambda10, main = "", xlab = "", ylab = "", ylim = c(0,80), xlim = c(0,100))
 
 par(mfrow=c(2,2))
 
@@ -365,25 +437,25 @@ hundred_perc_data_clusters$pathd8 = subset(clusters_pathd8, variable == "100")$v
 min(hundred_perc_data_clusters$pathd8)
 max(hundred_perc_data_clusters$pathd8)
 
-h1 = hist(hundred_perc_data_clusters$pathd8 , ylim = c(0,30), main = "", xlab = "", ylab = "")
+h1 = hist(hundred_perc_data_clusters$pathd8 , ylim = c(0,80), xlim = c(0,50), main = "PATHD8", xlab = "Distribution of delimited GMYC species", ylab = "Frequency")
 
 hundred_perc_data_clusters$chronos_lambda0 = subset(chronos_clusters, Sheet=="lambda_0" & variable == "100")$value
 min(hundred_perc_data_clusters$chronos_lambda0)
 max(hundred_perc_data_clusters$chronos_lambda0)
 
-h2 = hist(hundred_perc_data_clusters$chronos_lambda0, ylim = c(0,50), main = "", xlab = "", ylab = "") 
+h2 = hist(hundred_perc_data_clusters$chronos_lambda0, ylim = c(0,80), xlim = c(0,50), main = "chronos, λ = 0", xlab = "", ylab = "") 
 
 hundred_perc_data_clusters$chronos_lambda1 = subset(chronos_clusters, Sheet=="lambda_1" & variable == "100")$value
 min(hundred_perc_data_clusters$chronos_lambda1)
 max(hundred_perc_data_clusters$chronos_lambda1)
 
-h3 = hist(hundred_perc_data_clusters$chronos_lambda1, ylim = c(0,80), main = "", xlab = "", ylab = "") 
+h3 = hist(hundred_perc_data_clusters$chronos_lambda1, ylim = c(0,80), xlim = c(0,50), main = "chronos, λ = 1", xlab = "", ylab = "") 
 
 hundred_perc_data_clusters$chronos_lambda10 = subset(chronos_clusters, Sheet=="lambda_10" & variable == "100")$value
 min(hundred_perc_data_clusters$chronos_lambda10)
 max(hundred_perc_data_clusters$chronos_lambda10)
 
-h4 = hist(hundred_perc_data_clusters$chronos_lambda10, ylim = c(0,70), main = "", xlab = "", ylab = "") 
+h4 = hist(hundred_perc_data_clusters$chronos_lambda10, ylim = c(0,80), xlim = c(0,50), main = "chronos, λ = 10", xlab = "", ylab = "") 
 
 hundred_perc_data_clusters_melt = reshape::melt(hundred_perc_data_clusters )
 hundred_perc_data_clusters_melt =  as.data.frame(hundred_perc_data_clusters_melt)
@@ -414,7 +486,7 @@ clust_ent_plot = ggplot(merged_clust_ent_data, aes(x = method, y = value, fill =
   geom_boxplot() +
   xlab("Ultrametric method") +
   ylab("Number of clusters or entities") + 
-  scale_y_continuous(breaks = seq(0, 80, by = 5)) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10), limits=c(0,100)) +
   ggtitle("A") +
   labs(subtitle = "100% of the data") +
   theme_classic() +
@@ -435,7 +507,7 @@ per_match_compare1 = ggplot(merged_per_data_melt, aes(x = method, y = value, fil
   xlab("Ultrametric method") +
   ylab("Percentage Match") + 
   ggtitle("B") +
-  scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10), limits=c(0,100)) +
   labs(subtitle = "100% of the data") +
   theme_classic() +
   #theme(plot.title = element_text(size=16, face = "bold"), axis.text = element_text(size = 16), axis.title = element_text(size = 16)) +
@@ -445,7 +517,7 @@ per_match_compare1 = ggplot(merged_per_data_melt, aes(x = method, y = value, fil
 
 
 combo_boxplots = gridExtra::grid.arrange(clust_ent_plot, per_match_compare1, ncol = 2)
-ggsave(plot = combo_boxplots, width = 25, height = 15, dpi = 350, filename = "combo_boxplots.png", units = "cm")
+ggsave(plot = combo_boxplots, width = 25, height = 15, dpi = 350, filename = "combo_boxplots.svg", units = "cm")
 
 #########################################
 # INDIVIDUAL BOXPLOTS
@@ -515,7 +587,8 @@ singletons_pathd8_boxplot = ggplot(singletons_pathd8, aes(x = variable, y = valu
   ylab("Percentage GMYC singletons") + 
   labs(subtitle = "A) PATHD8") +
   stat_summary(fun = mean, geom="point", shape=18, size=3, color="red", fill="red") +
-  scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10)) +
+  expand_limits(x = 0, y = c(0,100)) +
   #ggtitle("A") +
   theme_classic() +
   theme(plot.title = element_text(size=10, face = "bold")) +
@@ -608,10 +681,11 @@ singletons_chronos_plot_0 = ggplot(chronos_singletons, aes(x = variable, y = val
   xlab("Data percentage") + 
   ylab("Percentage GMYC singletons") + 
   #ggtitle("C") + 
-  labs(subtitle = "B) chronos(), lambda = 0") +
+  labs(subtitle = "B) chronos(), λ = 0") +
   theme_classic() +
   theme(plot.title = element_text(size=10, face = "bold")) +
-  scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10)) +
+  expand_limits(x = 0, y = c(0,100)) +
   stat_summary(fun = mean, geom="point", shape=18, size=3, color="red", fill="red") +
   theme(legend.position = "none") ;singletons_chronos_plot_0
 
@@ -621,10 +695,11 @@ singletons_chronos_plot_1 = ggplot(chronos_singletons, aes(x = variable, y = val
   xlab("Data percentage") + 
   ylab("Percentage GMYC singletons") + 
   #ggtitle("C") + 
-  labs(subtitle = "C) chronos(), lambda = 1") +
+  labs(subtitle = "C) chronos(), λ = 1") +
   theme_classic() +
   theme(plot.title = element_text(size=10, face = "bold")) +
-  scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10)) +
+  expand_limits(x = 0, y = c(0,100)) +
   stat_summary(fun = mean, geom="point", shape=18, size=3, color="red", fill="red") +
   theme(legend.position = "none") ;singletons_chronos_plot_1
 
@@ -634,10 +709,11 @@ singletons_chronos_plot_10 = ggplot(chronos_singletons, aes(x = variable, y = va
   xlab("Data percentage") + 
   ylab("Percentage GMYC singletons") + 
   #ggtitle("C") + 
-  labs(subtitle = "D) chronos(), lambda = 10") +
+  labs(subtitle = "D) chronos(), λ = 10") +
   theme_classic() +
   theme(plot.title = element_text(size=10, face = "bold")) +
-  scale_y_continuous(breaks = seq(0, 100, by = 5)) +
+  scale_y_continuous(breaks = seq(0, 100, by = 10)) +
+  expand_limits(x = 0, y = c(0,100)) +
   stat_summary(fun = mean, geom="point", shape=18, size=3, color="red", fill="red") +
   theme(legend.position = "none") ;singletons_chronos_plot_10
 
