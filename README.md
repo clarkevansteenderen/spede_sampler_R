@@ -140,7 +140,7 @@ Upload the dataframe downloaded from the **Amalgamate** tab and apply the desire
 
 The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Python GUI program](https://github.com/CJMvS/spede-sampler-py) that randomly resampled 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% of the 142 cochineal insect sequences in the 12S_aligned FASTA file. Each subsampled dataset contains 100 iterations (performed with a set seed for reproducibility). The 'cochineal_ids' csv file contains predefined species designations for each sequence based on the host plant the specimen was collected from (the cochineal insects display high host-specificity, where a particular species will typically only feed on one cactus species). See the associated [journal article](https://www.sciencedirect.com/science/article/pii/S1049964420306538) for more information about these insects and genetic sequences. There are currently 11 described cochineal species, four of which are used as biological control agents for invasive cactus species. These are *Dactylopius opuntiae*, *D. tomeontosus*, *D. ceylonicus*, and *D. austrinus*. *Dactylopius opuntiae* comprises the "ficus" and "stricta" lineages, and *D. tomentosus* comprises lineages including "cholla", "imbricata", "californica var. parkerii", "bigelovii", and "cylindropuntia".
 
-📌 The **Supplementary data** file contains all the results of this worked example packaged in an R project with relevant code for generating graphical output.
+📌 The **Supplementary data** file contains all the results of this worked example (i.e. the output of the SPEDE-Sampler R shiny application) packaged as an R project with relevant code for generating graphical output.
 
 **Steps:**
 
