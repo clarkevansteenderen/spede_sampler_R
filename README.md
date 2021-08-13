@@ -145,7 +145,7 @@ The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Pyth
 **Steps:**
 
 1. Download the worked_example.zip folder and unzip it. 
-2. Open the SPEDE-SAMPLER-GMYC R Shiny application using the runGitHub() function:  <br /> `shiny::runGitHub("spede-sampler", "CJMvS", ref="main")`
+2. Open the SPEDE-SAMPLER-GMYC R Shiny application using the instructions at the start of this README
 3. Use the **Folder select** button or paste the file path to the **Iterations_50** folder located in the now-unzipped **worked_example** folder. This folder contains 100 tree files created from randomly resampling 50% of the 142 cochineal 12S sequences, repeated 100 times.
 4. Leave the **FastTree** radio button selected, as these example tree files were created using FastTree.
 5. Check the **Set a seed?** radio button. 
