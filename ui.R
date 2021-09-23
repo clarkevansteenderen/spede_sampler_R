@@ -1,7 +1,12 @@
 
-mypackages <- c("ape", "data.table", "dplyr", "shiny", "shinyWidgets", "ips", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2")
+mypackages <- c("ape", "data.table", "dplyr", "shiny", "shinyWidgets", "ips", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2", "tools")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
+
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+  #install.packages("BiocManager")
+
+#BiocManager::install("Biostring")
 
 library(shiny)
 library(ape)
@@ -20,6 +25,11 @@ library(dplyr)
 library(data.table)
 library(shinyWidgets)
 library(ips)
+library(tools)
+library(Biostrings)
+
+#devtools::install_github("GuillemSalazar/FastaUtils")
+#library(FastaUtils)
 
 ggthemes = list("Classic" = theme_classic(),
                 "Dark" = theme_dark(),
@@ -48,27 +58,31 @@ ui <- fluidPage(
                            .navbar-default .navbar-nav > .active > a, 
                            .navbar-default .navbar-nav > li > a {color:black;}
                            .navbar-default .navbar-nav > .active > a:focus, 
-                           .navbar-default .navbar-nav > .active > a:hover {color: #000000; background-color: #ffffff;}
-                           .well {background-color: #d6e6eb;}'
+                           .navbar-default .navbar-nav > .active > a:hover {color: grey; background-color: #ffffff;}
+                           .nav-tabs>li>a {color: black; background-color:#79aaaa; border-color: white}
+                           .well {background-color: #E7F0F1;}'
                            )
                 )),
   
                 navbarPage(title = "SPEDE-SAMPLER-GMYC", id = "tabset",
                           tabPanel("Home",
                           wellPanel(align = "justify", style = "background: white",
-                                            
+                          br(), br(),                
                           div(img(src='spede_sampler_gmyc_logo.png',  height = 'auto', width = '70%'), style="display: block; margin-left: auto; margin-right: auto; text-align: center;"),
                           br(), br(),
-                          fluidRow(actionButton("app", strong("BEGIN"), style = 'font-size:150%; color: black; background-color: lightgreen; border-color: green'), align = "center"),
+                          fluidRow(actionButton("app", strong("BEGIN"), style = 'font-size:150%; color: black; background-color: #A6C3C6; border-color: black'), align = "center"),
                           br(), br(),
-                          HTML("SPEDE-SAMPLER offers the following functionalities: 
-                                                                  (1) Runs GMYC analyses on multiple Maximum Likelihood tree files and records the number of clusters and entities, 
-                                                                    (2) Calculates the match percentage between user-defined grouping information and species estimated by the GMYC method,
-                                                                    (3) Calculates to what extent the GMYC method oversplits species relative to predefined groupings,
-                                                                    (4) Extracts desired output data columns from separate runs to amalgamate and plot on one graph,
-                                                                    and (5) downloads figures and Excel data produced by the application.
-                                                                    View plots and/or data at the bottom of each tab window.
-                                                                "),      
+                          div(img(src='cover_insects.png',  height = 'auto', width = '80%'), style="display: block; margin-left: auto; margin-right: auto; text-align: center;"),
+                          
+                          # br(), br(),
+                          # HTML("SPEDE-SAMPLER offers the following functionalities: 
+                          #                                         (1) Runs GMYC analyses on multiple Maximum Likelihood tree files and records the number of clusters and entities, 
+                          #                                           (2) Calculates the match percentage between user-defined grouping information and species estimated by the GMYC method,
+                          #                                           (3) Calculates to what extent the GMYC method oversplits species relative to predefined groupings,
+                          #                                           (4) Extracts desired output data columns from separate runs to amalgamate and plot on one graph,
+                          #                                           and (5) downloads figures and Excel data produced by the application.
+                          #                                           View plots and/or data at the bottom of each tab window.
+                          #                                       "),      
                          
                                     
                                     )
@@ -77,53 +91,255 @@ ui <- fluidPage(
                            tabPanel("App", value = "app",
                                     
                                     tabsetPanel(
-                                      tabPanel(strong("Multiple ML trees"),
-                                               br(), br(),
-                                               h3(strong("Upload multiple tree files")),
+                                      
+                                      tabPanel(strong("Random resampling"),
                                                br(),
+                                               img(src="cornops.png", align = "left", height="20%", width="20%"),
+                                               br(), br(), br(), br(),
+                                               h3(strong("Upload a Fasta file to randomly sample")),
+                                               strong("Randomly resample a desired percentage of sequences in an uploaded multiple sequence alignment file, without replacement"),
+                                               br(), br(),
+                                        wellPanel(
+                                          fileInput("fasta_file", label="Upload a .fas file:", accept = c(".fas", ".fasta")),
+                                          br(),
+                                          textOutput("num_seqs"),
+                                          br(),
+                                          textInput("resampled_fasta_folder_name", label = 'Output fasta folder name: ', value = "RESAMPLED_FASTA_FILES"),
+                                          br(),
+                                          textInput("resampled_fasta_file_name", label = 'Output fasta file name: ', value = "resampled"),
+                                          br(),
+                                          numericInput("fasta_subsample_percent", "Percentage of sequences to resample:", value = 10,  min = 1, step = 1, width = "250px"),
+                                          br(),
+                                          numericInput("fasta_resample_iterations", "Number of iterations: ", value = 2, min = 1, step = 1, width = "250px"),
+                                          br(),
+                                          checkboxInput("set_seed_resampling", label = strong("Set a seed?"), value = FALSE),
+                                         fluidRow( actionButton("resample_fastas", strong("Resample"), style="font-size:150%; color: black; background-color: #A6C3C6; border-color: black"), align = "center")
+                                          
+                                        )       
+                                        
+                                      ),
+                                      
+                                      tabPanel(strong("BEAST XML Files"),
+                                               br(),
+                                               img(src="beast.png", align = "left", height="10%", width="10%"),
+                                               br(), br(),
+                                               h3(strong("Create XML files")),
+                                               strong("Use functionality from BEAUti to create an input .xml file for a BEAST analysis"),
+                                               br(), br(), br(),
                                                wellPanel(
-                                                            h5(strong('Select the folder containing your tree files:')),
-                                                            shinyDirButton('directory', 'Folder select', 'Please select a folder containing your tree files', style="color: black; background-color: white; border-color: black"),
-                                                            br(), br(),
-                                                            
-                                                            conditionalPanel(
-                                                              condition = "input.directory",
-                                                              h5(strong("You have selected the folder path: ")),
-                                                              br(),
-                                                              textOutput('folder_path'),
+                                                 textInput(inputId = 'resampled_fasta_file_path', label = 'Manually insert a file path to the folder containing your resampled Fasta files: '),
+                                                 br(),
+                                                 fluidRow(
+                                                   column(width = 2,
+                                                 selectInput("beast_site_model", "Site model", choices = c("GTR", "HKY", "JC69", "TN93"), width = "250px"),
+                                                   ),
+                                                 column(width = 4,
+                                                 selectInput("beast_clock_model", "Clock model", choices = c("Strict", "Relaxed lognormal"), width = "250px"),
+                                                 ),
+                                                 column(width = 2,
+                                                        numericInput("beast_clock_rate", "Clock rate", value = 1, min = 0, width = "250px"),
+                                                 ),
+                                                 ),
+                                                 fluidRow(
+                                                   
+                                                 column(width = 4,
+                                                 selectInput("beast_tree_prior", "Tree prior", choices = c("Birth-death", "Coalescent Bayesian skyline", "Coalescent constant-population", "Coalescent exponential-population", "Yule"), selected = "Yule", width = "250px"),
+                                                 ),
+                                                 
+                                            conditionalPanel(
+                                              condition = "input.beast_tree_prior == 'Birth-death'",
+                                                 
+                                                 column(width = 4,
+                                                 selectInput("distr_b", "Birth rate distribution", choices = c("Beta", "Exponential", "Gamma", "Inverse gamma", "Laplace", "Log-normal", "Normal", "1/X", "Poisson", "Uniform"), selected = "Uniform", width = "250px"),
+                                                 ),
+                                                
+                                                 column(width = 4,
+                                                 selectInput("distr_d", "Death rate distribution", choices = c("Beta", "Exponential", "Gamma", "Inverse gamma", "Laplace", "Log-normal", "Normal", "1/X", "Poisson", "Uniform"), selected = "Uniform", width = "250px"),
+                                                 ),
+                                              
+                                            ), # end conditionpanel
+                                            
+                                            conditionalPanel(
+                                              condition = "input.beast_tree_prior == 'Coalescent Bayesian skyline'",
+                                              
+                                              column(width = 3,
+                                                     numericInput("cbs_group_sizes_dim", "Group size dimension", value = 5, min = 0),
+                                              ),
+                                              
+                                            ), # end conditionpanel
+                                            
+                                            conditionalPanel(
+                                              condition = "input.beast_tree_prior == 'Coalescent constant-population'",
+                                              fluidRow(
+                                              column(width = 3,
+                                                     selectInput("distr_ccp", "Rate distribution", choices = c("Beta", "Exponential", "Gamma", "Inverse gamma", "Laplace", "Log-normal", "Normal", "1/X", "Poisson", "Uniform"), selected = "1/X", width = "250px"),
+                                              ),
+                                              column(width = 3,
+                                                     numericInput("pop_size_distribution", "Population distribution", value = 0.3, min = 0),
+                                              ),
+                                              ),
+                                              
+                                            ), # end conditionpanel
+                                            
+                                            conditionalPanel(
+                                              condition = "input.beast_tree_prior == 'Coalescent exponential-population'",
+                                              
+                                              column(width = 4,
+                                                     selectInput("distr_cep_pop", "Population distribution", choices = c("Beta", "Exponential", "Gamma", "Inverse gamma", "Laplace", "Log-normal", "Normal", "1/X", "Poisson", "Uniform"), selected = "1/X", width = "250px"),
+                                              ),
+                                              
+                                              column(width = 4,
+                                                     selectInput("distr_cep_gr", "Growth rate distribution", choices = c("Beta", "Exponential", "Gamma", "Inverse gamma", "Laplace", "Log-normal", "Normal", "1/X", "Poisson", "Uniform"), selected = "Laplace", width = "250px"),
+                                              ),
+                                              
+                                            ), # end conditionpanel
+                                            
+                                            conditionalPanel(
+                                              condition = "input.beast_tree_prior == 'Yule'",
+                                              
+                                              column(width = 3,
+                                                selectInput("distr_yule", "Birth rate distribution", choices = c("Beta", "Exponential", "Gamma", "Inverse gamma", "Laplace", "Log-normal", "Normal", "1/X", "Poisson", "Uniform"), selected = "Uniform", width = "250px"),   
+                                              ),
+                                              
+                                            ), # end conditionpanel
+                                            
+                                                 column(width = 2,
+                                                 numericInput("beast_mcmc", "MCMC:", value = 1000, min = 1, step = 1, width = "250px"),
+                                                 ),
+                                                 
+                                                 column(width = 2,
+                                                 numericInput("beast_store_every", "Store every:", value = 1000, min =1000, width = "250px"),
+                                                 ),
+                                                 
+                                                 ), # end of fluid row
+                                                 
+                                                 textInput("xml_folder_name", label = 'Output XML folder name: ', value = "XML_FILES"),
+                                                 fluidRow(actionButton("create_xml_files", strong("Generate"), style="font-size:150%; color: black; background-color: #A6C3C6; border-color: black"), align = "center")
                                                ),
-                                                            
-                                                            br(), br(),
-                                                            h3('OR'),
+                                               
+                                               ),
+                                              
+                                      tabPanel(strong("Run BEAST"),
+                                               br(),
+                                               img(src="beast.png", align = "left", height="10%", width="10%"),
+                                               br(), br(), br(),
+                                               h3(strong("Run BEAST2")),
+                                               strong("Use the generated XML files to run BEAST2, via the R package 'beastier'. Consider using the CIPRES server as an alternative for large sequence alignments."),
+                                               br(), br(),
+                                               wellPanel(
+                                                 textInput(inputId = 'xml_file_path', label = 'Manually insert a file path to the folder containing your XML files: '),
+                                                 checkboxInput("run_beagle", strong("Run BEAGLE?"), value = FALSE),
+                                                 #textInput("beast_output_folder_name", label = 'BEAST output folder name: ', value = "BEAST_OUTPUT"),
+                                                 fluidRow(actionButton("run_beast", strong("Run BEAST2"), style="font-size:150%; color: black; background-color: #A6C3C6; border-color: black"), align = "center")
+                                               ),
+                                      ),
+                                      
+                                      tabPanel(strong("Run LogCombiner"),
+                                               br(),
+                                               img(src="pillbug.png", align = "left", height="15%", width="15%"),
+                                               br(), br(), br(),
+                                               h3(strong("Run LogCombiner")),
+                                               strong("Use LogCombiner to optionally reduce the size of the .trees file generated by BEAST by resampling states at a lower frequency. If trees were sampled at every 1000 states, these can be thinned to 2000 or 3000, for example. This will ensure that TreeAnnotator does not run out of memory when processing trees."),
+                                               br(), br(),
+                                               strong("* Make sure that the LogCombiner.exe file is in the same directory as the input files"),
+                                               br(), br(),
+                                               wellPanel(
+                                                 textInput(inputId = 'logcombiner_file_path', label = 'Manually insert a file path to the folder containing your .trees files: '),
+                                                 numericInput("resample_freq", "Resampling frequency:", value = 2000, width = "250px"),
+                                                 textInput("logcombiner_folder_results", "Name of the output folder:", value = "LogCombiner_output"),
+                                                 fluidRow(actionButton("run_logcombiner", strong("Run"), style="font-size:150%; color: black; background-color: #A6C3C6; border-color: black"), align = "center")
+                                               )
+                                      ),
+                                      
+                                      tabPanel(strong("Run TreeAnnotator"),
+                                               br(),
+                                               img(src="beast.png", align = "left", height="10%", width="10%"),
+                                               br(), br(),
+                                               h3(strong("Run TreeAnnotator")),
+                                               strong("* Ensure that a copy of the TreeAnnotator.exe application is in the same directory as the data files"),
+                                               br(), br(),
+                                               wellPanel(
+                                                 textInput(inputId = 'beast_trees_file_path', label = 'Manually insert a file path to the folder containing your BEAST .trees files: '),
+                                                 fluidRow(
+                                                   column(width = 3,
+                                                 numericInput("treeannotator_burnin", "Burnin (% trees):", value = 0, min = 0, width = "250px"),
+                                                 checkboxInput("treeannotator_low_mem", "Low Memory?", value = TRUE),
+                                                   ),
+                                                 column(width = 2,
+                                                 selectInput("treeannotator_heights", "Heights:", choices = c("median", "keep", "mean", "ca")),
+                                                 ),  
+                                                 ), # end of fluidrow
+                                                 fluidRow(actionButton("run_treeannotator", strong("Run"), style="font-size:150%; color: black; background-color: #A6C3C6; border-color: black"), align = "center")
+                                               )
+                                               
+                                      ),
+                                      
+                                      tabPanel(strong("Tracer"),
+                                        br(),
+                                        img(src="beast.png", align = "left", height="10%", width="10%"),
+                                        br(), br(),
+                                        h3(strong("Tracer")),
+                                        strong("Check that ESS scores > 200, and for MCMC convergence"),
+                                        br(), br(),
+                                        wellPanel(
+                                          textInput("beast_log_files_path", "Manually insert a file path to the folder containing your BEAST log files: "),
+                                          fluidRow(actionButton("load_log_files", strong("Load"), style="font-size:150%; color: black; background-color: #A6C3C6; border-color: black"), align = "center"),
+                                          numericInput("tracer_burnin", "Burnin:", value = 0.1, min = 0, width = "250px"),
+                                          numericInput("tracer_sample_interval", "Sample interval:", value = 1000, min = 0, width = "250px"),
+                                          selectInput("select_log_file", label = "Select a log file:", choices = NULL),
+                                          fluidRow(actionButton("table_log_files", strong("Results"), style="font-size:150%; color: black; background-color: #A6C3C6; border-color: black"), align = "center")
+                                        ),
+                                        column(4,
+                                        tableOutput("tracer_ess"),
+                                        ),
+                                        column(8,
+                                        plotOutput("tracer_plot"),
+                                        )
+                                        
+                                      ),
+                                      
+                                      tabPanel(strong("GMYC Analysis"),
+                                               br(),
+                                               img(src="beast_octopus.png", align = "center", height="15%", width="15%"),
+                                               br(), 
+                                               h3(strong("Upload multiple tree files")),
+                                               strong("Run GMYC analyses on all the tree files in a designated folder"),
+                                               br(), br(),
+                                               wellPanel(
+                                               #              h5(strong('Select the folder containing your tree files:')),
+                                               #              shinyDirButton('directory', 'Folder select', 'Please select a folder containing your tree files', style="color: black; background-color: white; border-color: black"),
+                                               #              br(), br(),
+                                               #              
+                                               #              conditionalPanel(
+                                               #                condition = "input.directory",
+                                               #                h5(strong("You have selected the folder path: ")),
+                                               #                br(),
+                                               #                textOutput('folder_path'),
+                                               # ),
+                                               #              
+                                               #              br(), br(),
+                                               #              h3('OR'),
+                                               #              br(),
+                                                            textInput(inputId = 'raw_file_path', label = 'Manually insert a file path to the folder containing your tree files: '),
                                                             br(),
-                                                            textInput(inputId = 'raw_file_path', label = 'Manually insert a file path: '),
+                                                            selectInput("gmyc_threshold", "GMYC threshold:", choices = c("single", "multiple"), width = "250px"),
                                                             br(),
-                                                            selectInput("ultrametric_tool", "Select ultrametric obtention method:", choices = c("chronos (ape)", "PATHD8", "force.ultrametric (phytools)"), width = "250px"),
-                                                  conditionalPanel(
-                                                  condition = "input.ultrametric_tool == 'chronos (ape)'",
-                                                            numericInput("lambda", label = "Smoothing parameter (lambda): ", value = 1, min = 0, step = 1, width = "250px"),
-                                                            selectInput("chronos_model", label = "Model of substitution rate variation among branches:", choices = c("correlated", "discrete", "relaxed"), selected = "correlated", width = "250px"),
-                                                  ),  
+                                                            selectInput("tree_tool", "Select phylogenetic method:", choices = c("BEAST", "Non-ultrametric: PATHD8"), width = "250px"),
+                                                  
                                                conditionalPanel(
-                                                 condition = "input.ultrametric_tool == 'PATHD8'",
-                                                 numericInput("seqlength", "Sequence length of alignment (bp):", value = 1,  min = 0, step = 1, width = "250px")
+                                                 condition = "input.tree_tool == 'Non-ultrametric: PATHD8'",
+                                                 numericInput("seqlength", "Sequence length of alignment (bp):", value = 1,  min = 0, step = 1, width = "250px"),
+                                                 radioButtons("data_type", label="Maximum Likelihood program used to produce tree files:", choices = c("FastTree", "RAxML"))
                                                ),
-                                               conditionalPanel(
-                                                 condition = "input.ultrametric_tool == 'force.ultrametric (phytools)'",
-                                                 #selectInput("force.ultrametric_method", "Method", choices = c("extend", "nnls")),
-                                               ),
+                                               
                                                
                                                             br(),
                                                ),
                                                
-                                               wellPanel(
-                                                            radioButtons("data_type", label="Maximum Likelihood program used to produce tree files:", choices = c("FastTree", "RAxML")),
-                                                            
-                                               ),
                                                h3(strong("[Optional] Upload a csv file with prior grouping information")),
                                                wellPanel(
                                                             fileInput("predefined_groups", label="Upload a .csv file:", accept = ".csv"),
-                                                            actionButton("group_data_uploaded", strong("Confirm file"), style = 'font-size:120%; color: black; background-color: lightgreen; border-color: green', icon("thumbs-o-up")),
+                                                            actionButton("group_data_uploaded", strong("Confirm file"), style = 'font-size:120%; color: black; background-color: #A6C3C6; border-color: black', icon("thumbs-o-up")),
                                                             br(), br(),
                                                             selectInput("col.group", "Select Group Column:", choices="", width = "350px"),
                                                             selectInput("sample_names", "Select Sample Name Column:", choices="", width = "350px"),
@@ -136,31 +352,34 @@ ui <- fluidPage(
                                                             ),
                                                ),  
                                                             br(),
-                                                            fluidRow(actionButton("run_gmyc", strong("RUN"), style = 'font-size:150%; color: black; background-color: lightgreen; border-color: green'), align = "center"),
-                                                            #actionButton("run_gmyc", label = strong("RUN"), style="color: black; background-color: lightgreen; border-color: green", icon("check-square")),
+                                                            fluidRow(actionButton("run_gmyc", strong("RUN GMYC"), style = 'font-size:150%; color: black; background-color: #A6C3C6; border-color: black'), align = "center"),
+                                                            #actionButton("run_gmyc", label = strong("RUN"), style="color: black; background-color: lightgreen; border-color: black", icon("check-square")),
                                                             br(),br()
                                                ),
                                                
-                                               mainPanel(), 
+                                               #mainPanel(), 
                                       
                                       tabPanel(strong("View Data"),
-                                               br(), br(),
+                                               br(),
+                                               img(src="iris_flea_beetle.png", align = "left", height="15%", width="15%"),
+                                               br(), br(), br(),
                                                textOutput("sp.numbers"),
                                                br(),
                                                h3(strong("View cluster and entity data")),
-                                               br(),
+                                               strong("Assess the number of clusters and entities estimated by the GMYC analyses"),
+                                               br(), br(),
                                                wellPanel(align = "justify",
                                                h4(strong("Print all data to the screen")),
                                                br(),
-                                               actionButton('all_data', label=strong('Print'), style="color: black; background-color: lightgreen; border-color: green", icon("edit")),
-                                               downloadButton("download_clust_ent_data", label = strong("Download all data"), style="color: black; background-color: lightgreen; border-color: green"),
+                                               actionButton('all_data', label=strong('Print'), style="color: black; background-color: #A6C3C6; border-color: black", icon("edit")),
+                                               downloadButton("download_clust_ent_data", label = strong("Download all data"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ),
                                                br(),
                                                wellPanel(align = "justify",
                                                h4(strong("Print summary statistics to the screen")),
                                                br(),
-                                               actionButton('summary_data', label = strong('Print'), style="color: black; background-color: lightblue; border-color: steelblue", icon("edit")),
-                                               downloadButton("download_stat_summary", label = strong("Download summary table"), style="color: black; background-color: lightblue; border-color: steelblue"),
+                                               actionButton('summary_data', label = strong('Print'), style="color: black; background-color: #A6C3C6; border-color: black", icon("edit")),
+                                               downloadButton("download_stat_summary", label = strong("Download summary table"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ),
                                                br(),
                                                tableOutput("data_table"),
@@ -170,6 +389,8 @@ ui <- fluidPage(
                                       
                                       tabPanel(strong("Plot Results"), 
                                                br(), br(),
+                                               img(src="parasitoid.png", align = "left", height="20%", width="20%"),
+                                               br(), br(), br(),
                                                h3(strong("Plot cluster-entity results")),
                                                br(),
                                                wellPanel(align = "justify",
@@ -191,7 +412,7 @@ ui <- fluidPage(
                                                       selectInput("clust_vs_ent_plot_point_shape", label = "Point shape: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18)),     
                                                ),
                                                ),
-                                               actionButton("plot_clusts", label = strong("Plot"), style="color: black; background-color: lightgreen; border-color: green", icon("drafting-compass")),
+                                               actionButton("plot_clusts", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")),
                                                hr(),
                                                h4(strong("DOWNLOAD")),
                                                br(), 
@@ -217,7 +438,7 @@ ui <- fluidPage(
                                                  ),
                                                ),
                                                
-                                               downloadButton("download_clust_plot", label = strong("Download"), style="color: black; background-color: lightgreen; border-color: green"),
+                                               downloadButton("download_clust_plot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(),
                                                ), br(),
                                                
@@ -225,7 +446,7 @@ ui <- fluidPage(
                                                wellPanel(align = "justify",
                                                          h4(strong("BOXPLOT")),
                                                          br(),
-                                               actionButton("plot_boxplot", label = strong("Plot"), style="color: black; background-color: lightblue; border-color: steelblue", icon("drafting-compass")), 
+                                               actionButton("plot_boxplot", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")), 
                                                hr(),
                                                h4(strong("DOWNLOAD")),
                                                br(), 
@@ -251,7 +472,7 @@ ui <- fluidPage(
                                                  ),
                                                ),
                                                
-                                               downloadButton("download_boxplot", label = strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"),
+                                               downloadButton("download_boxplot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ), br(),
                                                
                                                
@@ -272,7 +493,7 @@ ui <- fluidPage(
                                                selectInput("plot_clusts_vs_iterations_line_colour", "Line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen", "white"), width = "150px"),
                                                ),
                                                ),
-                                               actionButton("plot_clusts_vs_iterations", label = strong("Plot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")), 
+                                               actionButton("plot_clusts_vs_iterations", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")), 
                                                hr(),
                                                h4(strong("DOWNLOAD")),
                                                br(), 
@@ -299,7 +520,7 @@ ui <- fluidPage(
                                                  ),
                                                ),
                                                
-                                               downloadButton("download_clusts_vs_iterations", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
+                                               downloadButton("download_clusts_vs_iterations", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(),
                                                ), br(),
                                                
@@ -321,7 +542,7 @@ ui <- fluidPage(
                                                selectInput("plot_ents_vs_iterations_line_colour", "Line colour: ", choices = c("black", "grey", "lightblue", "salmon", "lightgreen"), width = "150px"),
                                                ),
                                                ),
-                                               actionButton("plot_ents_vs_iterations", label = strong("Plot"), style="color: black; background-color: lightpink; border-color: black", icon("drafting-compass")), 
+                                               actionButton("plot_ents_vs_iterations", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")), 
                                                hr(),
                                                h4(strong("DOWNLOAD")),
                                                br(), 
@@ -359,6 +580,8 @@ ui <- fluidPage(
                                       
                                       tabPanel(strong("Plot Trees"),
                                                br(), br(),
+                                               img(src="phenrica.png", align = "left", height="25%", width="25%"),
+                                               br(), br(), 
                                                h3(strong("Plot phylogenies")),
                                                br(),
                                                
@@ -372,7 +595,7 @@ ui <- fluidPage(
                                                          br(),
                                                fluidRow(
                                                  column(width = 3,
-                                               selectInput("support_value_type", label = "Support value type: ", choices = c("Original ML", "GMYC estimate"), selected = "GMYC estimate", width = "150px"),
+                                               selectInput("support_value_type", label = "Support value type: ", choices = c("GMYC estimate"), selected = "GMYC estimate", width = "150px"),
                                                  ),
                                                column(width = 3,
                                                selectInput("support_value_col", label = "Support value colour: ", choices = c("grey", "lightblue", "salmon", "lightgreen", "lightyellow", "white"), selected = "lightgreen", width = "150px"),
@@ -385,7 +608,7 @@ ui <- fluidPage(
                                                ),
                                                ),
                                                br(),
-                                               actionButton("plot_gmyc_tree", label = strong("Plot GMYC tree result"), style="color: black; background-color: lightpink; border-color: black", icon("drafting-compass")),
+                                               actionButton("plot_gmyc_tree", label = strong("Plot GMYC tree result"), style="color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")),
                                                ),
                                                br(),
                                               
@@ -415,7 +638,7 @@ ui <- fluidPage(
                                                          ),
                                                
                                                
-                                               downloadButton("download_gmyc_tree", label = strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"),
+                                               downloadButton("download_gmyc_tree", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ),
                                                h3(strong("Tree output:")),
                                                br(), br(),
@@ -425,7 +648,10 @@ ui <- fluidPage(
                                       
                                       tabPanel(strong("Percentage Matches"),
                                                br(), br(),
+                                               img(src="neochetina.png", align = "left", height="15%", width="15%"),
+                                               br(), br(), br(),
                                                h3(strong("View percentage matches")),
+                                               strong("Compare your predefined grouping information to the assessments made by the GMYC"),
                                                br(), br(),
                                                
                                                wellPanel(align = "justify",
@@ -433,8 +659,8 @@ ui <- fluidPage(
                                                          br(),
                                                          selectInput("select_tree_speclist", label = "Select a tree file", choices = NULL),
                                                          br(),
-                                               actionButton("view_gmyc_spec", label = strong("View"), style="color: black; background-color: lightyellow; border-color: black", icon("edit")), 
-                                               downloadButton("download_gmyc_spec", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
+                                               actionButton("view_gmyc_spec", label = strong("View"), style="color: black; background-color: #A6C3C6; border-color: black", icon("edit")), 
+                                               downloadButton("download_gmyc_spec", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ), 
                                                
                                                br(),
@@ -442,16 +668,16 @@ ui <- fluidPage(
                                                wellPanel(align = "justify",
                                                          h4(strong("View matches")),
                                                          br(),
-                                               actionButton("view_match_data", label = strong("View"), style="color: black; background-color: lightgreen; border-color: green", icon("edit")),
-                                               downloadButton("download_match_data", label = strong("Download"), style="color: black; background-color: lightgreen; border-color: green"),
+                                               actionButton("view_match_data", label = strong("View"), style="color: black; background-color: #A6C3C6; border-color: black", icon("edit")),
+                                               downloadButton("download_match_data", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ), br(),
                                                
                                                
                                                wellPanel(align = "justify",
                                                          h4(strong("View Matches Summary")),
                                                          br(),
-                                               actionButton("view_summary_match_data", label = strong("View"), style="color: black; background-color: lightblue; border-color: steelblue", icon("edit")),
-                                               downloadButton("download_match_data_summary", label = strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"), 
+                                               actionButton("view_summary_match_data", label = strong("View"), style="color: black; background-color: #A6C3C6; border-color: black", icon("edit")),
+                                               downloadButton("download_match_data_summary", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"), 
                                                ),br(),
                                                tableOutput("matches"),
                                                br(), br()
@@ -460,8 +686,10 @@ ui <- fluidPage(
                                       
                                       tabPanel(strong("Plot Percentage matches"),
                                                br(), br(),
+                                               img(src="lysathia.png", align = "left", height="15%", width="15%"),
+                                               br(), br(), br(),
                                                h3(strong("Plot percentage matches")),
-                                               br(), br(),
+                                               br(), 
                                                wellPanel(align = "justify",
                                                          h4(strong("PLOT TWEAKS")),
                                                          br(),
@@ -478,7 +706,7 @@ ui <- fluidPage(
                                                ),
                                                ),
                                                br(),
-                                               actionButton("plot_matches", label = strong("Plot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
+                                               actionButton("plot_matches", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")),
                                                ),
                                                wellPanel(align = "justify",
                                                          h4(strong("DOWNLOAD")),
@@ -505,7 +733,7 @@ ui <- fluidPage(
                                                            ),
                                                          ),
                                                
-                                               downloadButton("download_match_plot", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
+                                               downloadButton("download_match_plot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ),
                                                h3(strong("Plot:")),
                                                br(), br(),
@@ -516,14 +744,20 @@ ui <- fluidPage(
                                       
                                       tabPanel(strong("GMYC Oversplitting"),
                                                br(), br(),
+                                               img(src="bactrocera.png", align = "left", height="15%", width="15%"),
+                                               br(), br(), br(),
                                                h3(strong("GMYC oversplitting")),
-                                               br(), br(),
+                                               strong("Assess which taxa are split into multiple groups, indicating potential diversity"),
+                                               br(),br(),
                                                
                                                wellPanel(align = "justify",
-                                                         h4(strong("View summary table:")),
+                                                         h4(strong("View output:")),
                                                          br(),
-                                               actionButton("GMYC_oversplit_table_view", label = strong("View"), style="color: black; background-color: lightblue; border-color: steelblue"),
-                                               downloadButton("GMYC_oversplit_table_download", label = strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"),
+                                               actionButton("GMCY_oversplit_full_table", label = strong("View full"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               actionButton("GMYC_oversplit_table_view", label = strong("View summary"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               br(), br(),
+                                               downloadButton("GMYC_oversplit_full_table_download", label = strong("Download full"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               downloadButton("GMYC_oversplit_table_download", label = strong("Download summary"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ),
                                                br(), 
                                                
@@ -535,7 +769,7 @@ ui <- fluidPage(
                                                wellPanel(align = "justify",
                                                          h4(strong("BOXPLOT")),
                                                          br(),
-                                               actionButton("GMYC_oversplit_boxplot", label = strong("Plot"), style="color: black; background-color: lightyellow; border-color: black"),
+                                               actionButton("GMYC_oversplit_boxplot", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                hr(),
                                                h4(strong("DOWNLOAD")),
                                                br(), 
@@ -561,7 +795,7 @@ ui <- fluidPage(
                                                  ),
                                                ),
                                                
-                                               downloadButton("GMYC_oversplit_boxplot_download", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black"),
+                                               downloadButton("GMYC_oversplit_boxplot_download", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ),
                                                br(),
                                                
@@ -576,7 +810,7 @@ ui <- fluidPage(
                                                 selectInput("GMYC_barchart_outline", "Outline: ", choices = c("black", "steelblue", "white", "darkgreen"), selected = "black", width = "150px"),
                                                 ),
                                                 ),         
-                                               actionButton("GMYC_oversplit_barplot", label = strong("Plot"), style="color: black; background-color: lightgreen; border-color: darkgreen"),
+                                               actionButton("GMYC_oversplit_barplot", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: darkgreen"),
                                                hr(),
                                                h4(strong("DOWNLOAD")),
                                                br(), 
@@ -602,7 +836,7 @@ ui <- fluidPage(
                                                  ),
                                                ),
                                                
-                                               downloadButton("GMYC_oversplit_barplot_download", label = strong("Download"), style="color: black; background-color: lightgreen; border-color: darkgreen"),
+                                               downloadButton("GMYC_oversplit_barplot_download", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: darkgreen"),
                                                ),
                                                br(), 
                                                h3(strong("Table/Plot output:")),
@@ -616,16 +850,18 @@ ui <- fluidPage(
                                       
                                       tabPanel(strong("Amalgamate"),
                                                br(), br(),
+                                               img(src="tetramesa.png", align = "left", height="15%", width="15%"),
+                                               br(), br(), br(),
                                                h3(strong("Amalgamate data")),
-                                               br(), br(),
+                                               br(), 
                                                wellPanel(align = "justify",
                                                          br(),
                                                fileInput("amalgamate_multiple", label = "Upload multiple .csv files with multiple columns of output data:", accept = ".csv", multiple = TRUE),
                                                ),
                                                
                                                selectInput("amalg_col", "Select column data:", choices=NULL),
-                                               actionButton("view_amalg", strong("View"), style="color: black; background-color: lightblue; border-color: steelblue"),
-                                               downloadButton("download_amalg", strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"),
+                                               actionButton("view_amalg", strong("View"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               downloadButton("download_amalg", strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(), br(),
                                                tableOutput("amalgamate_table"),
                                                br(), br()
@@ -635,7 +871,7 @@ ui <- fluidPage(
                                       tabPanel(strong("Plot for multiple-column data"),
                                                br(), br(),
                                                h3(strong("Plot multiple-column data")),
-                                               br(), br(),
+                                               br(), 
                                                wellPanel(align = "justify",
                                                selectInput("ggtheme_multiple", "Select ggplot Theme:", choices = names(ggthemes), selected = ggthemes["Classic"], width = "150px"),
                                                ),
@@ -643,7 +879,7 @@ ui <- fluidPage(
                                                wellPanel(align = "justify",
                                                          h4(strong("BOXPLOT")),
                                                          br(),
-                                                         actionButton("multiple_input_boxplot", label = strong("Plot"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
+                                                         actionButton("multiple_input_boxplot", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")),
                                                          br(), br(),
                                                          textInput("file_name_multi_box", "File name: ", "multiple_data_boxplot"),
                                                         
@@ -667,7 +903,7 @@ ui <- fluidPage(
                                                            ),
                                                          ),
                                                          
-                                                         downloadButton("download_multiple_input_boxplot", label = strong("Download"), style="color: black; background-color: lightyellow; border-color: black", icon("drafting-compass")),
+                                                         downloadButton("download_multiple_input_boxplot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")),
                                                ),
                                                
                                                fluidRow(
@@ -727,7 +963,7 @@ ui <- fluidPage(
                                                
                                                ),
                                                
-                                               fluidRow(actionButton("plot_multiple_input", label = strong("Plot"), style="font-size:150%; color: black; background-color: lightblue; border-color: steelblue", icon("drafting-compass")), align = "center"),
+                                               fluidRow(actionButton("plot_multiple_input", label = strong("Plot"), style="font-size:150%; color: black; background-color: #A6C3C6; border-color: black", icon("drafting-compass")), align = "center"),
                                                br(), br(),
                                                
                                                wellPanel(align = "justify",
@@ -755,7 +991,7 @@ ui <- fluidPage(
                                                  ),
                                                ),
                                                
-                                               downloadButton("download_multiple_input_plot", label = strong("Download"), style="color: black; background-color: lightblue; border-color: steelblue"),
+                                               downloadButton("download_multiple_input_plot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                ),
                                                
                                                br(), br(),
@@ -773,7 +1009,26 @@ ui <- fluidPage(
                                     wellPanel(align = "justify",
                                               HTML("<h1 align = 'center'>SPEDE-SAMPLER <i>1.0.0</i> </h1>"),
                                               p(Sys.Date(), align = "center"),
-                                              HTML("<p align = 'center'><img src = 'GitHub.png' width = '20px' height = 'auto'> <a target='_blank' rel='noopener noreferrer' href='https://github.com/CJMvS/spede-sampler'> GitHub Link </a></p>")
+                                              HTML("<p align = 'center'><img src = 'GitHub.png' width = '20px' height = 'auto'> <a target='_blank' rel='noopener noreferrer' href='https://github.com/CJMvS/spede-sampler'> GitHub Link </a></p>"),
+                                              img(src="spede_authors.png", align = "center", height="75%", width="75%", style="display: block; margin-left: auto; margin-right: auto;"),
+                                              br(), br(),
+                                              strong("Image credits, with thanks to David Taylor at the Center for Biological Control, Department of Zoology and Entomology, Rhodes University:"),
+                                              br(), br(),
+                                              HTML("Random resampling tab: <i>Cornops aquaticum</i>"),
+                                              br(),
+                                              HTML("View Data tab: Iris flea beetle"),
+                                              br(),
+                                              HTML("Plot Results tab: Parasitoid wasp on <i>Eragrostis curvula</i>, Eastern Cape"),
+                                              br(),
+                                              HTML("Plot Trees tab: <i>Phenrica guerni</i>"),
+                                              br(),
+                                              HTML("Percentage Matches tab: <i>Neochetina</i>"),
+                                              br(),
+                                              HTML("Plot percentage matches tab: <i>Lysathia</i>"),
+                                              br(),
+                                              HTML("GMYC Oversplitting tab: <i>Bactrocera</i>"),
+                                              br(),
+                                              HTML("Amalgamate tab: <i>Tetramesa</i>")
                                               #HTML("<p><b>Cite the application:</b> van Steenderen, C.J.M. & Sutton, G.F.S. (2021) SPEDE-SAMPLER:  assess GMYC sampling effects on SPecies DElimitation </i>, 11: 1526-1534 <a target='_blank' rel='noopener noreferrer' href='https://doi.org/10.1002/ece3.6928'>https://doi.org/10.1002/ece3.6928</a></p>")
                                               
                                     )

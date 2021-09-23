@@ -1,0 +1,11 @@
+"filename","percentage_match","percentage_match_excl_singles","percentage_single_sample_GMYC_species","oversplitting_ratio","oversplitting_excl_singles"
+"resampled_1.trees.nex",98.28,94.59,68.1,1.04,0.33
+"resampled_2.trees.nex",97.32,93.62,58.04,1.05,0.44
+"resampled_3.trees.nex",98.23,94.87,65.49,1.09,0.38
+"resampled_4.trees.nex",97.5,93.33,62.5,1.03,0.39
+"resampled_5.trees.nex",97.3,93.02,61.26,1,0.39
+"resampled_6.trees.nex",98.21,95.12,63.39,1.09,0.4
+"resampled_7.trees.nex",98.25,95.24,63.16,1.08,0.4
+"resampled_8.trees.nex",98.25,95.45,61.4,1.1,0.42
+"resampled_9.trees.nex",98.15,95.56,58.33,1.08,0.45
+"resampled_10.trees.nex",97.41,92.11,67.24,1.09,0.36

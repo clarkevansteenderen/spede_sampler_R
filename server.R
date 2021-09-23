@@ -12,12 +12,312 @@ server = function(input, output, session) {
   #access to the app from the homepage link
   observeEvent(input$app, updateTabsetPanel(session = session, inputId = "tabset", selected = "app"))
   
+################################################################################################
+# RANDOM RESAMPLING OF FASTA FILE SEQUENCES
+################################################################################################
+  
+  # Read in the fasta file
+  
+observe({
+    
+    in_seqs = input$fasta_file
+    if (is.null(in_seqs)) {
+      return(NULL)
+    }
+    
+  seqs = ape::read.FASTA(in_seqs$datapath) 
+  
+  # get the number of sequences in the alignment file
+  output$num_seqs = renderText({paste("There are ", length(seqs), " sequences in your alignment.")})
+  
+observeEvent(input$resample_fastas, {
+  
+  # get the number of sequences to resample
+  num_fasta_seqs = floor( (input$fasta_subsample_percent/100) * length(seqs) )
+  
+  # create an empty folder to store resampled fasta files
+  dir.create(input$resampled_fasta_folder_name)
+  
+  # ITERATE THIS N TIMES
+  out_file = paste(input$resampled_fasta_folder_name, "/", input$resampled_fasta_file_name, sep = "")
+  
+ if(input$set_seed_resampling == TRUE) set.seed(123)
+  
+  # function from the FastaUtils github package, Guillem Salazar
+  fasta.sample<-function(infile=NULL,nseq=NULL,file.out=NULL,replacement=FALSE){
+    seqs<- Biostrings::readDNAStringSet(infile)
+    selected<-seqs[sample(1:length(seqs),nseq,replace=replacement)]
+    Biostrings::writeXStringSet(selected,filepath=file.out)}
+  
+  withProgress(message = 'Resampling...', value = 0, {
+    
+  for (i in 1:input$fasta_resample_iterations){
+    
+    fasta.sample(infile = in_seqs$datapath, nseq = num_fasta_seqs, file.out = paste(out_file, "_", i, ".fasta", sep = ""), 
+                             replacement = FALSE)
+  
+    # Increment the progress bar, and update the detail text.
+    incProgress(1/input$fasta_resample_iterations, detail = paste("Resampling file ", i, " of ", input$fasta_resample_iterations, "[ ", round(i/input$fasta_resample_iterations*100, 0), "% ]"))
+    # Pause for 0.1 seconds to simulate a long computation.
+    Sys.sleep(0.1)
+    
+  }
+    
+  }) # end of progressbar
+  
+  shinyalert::shinyalert("Complete", "Successfully resampled", type = "success")
+  
+}) # end of observeEvent
+  
+}) # end of observe
+  
+################################################################################################
+  # GENERATE XML FILES FOR BEAST
+################################################################################################
+
+  observeEvent(input$create_xml_files, {
+  
+    resampled_fasta_file_path = input$resampled_fasta_file_path
+    setwd(resampled_fasta_file_path)
+    resampled_fasta_files = gtools::mixedsort( list.files(pattern = "\\.fas") ) 
+    
+    # different rate distribution options
+    rate_option = function(distribution_prior, n){ 
+      
+      if(missing(n)){
+      switch(distribution_prior, 
+             "Beta" = beautier::create_beta_distr(),
+             "Exponential" = beautier::create_exp_distr(),
+             "Gamma" = beautier::create_gamma_distr(),
+             "Inverse gamma" = beautier::create_inv_gamma_distr(),
+             "Laplace" = beautier::create_laplace_distr(),
+             "Log-normal" = beautier::create_log_normal_distr(),
+             "Normal" = beautier::create_normal_distr(),
+             "1/X" = beautier::create_distr_one_div_x(),
+             "Poisson" = beautier::create_poisson_distr(),
+             "Uniform" = beautier::create_uniform_distr())
+      }
+      
+      else {
+        switch(distribution_prior, 
+               "Beta" = beautier::create_beta_distr(value = n),
+               "Exponential" = beautier::create_exp_distr(value = n),
+               "Gamma" = beautier::create_gamma_distr(value = n),
+               "Inverse gamma" = beautier::create_inv_gamma_distr(value = n),
+               "Laplace" = beautier::create_laplace_distr(value = n),
+               "Log-normal" = beautier::create_log_normal_distr(value = n),
+               "Normal" = beautier::create_normal_distr(value = n),
+               "1/X" = beautier::create_distr_one_div_x(value = n),
+               "Poisson" = beautier::create_poisson_distr(value = n),
+               "Uniform" = beautier::create_uniform_distr(value = n))
+      }
+    }
+    
+    
+  # Set up the inference model 
+  inference_model = beautier::create_inference_model(
+    
+    site_model = switch(input$beast_site_model, "GTR" = beautier::create_gtr_site_model(), 
+                        "HKY" = beautier::create_hky_site_model(),
+                        "JC69" = beautier::create_jc69_site_model(),
+                        "TN93" = beautier::create_tn93_site_model()),
+    
+    clock_model = switch(input$beast_clock_model, "Strict" = beautier::create_strict_clock_model(clock_rate_param = input$beast_clock_rate), 
+                         "Relaxed lognormal" = beautier::create_rln_clock_model(clock_rate_param = input$beast_clock_rate)),
+   
+    tree_prior = switch(input$beast_tree_prior, "Birth-death" = beautier::create_bd_tree_prior(birth_rate_distr = rate_option(input$distr_b), death_rate_distr = rate_option(input$distr_d)),
+                        "Coalescent Bayesian skyline" = beautier::create_cbs_tree_prior(group_sizes_dimension = input$cbs_group_sizes_dim),
+                        "Coalescent constant-population" = beautier::create_ccp_tree_prior(pop_size_distr = rate_option(input$distr_ccp, n = input$pop_size_distribution)),
+                        "Coalescent exponential-population" = beautier::create_cep_tree_prior(pop_size_distr = rate_option(input$distr_cep_pop), growth_rate_distr = rate_option(input$distr_cep_gr)),
+                        "Yule" = beautier::create_yule_tree_prior(birth_rate_distr = rate_option(input$distr_yule))),
+    
+    mcmc = beautier::create_mcmc(chain_length = input$beast_mcmc, store_every = input$beast_store_every)
+    
+  )
+  
+  # create xml files
+  withProgress(message = 'Creating XML files...', value = 0, {
+    
+  for(i in seq(along = resampled_fasta_files)){
+    
+    beautier::create_beast2_input_file_from_model(
+      input_filename =  resampled_fasta_files[i],
+      inference_model = inference_model,
+      output_filename = paste(input$xml_folder_name,"/", tools::file_path_sans_ext(resampled_fasta_files[i]), ".xml", sep = "" )
+    )
+    
+    # Increment the progress bar, and update the detail text.
+    incProgress(1/length(resampled_fasta_files), detail = paste("Processing fasta file ", i, " of ", length(resampled_fasta_files), "[ ", round(i/length(resampled_fasta_files)*100, 0), "% ]"))
+    # Pause for 0.1 seconds to simulate a long computation.
+    Sys.sleep(0.1)
+    
+  }
+    
+  }) # end of progress bar
+  
+  shinyalert::shinyalert("Complete", "Successfully created XML files", type = "success")
+  
+})
+  
+################################################################################################
+# RUN BEAST ON THE GENERATED XML FILES
+################################################################################################
+
+  observeEvent(input$run_beast, {
+    
+    setwd(input$xml_file_path)
+    
+    xml_files = gtools::mixedsort( list.files(pattern = "\\.xml") ) 
+    
+    withProgress(message = 'Running BEAST...', value = 0, {
+    for(i in seq(along = xml_files)){
+      beastier::run_beast2(
+        input_filename = xml_files[i],
+        verbose = TRUE,
+        use_beagle = input$run_beagle
+        
+      )
+      
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/length(xml_files), detail = paste("Processing XML file ", i, " of ", length(xml_files), "[ ", round(i/length(xml_files)*100, 0), "% ]"))
+      # Pause for 0.1 seconds to simulate a long computation.
+      Sys.sleep(0.1)
+      
+    }
+      
+    }) # end of progress bar
+    
+    shinyalert::shinyalert("Complete", "BEAST successfully run", type = "success")
+    
+  })
+
+################################################################################################
+  # RUN TREEANNOTATOR ON BEAST .TREES FILES
+################################################################################################
+  
+  observeEvent(input$run_treeannotator, {
+    
+    setwd(input$beast_trees_file_path)
+    
+    beast_tree_files = gtools::mixedsort( list.files(pattern = "\\.trees") ) 
+    
+    burnin = paste("-burnin", input$treeannotator_burnin) 
+    heights = paste("-heights", input$treeannotator_heights)
+    
+    withProgress(message = 'Running TreeAnnotator...', value = 0, {
+      
+    for(i in seq(along = beast_tree_files)){
+      
+      in_file = beast_tree_files[i]
+      out_file = paste(tools::file_path_sans_ext(beast_tree_files[i]), ".nex", sep = "")
+      
+      if(input$treeannotator_low_mem == TRUE)
+        treeannotator_command_line = paste("TreeAnnotator.exe", burnin, heights, "-lowMem", in_file, out_file)
+      else treeannotator_command_line = paste("TreeAnnotator.exe", burnin, heights, in_file, out_file)
+      
+      system(treeannotator_command_line)
+      
+      # Increment the progress bar, and update the detail text.
+      incProgress(1/length(beast_tree_files), detail = paste("Processing BEAST .trees file ", i, " of ", length(beast_tree_files), "[ ", round(i/length(beast_tree_files)*100, 0), "% ]"))
+      # Pause for 0.1 seconds to simulate a long computation.
+      Sys.sleep(0.1)
+      
+      # this while loop delays the main loop so that it only goes into the next iteration after the file has been written.
+      # this seems to prevent the program from freezing up when treeannotator is run with very large file sizes
+      
+      while (!file.exists( paste(tools::file_path_sans_ext( beast_tree_files[i] ), ".nex", sep = "") ) ) {
+        Sys.sleep(2)
+      }
+      
+    }
+      
+    }) # end of progress bar
+    
+    shinyalert::shinyalert("Complete", "TreeAnnotator successfully run", type = "success")
+    
+  })
+  
+################################################################################################
+  # Run TRACER
+################################################################################################
+ 
+ observeEvent(input$load_log_files, {
+   
+   setwd(input$beast_log_files_path)
+   
+   log_files = gtools::mixedsort( list.files(pattern = "\\.log") )
+   updateSelectInput(session,"select_log_file", choices=log_files)
+   
+   observeEvent(input$table_log_files, {
+     
+     estimates <- tracerer::parse_beast_tracelog_file(input$select_log_file)
+     estimates <- tracerer::remove_burn_ins(estimates, burn_in_fraction = input$tracer_burnin)
+     esses <- tracerer::calc_esses(estimates, sample_interval = input$tracer_sample_interval)
+     ess_table <- t(esses)
+     colnames(ess_table) <- c("ESS")
+     output$tracer_ess = renderTable(ess_table, rownames = TRUE, colnames = TRUE, digits = 0)
+     
+    output$tracer_plot = renderPlot({  ggplot2::ggplot(
+       data = tracerer::remove_burn_ins(estimates, burn_in_fraction = input$tracer_burnin),
+       ggplot2::aes(x = Sample)
+     ) + ggplot2::geom_line(ggplot2::aes(y = posterior)) + ggplot2::ggtitle("Trace plot") + ggplot2::theme_classic()
+    })
+    
+   })
+   
+ })
+  
+  ################################################################################################
+  # RUN LOGCOMBINER
+  ################################################################################################
+  
+  observeEvent(input$run_logcombiner, {
+    
+    setwd(input$logcombiner_file_path)
+    
+    # create an empty folder 
+    dir.create(input$logcombiner_folder_results)
+    
+    logcombiner_tree_files = gtools::mixedsort( list.files(pattern = "\\.trees") ) 
+    
+    resampling = paste("-resample", input$resample_freq) 
+    
+    withProgress(message = 'Running LogCombiner...', value = 0, {
+      
+      for(i in seq(along = logcombiner_tree_files)){
+        
+        logcombiner_in_file = paste("-log", logcombiner_tree_files[i])
+        logcombiner_out_file = paste("-o", paste( input$logcombiner_folder_results, "/", tools::file_path_sans_ext(logcombiner_tree_files[i]), ".trees", sep = "") )
+        
+        logcombiner_command_line = paste("LogCombiner.exe", logcombiner_in_file, logcombiner_out_file, resampling)
+        
+        system(logcombiner_command_line)
+        
+        # Increment the progress bar, and update the detail text.
+        incProgress(1/length(logcombiner_tree_files), detail = paste("Processing LogCombiner .trees file ", i, " of ", length(logcombiner_tree_files), "[ ", round(i/length(logcombiner_tree_files)*100, 0), "% ]"))
+        # Pause for 0.1 seconds to simulate a long computation.
+        Sys.sleep(0.1)
+        
+      }
+      
+    }) # end of progress bar
+    
+    shinyalert::shinyalert("Complete", "LogCombiner successfully run", type = "success")
+    
+  })
+  
+################################################################################################
+
+################################################################################################
+  
   # get the filepath for the PATHD8 executable ready, if the user chooses to select it. It is in the PATHD8 folder, in the GitHub repo
   # that is downloaded.
   pathd8_filepath = paste(getwd(), "/PATHd8/PATHd8", sep="")
   
   # tell the shinyhelper package what the file name of the help file is
   # observe_helpers(help_dir = "HelpFile")
+  
+  # I'm leaving this bit in, despite taking the option of a folder upload via a button out of the GUI
   
   volumes =  getVolumes()() # this presents all the folders on the user's PC
   
@@ -71,7 +371,6 @@ server = function(input, output, session) {
       if (length(path()) == 0 && manual_file_path == "") shinyalert::shinyalert("No folder or path input", "You have not selected a folder or pasted in a folder path.", type = "warning")
       if (length(path()) > 0 && manual_file_path != "") shinyalert::shinyalert("Issue: Two folder inputs", "You have selected a folder and inputted a file path. Please remove the manual file path and ensure that the desired folder has been selected.", type = "warning")
       if (!is.null( predefined_groups_uploaded() ) && input$col.group == "" ) shinyalert::shinyalert("Confirm columns", "Please click the Confirm button, and then select columns for grouping and sample name informaiton for your .csv file data.", type = "warning")
-      if (input$lambda < 0 || input$lambda == "") shinyalert::shinyalert("Absent or negative lambda value not allowed", "Please input a positive lambda value.", type = "warning")
       
       ################################################################################################
       # If they have inputted one or the other, proceed:
@@ -98,10 +397,9 @@ server = function(input, output, session) {
         
         else setwd(path())
         
-        ml_input_type = input$data_type
-        
-        if (ml_input_type == "FastTree") files = gtools::mixedsort( list.files(pattern = "\\.tre$") ) # the gtools::mixedsort() function preserves the original order of the files, instead of ordering them 1, 10, 100 etc.
-        else if (ml_input_type == "RAxML") files = gtools::mixedsort( list.files(pattern = "bestTree") )
+        if (input$tree_tool == "Non-ultrametric: PATHD8" && input$data_type == "FastTree") files = gtools::mixedsort( list.files(pattern = "\\.tre$") ) # the gtools::mixedsort() function preserves the original order of the files, instead of ordering them 1, 10, 100 etc.
+        if (input$tree_tool == "Non-ultrametric: PATHD8" && input$data_type == "RAxML") files = gtools::mixedsort( list.files(pattern = "bestTree") )
+        else if (input$tree_tool == "BEAST") files = gtools::mixedsort( list.files(pattern = "\\.nex") )
         
         # populate the dropdown list to show all the files inputted, so that the user can plot one if they wish
         updateSelectInput(session,"select_tree", choices=files)
@@ -149,22 +447,11 @@ server = function(input, output, session) {
             
             for(i in seq(along=files)) {
               
-              treex = ape::read.tree(files[i])
               
+              if(input$tree_tool == "BEAST") treex.ultra2 = ape::read.nexus(files[i])
               
-              if(input$ultrametric_tool == "chronos (ape)") {
-              tryCatch({
-              treex.ultra = ape::chronos(treex, lambda = input$lambda, model = input$chronos_model) # converts it to an ultrametric tree. This is an alternative to creating the ultrametric tree in BEAST first, and then running this GMYC analysis
-                }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-              }
-              
-              if(input$ultrametric_tool == "force.ultrametric (phytools)"){
-                tryCatch({
-                treex.ultra = phytools::force.ultrametric(treex, method = "extend")
-                }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-              }
-              
-              if(input$ultrametric_tool == "PATHD8"){
+              else if(input$tree_tool == "Non-ultrametric: PATHD8"){
+                treex = ape::read.tree(files[i])
                 treex_tiplabels = treex$tip.label
                 # extract the first two tip labels (could be any two labels)
                 label1 = treex_tiplabels[1]
@@ -176,11 +463,10 @@ server = function(input, output, session) {
                 tryCatch({
                 pathd8_result = ips::pathd8(phy = treex, exec = pathd8_filepath, seql = input$seqlength, calibration = pathd8_params)
                 treex.ultra = pathd8_result$mpl_tree
+                treex.ultra2 = ape::multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
                 }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
                 
               }
-              
-              treex.ultra2 = ape::multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
               
               if (input$set_seed == TRUE) set.seed(1234)
               
@@ -188,7 +474,7 @@ server = function(input, output, session) {
               # tryCatch skips through any possible errors with the gmyc function (e.g. nuclear genes that are identical)
               
               tryCatch({
-                 treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = "multiple")
+                 treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = input$gmyc_threshold)
               }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
               
               # treex.gmyc = gmyc(treex.ultra2, quiet = F, method = "multiple")
@@ -403,11 +689,23 @@ server = function(input, output, session) {
             }
           })
           
-          # download the table
+          # download the summary table
           output$GMYC_oversplit_table_download = downloadHandler(
             
             filename = function (){paste('mean_oversplits_per_group', 'csv', sep = '.')},
             content = function (file){write.csv(mean_oversplits_per_grp, file, row.names = FALSE)}
+          )
+          
+          # View the full table data
+          observeEvent(input$GMCY_oversplit_full_table,{
+            output$GMYC_oversplit_table = renderTable(oversplitting_species_bound, rownames = FALSE, colnames = TRUE, digits = 2)
+          })
+          
+          # download the full data table
+          output$GMYC_oversplit_full_table_download = downloadHandler(
+            
+            filename = function (){paste('mean_oversplits_per_group_full', 'csv', sep = '.')},
+            content = function (file){write.csv(oversplitting_species_bound, file, row.names = FALSE)}
           )
           
           ################################################################################################
@@ -700,6 +998,31 @@ server = function(input, output, session) {
             stats.df$entities = ent_summmary
             
             output$data_table =  renderTable(stats.df, rownames = FALSE, colnames = TRUE, digits = 2)
+            
+            ################################################################################################
+            # Download entities and clusters data
+            ################################################################################################
+            
+            
+            output$download_clust_ent_data = downloadHandler(
+              
+              filename = function (){paste('clust_ent_data', 'csv', sep = '.')},
+              content = function (file){write.csv(clust_ent, file, row.names = FALSE)}
+            )
+            
+            
+            ################################################################################################
+            # Download stat summary for entities and clusters data
+            ################################################################################################
+            
+            
+            output$download_stat_summary = downloadHandler(
+              
+              filename = function (){paste('clust_ent_summary', 'csv', sep = '.')},
+              content = function (file){write.csv(stats.df, file, row.names = FALSE)}
+            )
+            
+            ################################################################################################
           })
           
           
@@ -991,30 +1314,7 @@ server = function(input, output, session) {
             }
           )
           
-          ################################################################################################
-          # Download entities and clusters data
-          ################################################################################################
           
-          
-          output$download_clust_ent_data = downloadHandler(
-            
-            filename = function (){paste('clust_ent_data', 'csv', sep = '.')},
-            content = function (file){write.csv(clust_ent, file, row.names = FALSE)}
-          )
-          
-          
-          ################################################################################################
-          # Download stat summary for entities and clusters data
-          ################################################################################################
-          
-          
-          output$download_stat_summary = downloadHandler(
-            
-            filename = function (){paste('clust_ent_summary', 'csv', sep = '.')},
-            content = function (file){write.csv(stats.df, file, row.names = FALSE)}
-          )
-          
-          ################################################################################################
           
         }# end of else 1
         
