@@ -214,7 +214,7 @@ The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Pyth
 10. Under the **Select Group Column:** dropdown menu, select **predefined_group**. Leave the **Select Smaple Name Column** selected from the second dropdown menu.
 11. Click the **RUN GMYC** button.
 12. Once the analysis is complete, select the **View Data** tab. 
-13. The **Print** button in the **Print all data to the screen** displays the number of clusters and entities recorded for each of the 10 iteration files, and the **Print** button in the **Print summary statistics to the screen** panel displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files.  
+13. The **Print** button in the **Print all data to the screen** displays the number of clusters and entities recorded for each of the 10 iteration files, and the **Print** button in the **Print summary statistics to the screen** panel displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files. These are the results using the 25% resampled data:
 
 | statistic        | clusters    | entities   | 
 |-----------      |-------|----- |
