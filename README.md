@@ -196,29 +196,32 @@ Upload the dataframe downloaded from the **Amalgamate** tab and apply the desire
 
 ## :pencil2: **Worked Example using cochineal 12S sequences**
 
-The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Python GUI program](https://github.com/CJMvS/spede-sampler-py) that randomly resampled 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% of the 142 cochineal insect sequences in the 12S_aligned FASTA file. Each subsampled dataset contains 100 iterations (performed with a set seed for reproducibility). The 'cochineal_ids' csv file contains predefined species designations for each sequence based on the host plant the specimen was collected from (the cochineal insects display high host-specificity, where a particular species will typically only feed on one cactus species). See the associated [journal article](https://www.sciencedirect.com/science/article/pii/S1049964420306538) for more information about these insects and genetic sequences. There are currently 11 described cochineal species, four of which are used as biological control agents for invasive cactus species. These are *Dactylopius opuntiae*, *D. tomeontosus*, *D. ceylonicus*, and *D. austrinus*. *Dactylopius opuntiae* comprises the "ficus" and "stricta" lineages, and *D. tomentosus* comprises lineages including "cholla", "imbricata", "californica var. parkerii", "bigelovii", and "cylindropuntia".
+The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Python GUI program](https://github.com/CJMvS/spede-sampler-py) that randomly resampled 25, 50, 75, and 100% of the 142 cochineal insect sequences in the 12S_aligned FASTA file. Each subsampled dataset contains 10 iterations (performed with a set seed for reproducibility). The 'cochineal_ids' csv file contains predefined species designations for each sequence based on the host plant the specimen was collected from (the cochineal insects display high host-specificity, where a particular species will typically only feed on one cactus species). See the associated [journal article](https://www.sciencedirect.com/science/article/pii/S1049964420306538) for more information about these insects and genetic sequences. There are currently 11 described cochineal species, four of which are used as biological control agents for invasive cactus species. These are *Dactylopius opuntiae*, *D. tomeontosus*, *D. ceylonicus*, and *D. austrinus*. *Dactylopius opuntiae* comprises the "ficus" and "stricta" lineages, and *D. tomentosus* comprises lineages including "cholla", "imbricata", "californica var. parkerii", "bigelovii", and "cylindropuntia".
 
 📌 The **Supplementary data** file contains all the results of this worked example (i.e. the output of the SPEDE-Sampler R shiny application) packaged as an R project with relevant code for generating graphical output.
 
 **Steps:**
 
-1. Download the worked_example.zip folder and unzip it. 
+1. Download the 12S_aligned.fas file. 
 2. Open the SPEDE-SAMPLER-GMYC R Shiny application using the instructions at the start of this README
-3. Use the **Folder select** button or paste the file path to the **Iterations_50** folder located in the now-unzipped **worked_example** folder. This folder contains 100 tree files created from randomly resampling 50% of the 142 cochineal 12S sequences, repeated 100 times.
-4. Leave the **FastTree** radio button selected, as these example tree files were created using FastTree.
-5. Check the **Set a seed?** radio button. 
-6. Under **Upload a .csv file containing predefined groups for your samples:**, click **Browse**, and select the **cochineal_ids.csv** file.
-7. Under the **Select Group Column:** dropdown menu, select **predefined_group**. Leave the **Select Smaple Name Column** selected from the second dropdown menu.
-8. Click the **RUN** button.
-9. Once the analysis is complete, select the **View Data** tab. 
-10. The **Show all data** button displays the number of clusters and entities recorded for each of the 100 iteration files, and the **Show summary table** button displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files. The **Clusters_entities** folder (**worked_example** --> **Multiple_data**) contains the number of clusters and entities for each tree file for the 15 - 100% resampled datasets. 
+3. Upload the 12S_aligned.fas file in the **Random resampling** tab. Change the "percentage of sequences to resample" to 25%, the "number of iterations" to 10, and select "Set a seed". Click "Resample". For the remainder of these instructions, repeat the process for 50, 75, and 100% of the data, changing the output folder names accordingly where appropriate.
+4. In the **BEAST XML Files** tab, insert the file path to the folder containing the resampled FASTA files of 25% of the dataset. Leave the default settings, changing only the MCMC to 5 000 000, and the output folder name. Click "Generate". 
+5. Either run BEAST2 from the **Run BEAST** tab by inserting the file path to the folder containing the desired .xml files, or upload the .xml files to CIPRES and run the analyses on the external server. This is much quicker than running it on your local machine, but slightly more admin. 
+6. In the **Run TreeAnnotator** tab, insert the file path to the folder containing the .trees files generated by BEAST. Leave the burnin at 25%, the heights on "median", and the "Low Memory?" button checked. Click "Run".
+7. In the **Tracer** tab, check for MCMC convergence, and that ESS scores > 200 for the inputted log files. 
+8. In the **GMYC** analysis tab, insert the file path to the folder containing the .trees files generated by TreeAnnotator. Select the single threshold option.
+9. Under **Upload a csv file with prior grouping information:**, click **Browse**, and select the **cochineal_ids.csv** file.
+10. Under the **Select Group Column:** dropdown menu, select **predefined_group**. Leave the **Select Smaple Name Column** selected from the second dropdown menu.
+11. Click the **RUN GMYC** button.
+12. Once the analysis is complete, select the **View Data** tab. 
+13. The **Print** button in the **Print all data to the screen** displays the number of clusters and entities recorded for each of the 10 iteration files, and the **Print** button in the **Print summary statistics to the screen** panel displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files.  
 
 | statistic        | clusters    | entities   | 
 |-----------      |-------|----- |
-| Average  | 4.58  | 13.84 | 
-| Standard deviation  | 2.37   | 13.05 | 
-| Minimum  | 1.00  | 2.00  | 
-| Maximum  | 12.00   | 43.00 | 
+| Average  | 5.80  | 8.30 | 
+| Standard deviation  | 1.75   | 2.50 | 
+| Minimum  | 4  | 6  | 
+| Maximum  | 10.00   | 15.00 | 
 
 11. The **Plot Results** tab allows for the plotting of the A) the number of clusters vs entities for each tree file, B) box-and-whisker plot for the clusters and entities (showing Q1, Q3, median, minimum, maximum, and outlier values), and a line graph for the number of GMYC C) clusters and D) entities for each tree file uploaded.
 
