@@ -25,10 +25,9 @@ shiny::runApp(appDir = getwd())
 
 ## **OVERVIEW**
 
-This R Shiny App is the final step of the analysis pipeline following from the [SPEDE-SAMPLER Python program](https://github.com/CJMvS/spede-sampler-py) (see the diagram below). The application requires the user to input a folder directory containing all the tree files created by FastTree or RAxML. If the user wishes to run the analysis on only one tree, this tree file needs to be saved into a folder first, which can then be selected.
-Using the "ape" package, each tree is opened and converted to become fully dichotomous (**multi2di()** function) and ultrametric (**chronos()** function).
-The GMYC species delimitation algorithm is then run on each tree using the R "splits" package. 
-If the user has predefined grouping data for their samples, this can be uploaded as an Excel .csv file. These predefined groups are then compared to the groups estimated by the GMYC analysis, and a percentage match is calculated.
+This R Shiny App offers an analysis pipeline for assessing how sampling effects and paramater choices can affect the results of a GMYC analysis. 
+The pipeline begins with the uploading of an aligned FASTA file, where a chosen percentage of the dataset is randomly resampled a *n* times without replacement. BEAST .xml files are then generated for each resampled FASTA alignment, applying desired configuration settings. Each .xml file is run in BEAST, and the results fed into TreeAnnotator. Maximum clade credibility trees are then used as input for GMYC analyses (single or multiple threshold).
+If the user has predefined grouping data for their samples (e.g. morphospecies assignments), this can be uploaded as an Excel .csv file. These predefined groups are compared to the groups estimated by the GMYC analysis, and percentage matches calculated.
 
 This application outputs:
 1. The number of clusters and entities estimated by the GMYC method for the uploaded data
