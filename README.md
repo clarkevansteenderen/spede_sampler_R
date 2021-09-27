@@ -235,7 +235,7 @@ The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Pyth
 
 11. The **Plot Results** tab allows for the plotting of the A) the number of clusters vs entities for each tree file, B) box-and-whisker plot for the clusters and entities (showing Q1, Q3, median, minimum, maximum, and outlier values), and a line graph for the number of GMYC C) clusters and D) entities for each tree file uploaded.
 
-<img src="worked_example_images/plot_results.png" alt="drawing" width="900"/>
+<img src="worked_example_figures/clust_ents_plot.png" alt="drawing" width="350"/>
 
 12. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
 
@@ -274,6 +274,35 @@ The output above means, for example, that the GMYC method oversplit the *Dactylo
 
 A barplot and boxplot for this data can be created and downloaded: 
 
-<img src="worked_example_images/oversplitting_species_boxbarplot.png" alt="drawing" width="900"/>
+<img src="worked_example_figures/oversplitting.png" alt="drawing" width="350"/>
 
-16. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. 
+16. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. In this way, the results of the 25, 50, 75, and 100% datasets can be joined into one file in order to be easily plotted. For example, the four files clust_ent_data_25.csv, clust_ent_data_50.csv, clust_ent_data_75.csv, and clust_ent_data_100.csv can be uploaded, and all the cluster data can be amalgamated into one file, and all the entity data into another.
+The clusters summary table looks like this:
+
+|                  | 25 | 50 | 75 | 100 |
+|------------------|----|----|----|-----|
+| resampled_1.nex  | 5  | 7  | 9  | 11  |
+| resampled_2.nex  | 4  | 11 | 11 | 11  |
+| resampled_3.nex  | 10 | 9  | 11 | 10  |
+| resampled_4.nex  | 6  | 10 | 10 | 10  |
+| resampled_5.nex  | 6  | 7  | 9  | 10  |
+| resampled_6.nex  | 7  | 7  | 10 | 11  |
+| resampled_7.nex  | 6  | 8  | 9  | 10  |
+| resampled_8.nex  | 5  | 9  | 10 | 11  |
+| resampled_9.nex  | 5  | 11 | 10 | 10  |
+| resampled_10.nex | 4  | 8  | 11 | 10  |
+
+and the entities table looks like this:
+
+|                  | 25 | 50 | 75 | 100 |
+|------------------|----|----|----|-----|
+| resampled_1.nex  | 7  | 9  | 10 | 12  |
+| resampled_2.nex  | 8  | 13 | 12 | 12  |
+| resampled_3.nex  | 15 | 10 | 12 | 10  |
+| resampled_4.nex  | 7  | 12 | 11 | 10  |
+| resampled_5.nex  | 8  | 9  | 10 | 10  |
+| resampled_6.nex  | 8  | 9  | 10 | 12  |
+| resampled_7.nex  | 9  | 9  | 10 | 10  |
+| resampled_8.nex  | 8  | 9  | 10 | 12  |
+| resampled_9.nex  | 6  | 11 | 10 | 10  |
+| resampled_10.nex | 7  | 9  | 12 | 10  |
