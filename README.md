@@ -48,7 +48,7 @@ This application outputs:
 
 ## **FUNCTIONALITY FLOW DIAGRAM**
 
-<img src="spede_sampler_diagram.png" alt="drawing" width="900"/>
+<img src="spede_workflow.png" alt="drawing" width="900"/>
 
 # **USAGE, TAB-BY-TAB**
 
