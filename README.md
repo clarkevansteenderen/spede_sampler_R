@@ -13,8 +13,18 @@
 
 1. Download and unzip the **spede_sampler_R** repository
 2. Open R, and install (if applicable) and load the shiny library
-3. Change the working directory to the downloaded folder
-4. Run the application using the **runApp()** function
+3. Install and load the Biostrings package:
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("Biostrings")
+library(Biostrings)
+```
+
+4. Change the working directory to the downloaded folder
+5. Run the application using the **runApp()** function
 
 ``` r
 install.packages("shiny")
@@ -31,10 +41,10 @@ If the user has predefined grouping data for their samples (e.g. morphospecies a
 
 This application outputs:
 1. The number of clusters and entities estimated by the GMYC method for the uploaded data
-2. The percentage matches between predefined groupings and GMYC species estimates; with and without GMYC species represented by single-samples
+2. The percentage matches between predefined groupings and GMYC species estimates; with and without GMYC species represented by single-samples (= singletons)
 3. Oversplitting ratios (the ratio of the number of GMYC species to predefined groups)
-4. Which predefined groups were split into more than one GMYC species 
-5. Summary plots for the results of multiple GMYC results 
+4. Which predefined groups were split into more than one GMYC species, indicating possible undiscovered diversity
+5. Summary plots 
 
 ## **FUNCTIONALITY FLOW DIAGRAM**
 
@@ -214,14 +224,14 @@ The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Pyth
 10. Under the **Select Group Column:** dropdown menu, select **predefined_group**. Leave the **Select Smaple Name Column** selected from the second dropdown menu.
 11. Click the **RUN GMYC** button.
 12. Once the analysis is complete, select the **View Data** tab. 
-13. The **Print** button in the **Print all data to the screen** displays the number of clusters and entities recorded for each of the 10 iteration files, and the **Print** button in the **Print summary statistics to the screen** panel displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files. These are the results using the 25% resampled data:
+13. The **Print** button in the **Print all data to the screen** displays the number of clusters and entities recorded for each of the 10 iteration files, and the **Print** button in the **Print summary statistics to the screen** panel displays the average, standard deviation, minimum, and maximum values for this data. Both of these dataframes can be downloaded as .csv files. These are the results using the 75% resampled data:
 
 | statistic        | clusters    | entities   | 
 |-----------      |-------|----- |
-| Average  | 5.80  | 8.30 | 
-| Standard deviation  | 1.75   | 2.50 | 
-| Minimum  | 4  | 6  | 
-| Maximum  | 10.00   | 15.00 | 
+| Average  | 10.0  | 10.7 | 
+| Standard deviation  | 0.82   | 0.95 | 
+| Minimum  | 9.00  | 10.00  | 
+| Maximum  | 11.00   | 12.00 | 
 
 11. The **Plot Results** tab allows for the plotting of the A) the number of clusters vs entities for each tree file, B) box-and-whisker plot for the clusters and entities (showing Q1, Q3, median, minimum, maximum, and outlier values), and a line graph for the number of GMYC C) clusters and D) entities for each tree file uploaded.
 
