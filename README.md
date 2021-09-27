@@ -261,8 +261,6 @@ The **View Matches** button displays the percentage matches including and exclud
 
 14. The **Plot Percentage matches** tab allows for the plotting of the percentage match; A) including or B) excluding GMYC single-sample species for each tree file.
 
-<img src="worked_example_images/match_data_plots.png" alt="drawing" width="900"/>
-
 15. The **GMYC Oversplitting** tab displays GMYC species oversplitting relative to the user's predefined groups. The **View Summary Table** button allows the user to download the mean, standard deviation, minimum and maximum oversplitting values for each predefined group.
 
 | predefined_group        | mean    | sd   | min | max |
@@ -272,33 +270,10 @@ The **View Matches** button displays the percentage matches including and exclud
 | opuntiae  | 2  | 0 | 2 | 2 |
 | tomentosus  | 3.9  | 0.32  | 3 | 4 |
 
-The output above means, for example, that the GMYC method oversplit the *Dactylopius opuntiae* predefined group into an average of 3.63 times more 'species' than expected (i.e. all the samples with the predefined group labelled "opuntiae" are expected to be grouped into one species by the GMYC method). The *D. opuntiae* sequences in this dataset were collected from various localities in the USA, and are likely different lineages/biotypes. The high value of 3.63 may therefore not be a case of incorrect 'oversplitting', but rather genuine intraspecific divisions. Each dataset needs to be analysed in the context of what is known about the organism's biology.
+The output above means, for example, that the GMYC method oversplit the *Dactylopius tomentosus* predefined group into an average of 3.9 times more 'species' than expected (i.e. all the samples with the predefined group labelled "tomentosus" are expected to be grouped into one species by the GMYC method). The *D. tomentosus* sequences in this dataset are known to contain different lineages/biotypes. The high value of 3.9 may therefore not be a case of incorrect 'oversplitting', but rather due to genuine intraspecific divisions. Each dataset needs to be analysed in the context of what is known about the organism's biology.
 
 A barplot and boxplot for this data can be created and downloaded: 
 
 <img src="worked_example_images/oversplitting_species_boxbarplot.png" alt="drawing" width="900"/>
 
-16. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. This worked example only looked at a 50% resampled dataset, but this could be repeated on many other resampled datasets of different sizes. The **worked_example.zip** file contains a folder called **Multiple_data**, with the output from 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100% resampled data.
-17. In the **Amalgamate** tab, select **Browse** under the **upload multiple .csv files with multiple columns of output data:**. Select the 10 **match_data** files, and select the desired column (e.g. **percentage_matches** and **percentage_matches_excl_single_samples**) to extract from each file and combine into one output. Download the resulting .csv files, and rename the column headings to 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100.
-The first two rows of the **percentage_matches.csv** result should be:
-
-| |15|20|30|40|50|60|70|80|90|100|
-|-------|-------|-----|-----|-----|-----|-----|-----|-----|-----|-----|
-|iteration1.tre| 83.33 | 50| 90| 95.83| 87.5|50|100|100|100|98.51|
-|iteration2.tre| 50 | 50| 85.71| 85.71| 97.22|92.31|97.06|90|90|100|
-
-18. In the **Plot for multiple-column data** tab, upload the amalgamated dataframe downloaded in step 17. These are all in the same **Multiple_data** folder for reference. Upload the **percent_excl_singles.csv** file under **LINE 1** and **oversplitting_excl_singles.csv** under **LINE 2**. Change the title to "Percentage match excluding single-sample GMYC species", and edit the y-axis label to "Match (%)". Set the y-axis tick-mark interval to 10. Plot the boxplot and line plot, with the desired tweaks (e.g. point colour, ggplot theme). 
-19. Plot a boxplot, or the line plot with either one or both lines displayed. To add the second line, select the **Include second line on line plot** check box. Note that the boxplot button plots the data that was uploaded as Line 1. 
-
-<img src="worked_example_images/multiple_data_plots.png" alt="drawing" width="900"/>
-
-Below is the output from plotting two lines for A) percentage matches and B) oversplitting ratios with and without single-sample GMYC species.
-
-<img src="worked_example_images/multiple_data_line_plot_two_lines.png" alt="drawing" width="900"/>
-
-From these graphs, excluding the GMYC species represented by single samples gives consistently lower average matches and oversplitting ratios, which are more conservative.
-
-20. The **Amalgamate** tab can also be used to merge the clusters and entities output. In this tab, upload all ten **clust_ent_data.csv** files in the **Clusters_entities** folder. First select **clusters** fromn the dropdown menu and download the result, and then do the same for the **entities** column. These have been saved as **clusters_comnbo.csv** and **entities_combo.csv** in the **Amalgamated** folder. Change the column headings to 15, 20, 30, 40, 50, 60, 70, 80, 90, and 100.
-21. In the **Plot for multiple-column data** tab, change the title to "Clusters and entities", and the y-axis label to "Number of clusters or entities". For Line 1 and Line 2, upload the clusters_combo and entities_combo in any order. Select the "Include second line on line plot?" checkbox, and change the line labels accordingly. Plot the chart.
-
-<img src="worked_example_images/multiple_data_line_plot_clust_ent.png" alt="drawing" width="700"/>
+16. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. 
