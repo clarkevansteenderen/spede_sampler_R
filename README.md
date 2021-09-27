@@ -237,9 +237,9 @@ The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Pyth
 
 <img src="worked_example_figures/clust_ents_plot.png" alt="drawing" width="350"/>
 
-12. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
+14. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
 
-13. The **Percentage Matches** tab shows the results of how the GMYC species designations compare to the predefined groups in the **cochineal-ids.csv** file.
+15. The **Percentage Matches** tab shows the results of how the GMYC species designations compare to the predefined groups in the **cochineal-ids.csv** file.
 The **View GMYC species list** button shows a datatable containing each sample name with the assigned GMYC species. The corresponding predefined group given to that particular sample is appended as a third column. For example:
 
 | GMYC_spec | sample_name | ids | 
@@ -259,9 +259,9 @@ The **View Matches** button displays the percentage matches including and exclud
 | Minimum             | 100.00  | 100.00  | 0.00  | 2.00 | 1.80 |
 | Maximum             | 100.00 | 100.00 | 10.00| 2.40 | 2.20 |
 
-14. The **Plot Percentage matches** tab allows for the plotting of the percentage match; A) including or B) excluding GMYC single-sample species for each tree file.
+16. The **Plot Percentage matches** tab allows for the plotting of the percentage match; A) including or B) excluding GMYC single-sample species for each tree file.
 
-15. The **GMYC Oversplitting** tab displays GMYC species oversplitting relative to the user's predefined groups. The **View Summary Table** button allows the user to download the mean, standard deviation, minimum and maximum oversplitting values for each predefined group.
+17. The **GMYC Oversplitting** tab displays GMYC species oversplitting relative to the user's predefined groups. The **View Summary Table** button allows the user to download the mean, standard deviation, minimum and maximum oversplitting values for each predefined group.
 
 | predefined_group        | mean    | sd   | min | max |
 |-----------      |-------|----- |----- |----- |
@@ -276,7 +276,7 @@ A barplot and boxplot for this data can be created and downloaded:
 
 <img src="worked_example_figures/oversplitting.png" alt="drawing" width="350"/>
 
-16. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. In this way, the results of the 25, 50, 75, and 100% datasets can be joined into one file in order to be easily plotted. For example, the four files clust_ent_data_25.csv, clust_ent_data_50.csv, clust_ent_data_75.csv, and clust_ent_data_100.csv can be uploaded, and all the cluster data can be amalgamated into one file, and all the entity data into another.
+18. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. In this way, the results of the 25, 50, 75, and 100% datasets can be joined into single files in order to be easily plotted. For example, the four files clust_ent_data_25.csv, clust_ent_data_50.csv, clust_ent_data_75.csv, and clust_ent_data_100.csv can be uploaded, and all the cluster data can be amalgamated into one file, and all the entity data into another.
 The clusters summary table looks like this:
 
 |                  | 25 | 50 | 75 | 100 |
@@ -306,3 +306,109 @@ and the entities table looks like this:
 | resampled_8.nex  | 8  | 9  | 10 | 12  |
 | resampled_9.nex  | 6  | 11 | 10 | 10  |
 | resampled_10.nex | 7  | 9  | 12 | 10  |
+
+The resulting summary plots can be plotted as shown below. A) The number of clusters and entities at each dataset size (the dotted lines indicate the expected number of species (n = 5), and species + lineages (n = 11) in the dataset), B) The oversplitting ratios with and without singletons across dataset sizes (the dotted line indicates the expected ratio of 1), and C) the percentage of singleton sequences across dataset sizes.
+
+<img src="worked_example_figures/combo_plots_cochineal_git.png" alt="drawing" width="550"/>
+
+The R code to create these plots is shown here:
+
+```r
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+
+# CLUSTERS
+
+clusters = read.csv("cochineal_12S/clust-ent-data/clusters_combined.csv", header = T, check.names = F)
+clusters_melt = reshape2::melt(clusters)
+colnames(clusters_melt) = c("file_name", "data_perc", "clusters")
+
+# #ENTITIES
+
+entities = read.csv("cochineal_12S/clust-ent-data/entities_combined.csv", header = T, check.names = F)
+entities_melt = reshape2::melt(entities)
+colnames(entities_melt) = c("file_name", "data_perc", "entities")
+
+clusters_melt$entities = entities_melt$entities 
+
+clusts_ents = reshape::melt(clusters_melt)
+
+# BOXPLOT
+
+clust_ent_boxplot = ggplot(data = clusts_ents, aes(x = data_perc, y = value)) + 
+  geom_boxplot(aes(fill = variable)) +
+  stat_summary(fun = mean, aes(group = variable), geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
+  scale_fill_manual(values=c("#1EAD4B", "#AC72D9"), name = "", labels = c("Clusters", "Entities")) +
+  xlab("Data Percentage") +
+  ylab("Number of clusters or entities") +
+  ggtitle("A") +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+  theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(legend.text=element_text(size=12)) +
+  theme(plot.title = element_text(size=16, face = "bold")) +
+  geom_hline(yintercept= 5, linetype="dashed") +
+  geom_hline(yintercept= 11, linetype="dashed") ; clust_ent_boxplot
+  #guides(fill=guide_legend(title=""))
+
+# OVERSPLITTING RATIOS
+
+oversplitting = read.csv("cochineal_12S/match_data/oversplitting_ratio.csv", header = T, check.names = F)
+oversplitting_melt = reshape2::melt(oversplitting)
+colnames(oversplitting_melt) = c("file_name", "data_perc", "oversplitting_ratio")
+
+oversplitting_excl_sing = read.csv("cochineal_12S/match_data/oversplitting_excl_singles.csv", header = T, check.names = F)
+oversplitting_excl_sing_melt = reshape2::melt(oversplitting_excl_sing)
+colnames(oversplitting_excl_sing_melt) = c("file_name", "data_perc", "oversplitting_ratio_excl")
+
+oversplitting_melt$oversplitting_excl = oversplitting_excl_sing_melt$oversplitting_ratio_excl
+
+oversplitting_combo = reshape::melt( oversplitting_melt )
+
+# BOXPLOT
+
+oversplitting_boxplot = ggplot(data = oversplitting_combo, aes(x = data_perc, y = value)) + 
+  geom_boxplot(aes(fill = variable)) +
+  stat_summary(fun = mean, aes(group = variable), geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
+  scale_fill_manual(values=c("#2D86F0", "#F02D5A"), name = "", labels = c("+ singletons", "- singletons")) +
+  xlab("Data Percentage") +
+  ylab("Oversplitting ratio") +
+  ggtitle("B") +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  guides(fill=guide_legend(title="")) +
+  theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+  theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(legend.text=element_text(size=12)) +
+  geom_hline(yintercept= 1, linetype="dashed") +
+  theme(plot.title = element_text(size=16, face = "bold")) ; oversplitting_boxplot
+
+# PERCENTAGE SINGLETONS
+
+singletons = read.csv("cochineal_12S/match_data/percentage_single_sample_GMYC_species.csv", header = T, check.names = F)
+singletons_melt = reshape2::melt(singletons)
+colnames(singletons_melt) = c("file_name", "data_perc", "perc_singletons")
+
+singletons_boxplot = ggplot(data = singletons_melt, aes(x = data_perc, y = perc_singletons)) +
+  geom_boxplot(fill = "#B5D5FA") +
+  stat_summary(fun = mean, geom="point", shape=17, size=4, color="black", position=position_dodge(0.77)) +
+  xlab("Data Percentage") +
+  ylab("Percentage singletons") +
+  ggtitle("C") +
+  theme_classic() +
+  theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+  theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=16, face = "bold")) ; singletons_boxplot
+  
+combo_plots = gridExtra::grid.arrange(clust_ent_boxplot, oversplitting_boxplot, singletons_boxplot, oversplitting_bar)
+ggsave(plot = combo_plots, width = 25, height = 25, dpi = 350, filename = "combo_plots_cochineal.pdf", units = "cm")
+```
