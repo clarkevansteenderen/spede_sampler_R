@@ -237,12 +237,10 @@ The **worked_example.zip** folder contains the output of the [SPEDE-SAMPLER Pyth
 
 <img src="worked_example_images/plot_results.png" alt="drawing" width="900"/>
 
-12. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. For example, select **iteration50.tre** from the dropdown menu:
-
-<img src="worked_example_images/iteration50.png" alt="drawing" width="900"/>
+12. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
 
 13. The **Percentage Matches** tab shows the results of how the GMYC species designations compare to the predefined groups in the **cochineal-ids.csv** file.
-The **View GMYC species list** button shows a datatable containing each sample name with the assigned GMYC species. The corresponding predefined group given to that particular sample is appended as a third column. The first 5 rows are:
+The **View GMYC species list** button shows a datatable containing each sample name with the assigned GMYC species. The corresponding predefined group given to that particular sample is appended as a third column. For example:
 
 | GMYC_spec | sample_name | ids | 
 | ----------- | ----------- | ----------- |
@@ -256,10 +254,10 @@ The **View Matches** button displays the percentage matches including and exclud
 
 | statistic        | percentage_matches    | percentage_matches_excl_single_samples   | percentage_single_sample_GMYC_species | oversplitting_ratio | oversplitting_ratio_excl_single_sample_spp |
 |--------             |-------|----- |----- |----- |----- |
-| Average             | 83.14  | 72.34 | 45.28 | 2.77 | 0.92 |
-| Standard deviation  | 16.19  | 17.87 | 27.79 | 2.61 | 0.47 |
-| Minimum             | 50.00  | 0.00  | 0.00  | 0.40 | 0.20 |
-| Maximum             | 100.00 | 100.00 | 94.29| 8.60 | 2.40 |
+| Average             | 100.00  | 100.00 | 6.41 | 2.41 | 2.00 |
+| Standard deviation  | 0.00  | 0.00 | 4.47 | 2.61 | 0.16 |
+| Minimum             | 100.00  | 100.00  | 0.00  | 2.00 | 1.80 |
+| Maximum             | 100.00 | 100.00 | 10.00| 2.40 | 2.20 |
 
 14. The **Plot Percentage matches** tab allows for the plotting of the percentage match; A) including or B) excluding GMYC single-sample species for each tree file.
 
@@ -269,11 +267,10 @@ The **View Matches** button displays the percentage matches including and exclud
 
 | predefined_group        | mean    | sd   | min | max |
 |-----------      |-------|----- |----- |----- |
-| opuntiae  | 3.63  | 1.65 | 2 | 9 |
-| confusus  | 2.18   | 0.40 | 2 | 3 |
-| tomentosus  | 2.73  | 0.79  | 2 | 4 |
-| austrinus  | 2.00   | NA | 2 | 4 |
-| ceylonicus  | 2.00   | NA | 2 | 2 |
+| ceylonicus  | 2 | 0 | 2 | 2 |
+| confusus  | 2   | 0 | 2 | 2 |
+| opuntiae  | 2  | 0 | 2 | 2 |
+| tomentosus  | 3.9  | 0.32  | 3 | 4 |
 
 The output above means, for example, that the GMYC method oversplit the *Dactylopius opuntiae* predefined group into an average of 3.63 times more 'species' than expected (i.e. all the samples with the predefined group labelled "opuntiae" are expected to be grouped into one species by the GMYC method). The *D. opuntiae* sequences in this dataset were collected from various localities in the USA, and are likely different lineages/biotypes. The high value of 3.63 may therefore not be a case of incorrect 'oversplitting', but rather genuine intraspecific divisions. Each dataset needs to be analysed in the context of what is known about the organism's biology.
 
