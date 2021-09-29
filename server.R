@@ -9,6 +9,10 @@ ggthemes = list("Classic" = theme_classic(),
 
 server = function(input, output, session) {
   
+  home_dir = getwd()
+  treeannotator_dir = paste(home_dir, "/TreeAnnotator.exe", sep = "")
+  logcombiner_dir = paste(home_dir, "/LogCombiner.exe", sep = "")
+  
   #access to the app from the homepage link
   observeEvent(input$app, updateTabsetPanel(session = session, inputId = "tabset", selected = "app"))
   
@@ -78,84 +82,92 @@ observeEvent(input$resample_fastas, {
   observeEvent(input$create_xml_files, {
   
     resampled_fasta_file_path = input$resampled_fasta_file_path
-    setwd(resampled_fasta_file_path)
-    resampled_fasta_files = gtools::mixedsort( list.files(pattern = "\\.fas") ) 
     
-    # different rate distribution options
-    rate_option = function(distribution_prior, n){ 
+    if (!dir.exists(resampled_fasta_file_path)) 
+      shinyalert::shinyalert("Error", "File path does not exist", type = "error")
+    
+    else{
+        setwd(resampled_fasta_file_path)
+        resampled_fasta_files = gtools::mixedsort( list.files(pattern = "\\.fas") ) 
+        
+        # different rate distribution options
+        rate_option = function(distribution_prior, n){ 
+          
+          if(missing(n)){
+          switch(distribution_prior, 
+                 "Beta" = beautier::create_beta_distr(),
+                 "Exponential" = beautier::create_exp_distr(),
+                 "Gamma" = beautier::create_gamma_distr(),
+                 "Inverse gamma" = beautier::create_inv_gamma_distr(),
+                 "Laplace" = beautier::create_laplace_distr(),
+                 "Log-normal" = beautier::create_log_normal_distr(),
+                 "Normal" = beautier::create_normal_distr(),
+                 "1/X" = beautier::create_distr_one_div_x(),
+                 "Poisson" = beautier::create_poisson_distr(),
+                 "Uniform" = beautier::create_uniform_distr())
+          }
+          
+          else {
+            switch(distribution_prior, 
+                   "Beta" = beautier::create_beta_distr(value = n),
+                   "Exponential" = beautier::create_exp_distr(value = n),
+                   "Gamma" = beautier::create_gamma_distr(value = n),
+                   "Inverse gamma" = beautier::create_inv_gamma_distr(value = n),
+                   "Laplace" = beautier::create_laplace_distr(value = n),
+                   "Log-normal" = beautier::create_log_normal_distr(value = n),
+                   "Normal" = beautier::create_normal_distr(value = n),
+                   "1/X" = beautier::create_distr_one_div_x(value = n),
+                   "Poisson" = beautier::create_poisson_distr(value = n),
+                   "Uniform" = beautier::create_uniform_distr(value = n))
+          } 
       
-      if(missing(n)){
-      switch(distribution_prior, 
-             "Beta" = beautier::create_beta_distr(),
-             "Exponential" = beautier::create_exp_distr(),
-             "Gamma" = beautier::create_gamma_distr(),
-             "Inverse gamma" = beautier::create_inv_gamma_distr(),
-             "Laplace" = beautier::create_laplace_distr(),
-             "Log-normal" = beautier::create_log_normal_distr(),
-             "Normal" = beautier::create_normal_distr(),
-             "1/X" = beautier::create_distr_one_div_x(),
-             "Poisson" = beautier::create_poisson_distr(),
-             "Uniform" = beautier::create_uniform_distr())
-      }
-      
-      else {
-        switch(distribution_prior, 
-               "Beta" = beautier::create_beta_distr(value = n),
-               "Exponential" = beautier::create_exp_distr(value = n),
-               "Gamma" = beautier::create_gamma_distr(value = n),
-               "Inverse gamma" = beautier::create_inv_gamma_distr(value = n),
-               "Laplace" = beautier::create_laplace_distr(value = n),
-               "Log-normal" = beautier::create_log_normal_distr(value = n),
-               "Normal" = beautier::create_normal_distr(value = n),
-               "1/X" = beautier::create_distr_one_div_x(value = n),
-               "Poisson" = beautier::create_poisson_distr(value = n),
-               "Uniform" = beautier::create_uniform_distr(value = n))
-      }
     }
     
     
-  # Set up the inference model 
-  inference_model = beautier::create_inference_model(
+        # Set up the inference model 
+        inference_model = beautier::create_inference_model(
+          
+          site_model = switch(input$beast_site_model, "GTR" = beautier::create_gtr_site_model(), 
+                              "HKY" = beautier::create_hky_site_model(),
+                              "JC69" = beautier::create_jc69_site_model(),
+                              "TN93" = beautier::create_tn93_site_model()),
+          
+          clock_model = switch(input$beast_clock_model, "Strict" = beautier::create_strict_clock_model(clock_rate_param = input$beast_clock_rate), 
+                               "Relaxed lognormal" = beautier::create_rln_clock_model(clock_rate_param = input$beast_clock_rate)),
+         
+          tree_prior = switch(input$beast_tree_prior, "Birth-death" = beautier::create_bd_tree_prior(birth_rate_distr = rate_option(input$distr_b), death_rate_distr = rate_option(input$distr_d)),
+                              "Coalescent Bayesian skyline" = beautier::create_cbs_tree_prior(group_sizes_dimension = input$cbs_group_sizes_dim),
+                              "Coalescent constant-population" = beautier::create_ccp_tree_prior(pop_size_distr = rate_option(input$distr_ccp, n = input$pop_size_distribution)),
+                              "Coalescent exponential-population" = beautier::create_cep_tree_prior(pop_size_distr = rate_option(input$distr_cep_pop), growth_rate_distr = rate_option(input$distr_cep_gr)),
+                              "Yule" = beautier::create_yule_tree_prior(birth_rate_distr = rate_option(input$distr_yule))),
+          
+          mcmc = beautier::create_mcmc(chain_length = input$beast_mcmc, store_every = input$beast_store_every)
     
-    site_model = switch(input$beast_site_model, "GTR" = beautier::create_gtr_site_model(), 
-                        "HKY" = beautier::create_hky_site_model(),
-                        "JC69" = beautier::create_jc69_site_model(),
-                        "TN93" = beautier::create_tn93_site_model()),
-    
-    clock_model = switch(input$beast_clock_model, "Strict" = beautier::create_strict_clock_model(clock_rate_param = input$beast_clock_rate), 
-                         "Relaxed lognormal" = beautier::create_rln_clock_model(clock_rate_param = input$beast_clock_rate)),
-   
-    tree_prior = switch(input$beast_tree_prior, "Birth-death" = beautier::create_bd_tree_prior(birth_rate_distr = rate_option(input$distr_b), death_rate_distr = rate_option(input$distr_d)),
-                        "Coalescent Bayesian skyline" = beautier::create_cbs_tree_prior(group_sizes_dimension = input$cbs_group_sizes_dim),
-                        "Coalescent constant-population" = beautier::create_ccp_tree_prior(pop_size_distr = rate_option(input$distr_ccp, n = input$pop_size_distribution)),
-                        "Coalescent exponential-population" = beautier::create_cep_tree_prior(pop_size_distr = rate_option(input$distr_cep_pop), growth_rate_distr = rate_option(input$distr_cep_gr)),
-                        "Yule" = beautier::create_yule_tree_prior(birth_rate_distr = rate_option(input$distr_yule))),
-    
-    mcmc = beautier::create_mcmc(chain_length = input$beast_mcmc, store_every = input$beast_store_every)
-    
-  )
+        )
+        
+        # create xml files
+        withProgress(message = 'Creating XML files...', value = 0, {
+          
+        for(i in seq(along = resampled_fasta_files)){
+          
+          beautier::create_beast2_input_file_from_model(
+            input_filename =  resampled_fasta_files[i],
+            inference_model = inference_model,
+            output_filename = paste(input$xml_folder_name,"/", tools::file_path_sans_ext(resampled_fasta_files[i]), ".xml", sep = "" )
+          )
+          
+          # Increment the progress bar, and update the detail text.
+          incProgress(1/length(resampled_fasta_files), detail = paste("Processing fasta file ", i, " of ", length(resampled_fasta_files), "[ ", round(i/length(resampled_fasta_files)*100, 0), "% ]"))
+          # Pause for 0.1 seconds to simulate a long computation.
+          Sys.sleep(0.1)
+          
+        }
+          
+        }) # end of progress bar
+        
+        shinyalert::shinyalert("Complete", "Successfully created XML files", type = "success")
   
-  # create xml files
-  withProgress(message = 'Creating XML files...', value = 0, {
-    
-  for(i in seq(along = resampled_fasta_files)){
-    
-    beautier::create_beast2_input_file_from_model(
-      input_filename =  resampled_fasta_files[i],
-      inference_model = inference_model,
-      output_filename = paste(input$xml_folder_name,"/", tools::file_path_sans_ext(resampled_fasta_files[i]), ".xml", sep = "" )
-    )
-    
-    # Increment the progress bar, and update the detail text.
-    incProgress(1/length(resampled_fasta_files), detail = paste("Processing fasta file ", i, " of ", length(resampled_fasta_files), "[ ", round(i/length(resampled_fasta_files)*100, 0), "% ]"))
-    # Pause for 0.1 seconds to simulate a long computation.
-    Sys.sleep(0.1)
-    
-  }
-    
-  }) # end of progress bar
-  
-  shinyalert::shinyalert("Complete", "Successfully created XML files", type = "success")
+    } # end of else regarding setwd()
   
 })
   
@@ -164,6 +176,11 @@ observeEvent(input$resample_fastas, {
 ################################################################################################
 
   observeEvent(input$run_beast, {
+    
+    if (!dir.exists(input$xml_file_path)) 
+      shinyalert::shinyalert("Error", "File path does not exist", type = "error")
+    
+    else{
     
     setwd(input$xml_file_path)
     
@@ -189,6 +206,8 @@ observeEvent(input$resample_fastas, {
     
     shinyalert::shinyalert("Complete", "BEAST successfully run", type = "success")
     
+    } # end of else regarding setwd()
+    
   })
 
 ################################################################################################
@@ -197,43 +216,52 @@ observeEvent(input$resample_fastas, {
   
   observeEvent(input$run_treeannotator, {
     
-    setwd(input$beast_trees_file_path)
+    if (!dir.exists(input$beast_trees_file_path)) 
+      shinyalert::shinyalert("Error", "File path does not exist", type = "error")
     
-    beast_tree_files = gtools::mixedsort( list.files(pattern = "\\.trees") ) 
+    else{
     
-    burnin = paste("-burnin", input$treeannotator_burnin) 
-    heights = paste("-heights", input$treeannotator_heights)
+          file.copy(treeannotator_dir, input$beast_trees_file_path)
+          
+          setwd(input$beast_trees_file_path)
+          
+          beast_tree_files = gtools::mixedsort( list.files(pattern = "\\.trees") ) 
+          
+          burnin = paste("-burnin", input$treeannotator_burnin) 
+          heights = paste("-heights", input$treeannotator_heights)
+          
+          withProgress(message = 'Running TreeAnnotator...', value = 0, {
+            
+          for(i in seq(along = beast_tree_files)){
+            
+            in_file = beast_tree_files[i]
+            out_file = paste(tools::file_path_sans_ext(beast_tree_files[i]), ".nex", sep = "")
+            
+            if(input$treeannotator_low_mem == TRUE)
+              treeannotator_command_line = paste("TreeAnnotator.exe", burnin, heights, "-lowMem", in_file, out_file)
+            else treeannotator_command_line = paste("TreeAnnotator.exe", burnin, heights, in_file, out_file)
+            
+            system(treeannotator_command_line)
+            
+            # Increment the progress bar, and update the detail text.
+            incProgress(1/length(beast_tree_files), detail = paste("Processing BEAST .trees file ", i, " of ", length(beast_tree_files), "[ ", round(i/length(beast_tree_files)*100, 0), "% ]"))
+            # Pause for 0.1 seconds to simulate a long computation.
+            Sys.sleep(0.1)
+            
+            # this while loop delays the main loop so that it only goes into the next iteration after the file has been written.
+            # this seems to prevent the program from freezing up when treeannotator is run with very large file sizes
+            
+            while (!file.exists( paste(tools::file_path_sans_ext( beast_tree_files[i] ), ".nex", sep = "") ) ) {
+              Sys.sleep(2)
+            }
+            
+          }
+            
+          }) # end of progress bar
+          
+          shinyalert::shinyalert("Complete", "TreeAnnotator successfully run", type = "success")
     
-    withProgress(message = 'Running TreeAnnotator...', value = 0, {
-      
-    for(i in seq(along = beast_tree_files)){
-      
-      in_file = beast_tree_files[i]
-      out_file = paste(tools::file_path_sans_ext(beast_tree_files[i]), ".nex", sep = "")
-      
-      if(input$treeannotator_low_mem == TRUE)
-        treeannotator_command_line = paste("TreeAnnotator.exe", burnin, heights, "-lowMem", in_file, out_file)
-      else treeannotator_command_line = paste("TreeAnnotator.exe", burnin, heights, in_file, out_file)
-      
-      system(treeannotator_command_line)
-      
-      # Increment the progress bar, and update the detail text.
-      incProgress(1/length(beast_tree_files), detail = paste("Processing BEAST .trees file ", i, " of ", length(beast_tree_files), "[ ", round(i/length(beast_tree_files)*100, 0), "% ]"))
-      # Pause for 0.1 seconds to simulate a long computation.
-      Sys.sleep(0.1)
-      
-      # this while loop delays the main loop so that it only goes into the next iteration after the file has been written.
-      # this seems to prevent the program from freezing up when treeannotator is run with very large file sizes
-      
-      while (!file.exists( paste(tools::file_path_sans_ext( beast_tree_files[i] ), ".nex", sep = "") ) ) {
-        Sys.sleep(2)
-      }
-      
-    }
-      
-    }) # end of progress bar
-    
-    shinyalert::shinyalert("Complete", "TreeAnnotator successfully run", type = "success")
+    } # end of else regarding setwd()
     
   })
   
@@ -243,27 +271,34 @@ observeEvent(input$resample_fastas, {
  
  observeEvent(input$load_log_files, {
    
-   setwd(input$beast_log_files_path)
+   if (!dir.exists(input$beast_log_files_path)) 
+     shinyalert::shinyalert("Error", "File path does not exist", type = "error")
    
-   log_files = gtools::mixedsort( list.files(pattern = "\\.log") )
-   updateSelectInput(session,"select_log_file", choices=log_files)
+   else{
    
-   observeEvent(input$table_log_files, {
-     
-     estimates <- tracerer::parse_beast_tracelog_file(input$select_log_file)
-     estimates <- tracerer::remove_burn_ins(estimates, burn_in_fraction = input$tracer_burnin)
-     esses <- tracerer::calc_esses(estimates, sample_interval = input$tracer_sample_interval)
-     ess_table <- t(esses)
-     colnames(ess_table) <- c("ESS")
-     output$tracer_ess = renderTable(ess_table, rownames = TRUE, colnames = TRUE, digits = 0)
-     
-    output$tracer_plot = renderPlot({  ggplot2::ggplot(
-       data = tracerer::remove_burn_ins(estimates, burn_in_fraction = input$tracer_burnin),
-       ggplot2::aes(x = Sample)
-     ) + ggplot2::geom_line(ggplot2::aes(y = posterior)) + ggplot2::ggtitle("Trace plot") + ggplot2::theme_classic()
-    })
-    
-   })
+         setwd(input$beast_log_files_path)
+         
+         log_files = gtools::mixedsort( list.files(pattern = "\\.log") )
+         updateSelectInput(session,"select_log_file", choices=log_files)
+         
+         observeEvent(input$table_log_files, {
+           
+           estimates <- tracerer::parse_beast_tracelog_file(input$select_log_file)
+           estimates <- tracerer::remove_burn_ins(estimates, burn_in_fraction = input$tracer_burnin)
+           esses <- tracerer::calc_esses(estimates, sample_interval = input$tracer_sample_interval)
+           ess_table <- t(esses)
+           colnames(ess_table) <- c("ESS")
+           output$tracer_ess = renderTable(ess_table, rownames = TRUE, colnames = TRUE, digits = 0)
+           
+          output$tracer_plot = renderPlot({  ggplot2::ggplot(
+             data = tracerer::remove_burn_ins(estimates, burn_in_fraction = input$tracer_burnin),
+             ggplot2::aes(x = Sample)
+           ) + ggplot2::geom_line(ggplot2::aes(y = posterior)) + ggplot2::ggtitle("Trace plot") + ggplot2::theme_classic()
+          })
+          
+         })
+   
+   } # end of else
    
  })
   
@@ -273,36 +308,45 @@ observeEvent(input$resample_fastas, {
   
   observeEvent(input$run_logcombiner, {
     
-    setwd(input$logcombiner_file_path)
+    if (!dir.exists(input$logcombiner_file_path)) 
+      shinyalert::shinyalert("Error", "File path does not exist", type = "error")
     
-    # create an empty folder 
-    dir.create(input$logcombiner_folder_results)
+    else{
     
-    logcombiner_tree_files = gtools::mixedsort( list.files(pattern = "\\.trees") ) 
+          file.copy(logcombiner_dir, input$logcombiner_file_path)
+          
+          setwd(input$logcombiner_file_path)
+          
+          # create an empty folder 
+          dir.create(input$logcombiner_folder_results)
+          
+          logcombiner_tree_files = gtools::mixedsort( list.files(pattern = "\\.trees") ) 
+          
+          resampling = paste("-resample", input$resample_freq) 
+          
+          withProgress(message = 'Running LogCombiner...', value = 0, {
+            
+            for(i in seq(along = logcombiner_tree_files)){
+              
+              logcombiner_in_file = paste("-log", logcombiner_tree_files[i])
+              logcombiner_out_file = paste("-o", paste( input$logcombiner_folder_results, "/", tools::file_path_sans_ext(logcombiner_tree_files[i]), ".trees", sep = "") )
+              
+              logcombiner_command_line = paste("LogCombiner.exe", logcombiner_in_file, logcombiner_out_file, resampling)
+              
+              system(logcombiner_command_line)
+              
+              # Increment the progress bar, and update the detail text.
+              incProgress(1/length(logcombiner_tree_files), detail = paste("Processing LogCombiner .trees file ", i, " of ", length(logcombiner_tree_files), "[ ", round(i/length(logcombiner_tree_files)*100, 0), "% ]"))
+              # Pause for 0.1 seconds to simulate a long computation.
+              Sys.sleep(0.1)
+              
+            }
+            
+          }) # end of progress bar
+          
+          shinyalert::shinyalert("Complete", "LogCombiner successfully run", type = "success")
     
-    resampling = paste("-resample", input$resample_freq) 
-    
-    withProgress(message = 'Running LogCombiner...', value = 0, {
-      
-      for(i in seq(along = logcombiner_tree_files)){
-        
-        logcombiner_in_file = paste("-log", logcombiner_tree_files[i])
-        logcombiner_out_file = paste("-o", paste( input$logcombiner_folder_results, "/", tools::file_path_sans_ext(logcombiner_tree_files[i]), ".trees", sep = "") )
-        
-        logcombiner_command_line = paste("LogCombiner.exe", logcombiner_in_file, logcombiner_out_file, resampling)
-        
-        system(logcombiner_command_line)
-        
-        # Increment the progress bar, and update the detail text.
-        incProgress(1/length(logcombiner_tree_files), detail = paste("Processing LogCombiner .trees file ", i, " of ", length(logcombiner_tree_files), "[ ", round(i/length(logcombiner_tree_files)*100, 0), "% ]"))
-        # Pause for 0.1 seconds to simulate a long computation.
-        Sys.sleep(0.1)
-        
-      }
-      
-    }) # end of progress bar
-    
-    shinyalert::shinyalert("Complete", "LogCombiner successfully run", type = "success")
+    } # end of else re. setwd()
     
   })
   
@@ -362,269 +406,275 @@ observeEvent(input$resample_fastas, {
     
     observeEvent(input$run_gmyc, {
       
-      manual_file_path = input$raw_file_path
+      if (!dir.exists(input$raw_file_path)) 
+        shinyalert::shinyalert("Error", "File path does not exist", type = "error")
       
-      ################################################################################################
-      # check whether the user has neglected to select a folder or input a file path
-      ################################################################################################
+      else{
       
-      if (length(path()) == 0 && manual_file_path == "") shinyalert::shinyalert("No folder or path input", "You have not selected a folder or pasted in a folder path.", type = "warning")
-      if (length(path()) > 0 && manual_file_path != "") shinyalert::shinyalert("Issue: Two folder inputs", "You have selected a folder and inputted a file path. Please remove the manual file path and ensure that the desired folder has been selected.", type = "warning")
-      if (!is.null( predefined_groups_uploaded() ) && input$col.group == "" ) shinyalert::shinyalert("Confirm columns", "Please click the Confirm button, and then select columns for grouping and sample name informaiton for your .csv file data.", type = "warning")
-      
-      ################################################################################################
-      # If they have inputted one or the other, proceed:
-      ################################################################################################
-      
-      else{# else1
-        
-        output$warn_files = renderText("")
-        
-        ################################################################################################
-        # check whether the user has inserted only a manual file path. 
-        # If so, set that path as the working directory
-        ################################################################################################
-        
-        if (length(path()) == 0 && manual_file_path != "") {
-          
-          path = manual_file_path
-          setwd(path)
-        }
-        
-        ################################################################################################
-        # Otherwise use the path stored from the folder input button
-        ################################################################################################
-        
-        else setwd(path())
-        
-        if (input$tree_tool == "Non-ultrametric: PATHD8" && input$data_type == "FastTree") files = gtools::mixedsort( list.files(pattern = "\\.tre$") ) # the gtools::mixedsort() function preserves the original order of the files, instead of ordering them 1, 10, 100 etc.
-        if (input$tree_tool == "Non-ultrametric: PATHD8" && input$data_type == "RAxML") files = gtools::mixedsort( list.files(pattern = "bestTree") )
-        else if (input$tree_tool == "BEAST") files = gtools::mixedsort( list.files(pattern = "\\.nex") )
-        
-        # populate the dropdown list to show all the files inputted, so that the user can plot one if they wish
-        updateSelectInput(session,"select_tree", choices=files)
-        updateSelectInput(session,"select_tree_speclist", choices=files)
-        
-        ################################################################################################
-        # check whether there are files in the folder that contain bestTree or .tre in their names
-        ################################################################################################
-        
-        #if (length(files) == 0) output$warn_files = renderText('<b>There are no appropriate tree files in the folder you have selected.')
-        if (length(files) == 0) shinyalert::shinyalert("No .tre or bestTree files", "There are no appropriate tree files in the folder you have selected.", type = "error")
-        
-        ################################################################################################
-        # If there are, then proceed:
-        ################################################################################################
-        
-        else{ # else2
-          
-          output$warn_files = renderText("") # clear the warning if there was one before
-          
-          # initialise the dataframes to store cluster and entity info
-          clust_ent = data.frame(matrix(nrow = length(files), ncol = 3))
-          colnames(clust_ent) = c("filename", "clusters", "entities")
-          
-          # this initialises the dataframe below, even if the user doesn't input grouping info. Doesn't seem to work when these three lines are within the if statemetn for group_info
-          record = data.frame(matrix(nrow = length(files), ncol = 6))
-          colnames(record) = c("filename", "percentage_match", "percentage_match_excl_singles", "percentage_single_sample_GMYC_species", "oversplitting_ratio", "oversplitting_excl_singles")
-          record$filename = files
-          
-          # create a list to which each gmyc tree is stored
-          tree_container = vector("list", length(files))
-          # create a list with gmyc.spec output for each file
-          gmyc_spec_container = vector("list", length = length(files))
-          # create a list of which predefined species are being oversplit by the gmyc algorithm
-          oversplitting_species = vector("list")
-          
-          ################################################################################################
-          # Loop through the files in the chosen directory to create an ultrametric tree for each,
-          # then run the GMYC analysis,
-          # and store the entities and clusters
-          ################################################################################################
-          
-          withProgress(message = 'Running GMYC', value = 0, {
+            manual_file_path = input$raw_file_path
             
+            ################################################################################################
+            # check whether the user has neglected to select a folder or input a file path
+            ################################################################################################
             
-            for(i in seq(along=files)) {
+            if (length(path()) == 0 && manual_file_path == "") shinyalert::shinyalert("No folder or path input", "You have not selected a folder or pasted in a folder path.", type = "warning")
+            if (length(path()) > 0 && manual_file_path != "") shinyalert::shinyalert("Issue: Two folder inputs", "You have selected a folder and inputted a file path. Please remove the manual file path and ensure that the desired folder has been selected.", type = "warning")
+            if (!is.null( predefined_groups_uploaded() ) && input$col.group == "" ) shinyalert::shinyalert("Confirm columns", "Please click the Confirm button, and then select columns for grouping and sample name informaiton for your .csv file data.", type = "warning")
+            
+            ################################################################################################
+            # If they have inputted one or the other, proceed:
+            ################################################################################################
+            
+            else{# else1
               
+              output$warn_files = renderText("")
               
-              if(input$tree_tool == "BEAST") treex.ultra2 = ape::read.nexus(files[i])
+              ################################################################################################
+              # check whether the user has inserted only a manual file path. 
+              # If so, set that path as the working directory
+              ################################################################################################
               
-              else if(input$tree_tool == "Non-ultrametric: PATHD8"){
-                treex = ape::read.tree(files[i])
-                treex_tiplabels = treex$tip.label
-                # extract the first two tip labels (could be any two labels)
-                label1 = treex_tiplabels[1]
-                label2 = treex_tiplabels[2]
-                pathd8_params = data.frame(matrix(nrow = 1, ncol = 4))
-                colnames(pathd8_params) = c("tax1", "tax2", "age_type", "age")
-                pathd8_params[1,] = c(label1, label2, "root", 1)
+              if (length(path()) == 0 && manual_file_path != "") {
                 
-                tryCatch({
-                pathd8_result = ips::pathd8(phy = treex, exec = pathd8_filepath, seql = input$seqlength, calibration = pathd8_params)
-                treex.ultra = pathd8_result$mpl_tree
-                treex.ultra2 = ape::multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
-                }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-                
+                path = manual_file_path
+                setwd(path)
               }
               
-              if (input$set_seed == TRUE) set.seed(1234)
+              ################################################################################################
+              # Otherwise use the path stored from the folder input button
+              ################################################################################################
               
-              # Run the GMYC analysis
-              # tryCatch skips through any possible errors with the gmyc function (e.g. nuclear genes that are identical)
+              else setwd(path())
               
-              tryCatch({
-                 treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = input$gmyc_threshold)
-              }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+              if (input$tree_tool == "BEAST") files = gtools::mixedsort( list.files(pattern = "\\.nex") )
               
-              # treex.gmyc = gmyc(treex.ultra2, quiet = F, method = "multiple")
+              # populate the dropdown list to show all the files inputted, so that the user can plot one if they wish
+              updateSelectInput(session,"select_tree", choices=files)
+              updateSelectInput(session,"select_tree_speclist", choices=files)
               
-              # store the gmyc in the tree_container list
-              tree_container[[i]] = treex.gmyc
+              ################################################################################################
+              # check whether there are files in the folder that contain bestTree or .tre in their names
+              ################################################################################################
               
-              # these three lines below write the files to the same folder:
-              # uncomment to write them
+              #if (length(files) == 0) output$warn_files = renderText('<b>There are no appropriate tree files in the folder you have selected.')
+              if (length(files) == 0) shinyalert::shinyalert("No .tre or bestTree files", "There are no appropriate tree files in the folder you have selected.", type = "error")
               
-              #sink(paste(files[i], c("gmyc_out.txt"), sep = ""))
-              #summary.gmyc(treex.gmyc)
-              #sink()
+              ################################################################################################
+              # If there are, then proceed:
+              ################################################################################################
               
-              clust_ent[i,1] = files[i] # populate file name
-              clust_ent[i,2] = treex.gmyc$cluster[which.max(treex.gmyc$likelihood)] # extract the number of clusters
-              clust_ent[i,3] = treex.gmyc$entity[which.max(treex.gmyc$likelihood)] # extract the number of entities
-              
-              ########################################################################################################
-              # Do this bit only if the user uploaded a csv file with grouping data and clicked "CONFIRM"
-              ########################################################################################################
-              
-              if (!is.null( predefined_groups_uploaded() )){ 
+              else{ # else2
                 
-              groups = predefined_groups_uploaded()
-              
-              groups_col = as.name( input$col.group )
-              sample_names_col = as.name (input$sample_names )
-              
-              gmyc.spec = splits::spec.list(treex.gmyc)
-              gmyc.spec['ids'] = NA # add an empty column that will later have the predefined IDS as uploaded by the user
-              
-              
-              for (j in (1:nrow(gmyc.spec))){
+                output$warn_files = renderText("") # clear the warning if there was one before
                 
-                for (k in (1:nrow(groups))) {
+                # initialise the dataframes to store cluster and entity info
+                clust_ent = data.frame(matrix(nrow = length(files), ncol = 3))
+                colnames(clust_ent) = c("filename", "clusters", "entities")
+                
+                # this initialises the dataframe below, even if the user doesn't input grouping info. Doesn't seem to work when these three lines are within the if statemetn for group_info
+                record = data.frame(matrix(nrow = length(files), ncol = 6))
+                colnames(record) = c("filename", "percentage_match", "percentage_match_excl_singles", "percentage_single_sample_GMYC_species", "oversplitting_ratio", "oversplitting_excl_singles")
+                record$filename = files
+                
+                # create a list to which each gmyc tree is stored
+                tree_container = vector("list", length(files))
+                # create a list with gmyc.spec output for each file
+                gmyc_spec_container = vector("list", length = length(files))
+                # create a list of which predefined species are being oversplit by the gmyc algorithm
+                oversplitting_species = vector("list")
+                
+                ################################################################################################
+                # Loop through the files in the chosen directory to create an ultrametric tree for each,
+                # then run the GMYC analysis,
+                # and store the entities and clusters
+                ################################################################################################
+                
+                withProgress(message = 'Running GMYC', value = 0, {
                   
-                  if (gmyc.spec$sample_name[j] == groups[[sample_names_col]][k])
-                    gmyc.spec$ids[j] = groups[[groups_col]][k]
-                }
-              }
-              
-              gmyc_spec_container[[i]] = gmyc.spec
-              
-              # split the data by the species group numbers assigned by the GMYC
-              
-              spec_split = split(gmyc.spec, gmyc.spec$GMYC_spec)
-              
-              gmyc.spec$GMYC_spec = as.factor(gmyc.spec$GMYC_spec) # make the GMYC species a factor
-              gmyc.spec$ids = as.factor(gmyc.spec$ids) # make the user's predefined groups a factor
-              
-              matches.df = data.frame(matrix(nrow = length(levels(gmyc.spec$GMYC_spec)), ncol = 2)) 
-              colnames(matches.df) = c("GMYC_spec", "match(y/n)") 
-              matches.df$GMYC_spec = 1:nrow(matches.df) 
-              
-              # keep counts of the number of "yes", "no", and "single-sample" species:
-              
-              y_count = 0
-              n_count = 0
-              single_sample_count = 0
-              
-              for (m in 1:length(spec_split)){
+                  
+                  for(i in seq(along=files)) {
+                    
+                    
+                    if(input$tree_tool == "BEAST") treex.ultra2 = ape::read.nexus(files[i])
+                    
+                    else if(input$tree_tool == "Non-ultrametric: PATHD8"){
+                      treex = ape::read.tree(files[i])
+                      treex_tiplabels = treex$tip.label
+                      # extract the first two tip labels (could be any two labels)
+                      label1 = treex_tiplabels[1]
+                      label2 = treex_tiplabels[2]
+                      pathd8_params = data.frame(matrix(nrow = 1, ncol = 4))
+                      colnames(pathd8_params) = c("tax1", "tax2", "age_type", "age")
+                      pathd8_params[1,] = c(label1, label2, "root", 1)
+                      
+                      tryCatch({
+                      pathd8_result = ips::pathd8(phy = treex, exec = pathd8_filepath, seql = input$seqlength, calibration = pathd8_params)
+                      treex.ultra = pathd8_result$mpl_tree
+                      treex.ultra2 = ape::multi2di(treex.ultra, random = T) # makes the tree fully dichotomous
+                      }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+                      
+                    }
+                    
+                    if (input$set_seed == TRUE) set.seed(1234)
+                    
+                    # Run the GMYC analysis
+                    # tryCatch skips through any possible errors with the gmyc function (e.g. nuclear genes that are identical)
+                    
+                    tryCatch({
+                       treex.gmyc = splits::gmyc(treex.ultra2, quiet = F, method = input$gmyc_threshold)
+                    }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+                    
+                    # treex.gmyc = gmyc(treex.ultra2, quiet = F, method = "multiple")
+                    
+                    # store the gmyc in the tree_container list
+                    tree_container[[i]] = treex.gmyc
+                    
+                    # these three lines below write the files to the same folder:
+                    # uncomment to write them
+                    
+                    #sink(paste(files[i], c("gmyc_out.txt"), sep = ""))
+                    #summary.gmyc(treex.gmyc)
+                    #sink()
+                    
+                    clust_ent[i,1] = files[i] # populate file name
+                    clust_ent[i,2] = treex.gmyc$cluster[which.max(treex.gmyc$likelihood)] # extract the number of clusters
+                    clust_ent[i,3] = treex.gmyc$entity[which.max(treex.gmyc$likelihood)] # extract the number of entities
+                    
+                    ########################################################################################################
+                    # Do this bit only if the user uploaded a csv file with grouping data and clicked "CONFIRM"
+                    ########################################################################################################
+                    
+                    if (!is.null( predefined_groups_uploaded() )){ 
+                      
+                    groups = predefined_groups_uploaded()
+                    
+                    groups_col = as.name( input$col.group )
+                    sample_names_col = as.name (input$sample_names )
+                    
+                    gmyc.spec = splits::spec.list(treex.gmyc)
+                    gmyc.spec['ids'] = NA # add an empty column that will later have the predefined IDS as uploaded by the user
+                    
+                    
+                    for (j in (1:nrow(gmyc.spec))){
+                      
+                      for (k in (1:nrow(groups))) {
+                        
+                        if (gmyc.spec$sample_name[j] == groups[[sample_names_col]][k])
+                          gmyc.spec$ids[j] = groups[[groups_col]][k]
+                      }
+                    }
+                    
+                    gmyc_spec_container[[i]] = gmyc.spec
+                    
+                    # split the data by the species group numbers assigned by the GMYC
+                    
+                    spec_split = split(gmyc.spec, gmyc.spec$GMYC_spec)
+                    
+                    gmyc.spec$GMYC_spec = as.factor(gmyc.spec$GMYC_spec) # make the GMYC species a factor
+                    gmyc.spec$ids = as.factor(gmyc.spec$ids) # make the user's predefined groups a factor
+                    
+                    matches.df = data.frame(matrix(nrow = length(levels(gmyc.spec$GMYC_spec)), ncol = 2)) 
+                    colnames(matches.df) = c("GMYC_spec", "match(y/n)") 
+                    matches.df$GMYC_spec = 1:nrow(matches.df) 
+                    
+                    # keep counts of the number of "yes", "no", and "single-sample" species:
+                    
+                    y_count = 0
+                    n_count = 0
+                    single_sample_count = 0
+                    
+                    for (m in 1:length(spec_split)){
+                      
+                      len_unique = length(unique(spec_split[[m]]$ids))
+                      len_values = length(spec_split[[m]]$ids)
+                      
+                      if (len_unique == 1 && len_values > 1){
+                        matches.df$`match(y/n)`[m] = "y"
+                        y_count = y_count + 1
+                      }
+                      
+                      else if (len_values == 1){
+                        matches.df$`match(y/n)`[m] = "single_sample"
+                        single_sample_count = single_sample_count + 1
+                      }
+                      
+                      else {
+                        matches.df$`match(y/n)`[m] = "n"
+                        n_count = n_count + 1
+                      }
+                    }
+                    
+                    # this total excludes single samples
+                    total_excl_singles = y_count + n_count 
+                    
+                    # this total includes single samples
+                    total_incl_singles = y_count + n_count + single_sample_count
+                    #or just total_incl_singles = nrow(matches.df)
+                    
+                    # this is only taking the matches for GMYC species groups that had more than one sample in it
+                    success_excl_singles = round(y_count/total_excl_singles * 100, 2) 
+                    
+                    # this treats all single sample GMYC species as equivalent to a "yes" match, and will therefore be a larger value than the estimate
+                    # that excludes them
+                    success_incl_singles = round((y_count + single_sample_count)/total_incl_singles * 100, 2)
+                    
+                    prop_single_samples = round(single_sample_count/nrow(matches.df) * 100, 2)
+                    
+                    # populate the "record" dataframe
+                    
+                    record[i,2] = success_incl_singles
+                    record[i,3] = success_excl_singles
+                    record[i,4] = prop_single_samples
+                    
+                    num_predefined_groups = length(levels(gmyc.spec$ids))
+                    num_gmyc_groups = length(levels(gmyc.spec$GMYC_spec))
+                    num_gmyc_groups_excluding_single_spp = num_gmyc_groups - single_sample_count
+                    
+                    # oversplitting ratio (ie. GMYC species to predefined groups)
+                    record[i,5] = round( num_gmyc_groups/num_predefined_groups, 2 )
+                    # oversplitting ratio excluding single species
+                    record[i,6] = round( num_gmyc_groups_excluding_single_spp/num_predefined_groups, 2 )
+                    
+                    # find which species are being over-split:
+                    
+                    yes_indices = which(matches.df$`match(y/n)` == "y")
+                    
+                    if(length(yes_indices) > 0){
+                      
+                      predef_unique = c()
+                      
+                      for (v in 1:length(yes_indices)){
+                        predef_unique[v] = unique(spec_split[[yes_indices[v]]]$ids)
+                      }
+                      
+                      predef_unique_table = table(predef_unique)
+                      predef_unique_table = predef_unique_table
+                      predef_unique_table = as.data.frame(predef_unique_table)
+                      
+                      oversplitting_species[[i]] = predef_unique_table
+                    }
+                    
+                       }# end of if statement
+                    
+                    ################################################################################################
+                    
+                    ################################################################################################
+                    
+                    # Increment the progress bar, and update the detail text.
+                    incProgress(1/length(files), detail = paste("Processing tree file ", i, " of ", length(files), "[ ", round(i/length(files)*100, 0), "% ]"))
+                    # Pause for 0.1 seconds to simulate a long computation.
+                    Sys.sleep(0.1)
+                    
+                  } # end of for loop
+                  
+                  
+                }) # end of progress bar bracket
                 
-                len_unique = length(unique(spec_split[[m]]$ids))
-                len_values = length(spec_split[[m]]$ids)
                 
-                if (len_unique == 1 && len_values > 1){
-                  matches.df$`match(y/n)`[m] = "y"
-                  y_count = y_count + 1
-                }
+                shinyalert::shinyalert("Complete", "Please click on the tabs at the top of the window to view the results.", type = "success")
                 
-                else if (len_values == 1){
-                  matches.df$`match(y/n)`[m] = "single_sample"
-                  single_sample_count = single_sample_count + 1
-                }
                 
-                else {
-                  matches.df$`match(y/n)`[m] = "n"
-                  n_count = n_count + 1
-                }
-              }
-              
-              # this total excludes single samples
-              total_excl_singles = y_count + n_count 
-              
-              # this total includes single samples
-              total_incl_singles = y_count + n_count + single_sample_count
-              #or just total_incl_singles = nrow(matches.df)
-              
-              # this is only taking the matches for GMYC species groups that had more than one sample in it
-              success_excl_singles = round(y_count/total_excl_singles * 100, 2) 
-              
-              # this treats all single sample GMYC species as equivalent to a "yes" match, and will therefore be a larger value than the estimate
-              # that excludes them
-              success_incl_singles = round((y_count + single_sample_count)/total_incl_singles * 100, 2)
-              
-              prop_single_samples = round(single_sample_count/nrow(matches.df) * 100, 2)
-              
-              # populate the "record" dataframe
-              
-              record[i,2] = success_incl_singles
-              record[i,3] = success_excl_singles
-              record[i,4] = prop_single_samples
-              
-              num_predefined_groups = length(levels(gmyc.spec$ids))
-              num_gmyc_groups = length(levels(gmyc.spec$GMYC_spec))
-              num_gmyc_groups_excluding_single_spp = num_gmyc_groups - single_sample_count
-              
-              # oversplitting ratio (ie. GMYC species to predefined groups)
-              record[i,5] = round( num_gmyc_groups/num_predefined_groups, 2 )
-              # oversplitting ratio excluding single species
-              record[i,6] = round( num_gmyc_groups_excluding_single_spp/num_predefined_groups, 2 )
-              
-              # find which species are being over-split:
-              
-              yes_indices = which(matches.df$`match(y/n)` == "y")
-              
-              if(length(yes_indices) > 0){
-                
-                predef_unique = c()
-                
-                for (v in 1:length(yes_indices)){
-                  predef_unique[v] = unique(spec_split[[yes_indices[v]]]$ids)
-                }
-                
-                predef_unique_table = table(predef_unique)
-                predef_unique_table = predef_unique_table
-                predef_unique_table = as.data.frame(predef_unique_table)
-                
-                oversplitting_species[[i]] = predef_unique_table
-              }
-              
-                 }# end of if statement
-              
-              ################################################################################################
-              
-              ################################################################################################
-              
-              # Increment the progress bar, and update the detail text.
-              incProgress(1/length(files), detail = paste("Processing tree file ", i, " of ", length(files), "[ ", round(i/length(files)*100, 0), "% ]"))
-              # Pause for 0.1 seconds to simulate a long computation.
-              Sys.sleep(0.1)
-              
-            } # end of for loop
-            
-            
-          }) # end of progress bar bracket
-          
-          
-          shinyalert::shinyalert("Complete", "Please click on the tabs at the top of the window to view the results.", type = "success")
+        } # end of if re. !dir.exists()
           
           if (!is.null( predefined_groups_uploaded() )) output$sp.numbers = renderText(c("You have ", length(unique(groups[[groups_col]])), " predefined species."))
           
@@ -660,6 +710,7 @@ observeEvent(input$resample_fastas, {
             
             output$matches = renderTable(gmyc_spec_container[[file_i]], rownames = FALSE, colnames = TRUE, digits = 0)
             }
+            
             ################################################################################################
             # Download GMYC species table
             ################################################################################################
