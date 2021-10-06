@@ -1376,147 +1376,428 @@ observeEvent(input$resample_fastas, {
   # }) # end of observe of input of predefined group file
   
   ################################################################################################
-  # Read in a csv file with multiple columns of data
+  # Read in csv files with summary data
   ################################################################################################
   
-  observe({
+  multiple_summary_plots = list()
+  
+    # CLUSTER DATA
     
-    # data for line graph 1
+    observe({
+    infile_summary_clusters = input$summary_clusters
     
-    infile_multiple = input$multiple_input
-    
-    if (is.null(infile_multiple)) {
+    if (is.null(infile_summary_clusters)) {
       return(NULL)
     }
     
-    multiple_data = read.csv(infile_multiple$datapath, check.names = F)
-    multiple_data =  reshape2::melt(multiple_data) # get the data into a ggplot-friendly format
-    colnames(multiple_data) = c("file_name", "data_percentage", "measure1")
-    stats_multiple_data = Rmisc::summarySE(multiple_data, measurevar = "measure1", groupvars = "data_percentage") # get the summary statistics for the data
     
-    # plot a boxplot for the data uploaded for Line 1
-    
-    observeEvent(input$multiple_input_boxplot, {
+    observeEvent(input$plot_summary_clusts, {
       
-      output$multiple_input_plot = renderPlot({
-        
-        ggplot(multiple_data, aes(x = data_percentage, y = measure1)) + 
-          geom_boxplot() + 
-          xlab(input$x_lab_multiple_input) +
-          ylab(input$y_lab_multiple_input) +
-          ggtitle(input$title_multiple_input) + 
-          ggthemes[[input$ggtheme_multiple]] 
-        
-      })
+      summary_clusters_csv = read.csv(infile_summary_clusters$datapath, check.names = F)
+      summary_clusters_csv_melt = reshape2::melt(summary_clusters_csv)
       
-      # Download the boxplot
+      if(input$no_morphospecies > 0) linetype_morpho = "dashed"
+      else linetype_morpho = "blank"
+      colnames(summary_clusters_csv_melt) = c("file_name", "data_perc", "clusters")
       
-      output$download_multiple_input_boxplot = downloadHandler(
-        
-        filename = function (){paste(input$file_name_multi_box, input$plot_format_multi_box, sep = '.')},
-        
-        content = function (file){
-          
-          width.multiboxplot = as.numeric(input$w_plot_multi_box) 
-          height.multiboxplot = as.numeric(input$h_plot_multi_box) 
-          dpi.multiboxplot = as.numeric(input$res_plot_multi_box)
-          units.multiboxplot = input$unit_plot_multi_box
-          
-          ggsave(file, width = width.multiboxplot, height.multiboxplot = height, dpi = dpi.multiboxplot, units = units.multiboxplot,
-                 ggplot(multiple_data, aes(x = data_percentage, y = measure)) + 
-                   geom_boxplot() + 
-                   xlab(input$x_lab_multiple_input) +
-                   ylab(input$y_lab_multiple_input) +
-                   ggtitle(input$title_multiple_input) + 
-                   ggthemes[[input$ggtheme_multiple]] 
-          )
-        }
-      )
+      # CREATE PLOT
+      clust_accum <<- ggplot(data = summary_clusters_csv_melt, aes(x = as.numeric( data_perc ), y = clusters)) + 
+        geom_point() +
+        geom_smooth(span = 3, col = input$clust_ent_summary_line_col, fill = input$clust_ent_summary_ci_col, alpha = input$clust_ent_summary_ci_alpha) +
+        expand_limits(y = 0) +
+        #geom_boxplot(fill = "#1EAD4B") +
+        #stat_summary(fun = mean, geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
+        xlab("Data Percentage") +
+        ylab("Number of clusters") +
+        ggthemes[[input$ggtheme_summary_plots]] +
+        theme(legend.position = "bottom") +
+        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.text.x = element_text(size = 12)) +
+        theme(axis.text.y = element_text(size = 12)) +
+        theme(legend.text=element_text(size=12)) +
+        theme(plot.title = element_text(size=16, face = "bold")) +
+        scale_x_continuous(breaks = as.numeric(summary_clusters_csv_melt$data_perc), labels = summary_clusters_csv_melt$data_perc) +
+        geom_hline(yintercept= input$no_morphospecies, linetype= linetype_morpho)
+      
+      output$summary_plot = renderPlot(clust_accum)
+      multiple_summary_plots$clust_accum <<- clust_accum 
       
     })
     
-    # Plot the line chart
+    # download the plot
+    output$download_clust_summary_plot <- downloadHandler(
+      
+      filename = function (){paste("clust_summary_plot", input$plot_format_summary_clusts_ents, sep = '.')},
+      
+      content = function (file){
+        
+        width.clust_ent_summary = as.numeric(input$w_plot_summary_clusts_ents) 
+        height.clust_ent_summary = as.numeric(input$h_plot_summary_clusts_ents) 
+        dpi.clust_ent_summary = as.numeric(input$res_plot_summary_clusts_ents)
+        units.clust_ent_summary = input$unit_plot_summary_clusts_ents
+        
+        ggsave(file, width = width.clust_ent_summary, height = height.clust_ent_summary, dpi = dpi.clust_ent_summary, units = units.clust_ent_summary,
+               clust_accum)
+      }
+    )
     
-    observeEvent(input$plot_multiple_input, {
+  }) # end of observe
+    
+    ################################################################################################
+    
+  observe({
+    
+    # ENTITIES DATA
+    
+    infile_summary_entities = input$summary_entities
+    
+    if (is.null(infile_summary_entities)) {
+      return(NULL)
+    }
+    
+    observeEvent(input$plot_summary_ents, {
       
-      if(input$include_line2 == FALSE){ # plot only Line 1 if the radio button to include the second line is not selected
-        
-        multi_plot = ggplot(stats_multiple_data, aes(x=data_percentage, y=measure1)) + 
-          geom_errorbar(aes(ymin=measure1 - eval(as.name( input$error_bar_type )), ymax=measure1 + eval(as.name( input$error_bar_type) )), width=.1, color = input$multiple_input_error_bar_colour) +
-          geom_line(aes(group = 1), lty = as.numeric( input$multiple_input_line_type ), color = input$multiple_input_line_col, lwd = input$multiple_input_line_width) +
-          geom_point(size = input$multiple_input_point_size, shape = as.numeric( input$multiple_input_point_shape), colour = input$multiple_input_point_colour ) + 
-          xlab(input$x_lab_multiple_input) +
-          ylab(input$y_lab_multiple_input) +
-          ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
-          ggthemes[[input$ggtheme_multiple]] 
-      }
+      summary_entities_csv = read.csv(infile_summary_entities$datapath, check.names = F)
+      summary_entities_csv_melt = reshape2::melt(summary_entities_csv)
       
-      else if(input$include_line2 == TRUE){ # if the user selected the radio button to include the second line
-        
-        # data for line graph 2
-        
-        infile_multiple2 = input$multiple_input2
-        
-        if (is.null(infile_multiple2)) {
-          return(NULL)
-        }
-        
-        multiple_data2 = read.csv(infile_multiple2$datapath, check.names = F)
-        multiple_data2 =  reshape2::melt(multiple_data2) # get the data into a ggplot-friendly format
-        colnames(multiple_data2) = c("file_name", "data_percentage", "measure2")
-        stats_multiple_data2 = Rmisc::summarySE(multiple_data2, measurevar = "measure2", groupvars = "data_percentage") # get the summary statistics for the data
-        
-        match_summ = cbind(stats_multiple_data, stats_multiple_data2[3:6]) # bind the columns for the data for line 1 with that of line 2
-        colnames(match_summ)[4:6] = c("sd_1", "se_1", "ci_1")
-        colnames(match_summ)[8:10] = c("sd_2", "se_2", "ci_2")
-        
-        multi_plot = ggplot(match_summ, aes(x=data_percentage, y=measure1)) +
-          # the eval(as.name()) method solved the issue of passing a string parameter to one without quotes for use in ggpplot
-          geom_errorbar(aes(ymin=measure1 - eval(as.name(paste( input$error_bar_type, "_1", sep = "") )), ymax=measure1 + eval(as.name(paste( input$error_bar_type, "_1", sep = "") ))), width=.1, color = input$multiple_input_error_bar_colour) +
-          geom_line(aes(group = 1, color = "measure1"), lty = as.numeric( input$multiple_input_line_type ), lwd = input$multiple_input_line_width) +
-          geom_point(size = input$multiple_input_point_size, shape = as.numeric( input$multiple_input_point_shape), colour = input$multiple_input_point_colour ) + 
-          
-          # add the data for the second line:
-          ################################################################################################################
-        geom_errorbar(aes(ymin=measure2 - eval(as.name(paste( input$error_bar_type, "_2", sep = "") )), ymax=measure2 + eval(as.name(paste( input$error_bar_type, "_2", sep = "") ))), width=.1, color = input$multiple_input_error_bar_colour) +
-          geom_line(group = 1, aes(x=data_percentage, y=measure2, color = "measure2"), lty = as.numeric( input$multiple_input_line_type2 ), lwd = input$multiple_input_line_width2) +
-          geom_point(aes(x=data_percentage, y=measure2), size = input$multiple_input_point_size2, shape = as.numeric( input$multiple_input_point_shape2), colour = input$multiple_input_point_colour2 ) + 
-          ################################################################################################################
-        
-        xlab(input$x_lab_multiple_input) +
-          ylab(input$y_lab_multiple_input) +
-          ggtitle(paste( input$title_multiple_input, "with", input$error_bar_type, "error bars" )) +
-          ggthemes[[input$ggtheme_multiple]] +
-          
-          # add a legend with the line colour for each data set
-          scale_colour_manual(values = c(input$multiple_input_line_col, input$multiple_input_line_col2), labels = c(input$line1_lab, input$line2_lab)) +
-          guides(color=guide_legend("Key"))
-      }
+      if(input$no_morphospecies > 0) linetype_morpho = "dashed"
+      else linetype_morpho = "blank"
       
-      # output the plot to the screen
-      output$multiple_input_plot = renderPlot({
-        multi_plot
-      })
+      colnames(summary_entities_csv_melt) = c("file_name", "data_perc", "entities")
       
-      # download the line plot
-      output$download_multiple_input_plot = downloadHandler(
-        filename = function (){paste(input$file_name_multi_line, input$plot_format_multi_line, sep = '.')},
-        content = function (file){
-          
-          width.multilineplot = as.numeric(input$w_plot_multi_line) 
-          height.multilineplot = as.numeric(input$h_plot_multi_line) 
-          dpi.multilineplot = as.numeric(input$res_plot_multi_line)
-          units.multilineplot = input$multi.unit
-          
-          ggsave(file, width = width.multilineplot, height = height.multilineplot, dpi = dpi.multilineplot, units = units.multilineplot,
-                 multi_plot, width = input$ggplot_width, height = input$ggplot_height, units = "cm"
-          )
-        }
-        
-      )
+      ent_accum <<- ggplot(data = summary_entities_csv_melt, aes(x = as.numeric( data_perc ), y = entities)) + 
+        geom_point() +
+        geom_smooth(span = 3, col = input$clust_ent_summary_line_col, fill = input$clust_ent_summary_ci_col, alpha = input$clust_ent_summary_ci_alpha) +
+        expand_limits(y = 0) +
+        #geom_boxplot(fill = "#1EAD4B") +
+        #stat_summary(fun = mean, geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
+        xlab("Data Percentage") +
+        ylab("Number of entities") +
+        ggthemes[[input$ggtheme_summary_plots]] +
+        theme(legend.position = "bottom") +
+        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.text.x = element_text(size = 12)) +
+        theme(axis.text.y = element_text(size = 12)) +
+        theme(legend.text=element_text(size=12)) +
+        theme(plot.title = element_text(size=16, face = "bold")) +
+        scale_x_continuous(breaks = as.numeric(summary_entities_csv_melt$data_perc), labels = summary_entities_csv_melt$data_perc) +
+        geom_hline(yintercept= input$no_morphospecies, linetype= linetype_morpho)
+      
+      output$summary_plot = renderPlot(ent_accum)
+      multiple_summary_plots$ent_accum <<- ent_accum
       
     })
     
+    # download the plot
+    output$download_ent_summary_plot <- downloadHandler(
+      
+      filename = function (){paste("ent_summary_plot", input$plot_format_summary_clusts_ents, sep = '.')},
+      
+      content = function (file){
+        
+        width.clust_ent_summary = as.numeric(input$w_plot_summary_clusts_ents) 
+        height.clust_ent_summary = as.numeric(input$h_plot_summary_clusts_ents) 
+        dpi.clust_ent_summary = as.numeric(input$res_plot_summary_clusts_ents)
+        units.clust_ent_summary = input$unit_plot_summary_clusts_ents
+        
+        ggsave(file, width = width.clust_ent_summary, height = height.clust_ent_summary, dpi = dpi.clust_ent_summary, units = units.clust_ent_summary,
+               ent_accum)
+      }
+    )
+    
+  }) # end of observe
+    
+    ################################################################################################
+    
+  observe({
+    
+    # OVERSPLITTING RATIO DATA INC. SINGLETONS
+    
+    infile_summary_oversplitting_ratio_inc = input$summary_oversplitting_ratio_inc
+    
+    if (is.null(infile_summary_oversplitting_ratio_inc)) {
+      return(NULL)
+    }
+    
+    # PLOT
+    observeEvent(input$plot_summary_oversplits, {
+      
+      summary_oversplitting_inc_csv = read.csv(infile_summary_oversplitting_ratio_inc$datapath, header = T, check.names = F)
+      summary_oversplitting_inc_csv_melt = reshape2::melt(summary_oversplitting_inc_csv)
+      
+      # OVERSPLITTING RATIO DATA EXCL SINGLETONS
+      infile_summary_oversplitting_ratio_exc = input$summary_oversplitting_ratio_exc
+      
+      if (is.null(infile_summary_oversplitting_ratio_exc)) {
+        return(NULL)
+      }
+      
+      summary_oversplitting_exc_csv = read.csv(infile_summary_oversplitting_ratio_exc$datapath, header = T, check.names = F)
+      summary_oversplitting_exc_csv_melt = reshape2::melt(summary_oversplitting_exc_csv)
+      
+      colnames(summary_oversplitting_inc_csv_melt) = c("file_name", "data_perc", "oversplitting_ratio")
+      colnames(summary_oversplitting_exc_csv_melt) = c("file_name", "data_perc", "oversplitting_ratio_excl")
+      
+      summary_oversplitting_inc_csv_melt$oversplitting_excl = summary_oversplitting_exc_csv_melt$oversplitting_ratio_excl
+      oversplitting_combo = reshape::melt( summary_oversplitting_inc_csv_melt )
+      
+      oversplitting_boxplot_summary <<- ggplot(data = oversplitting_combo, aes(x = data_perc, y = value)) + 
+        geom_boxplot(aes(fill = variable)) +
+        expand_limits(y = 0) +
+        stat_summary(fun = mean, aes(group = variable), geom="point", shape = as.numeric(input$oversplitting_plot_point_shape), size=3, color="black", position=position_dodge(0.77)) +
+        scale_fill_manual(values=c(input$oversplitting_inc_col, input$oversplitting_exc_col), name = "", labels = c("+ singletons", "- singletons")) +
+        xlab("Data Percentage") +
+        ylab("Oversplitting ratio") +
+        ggthemes[[input$ggtheme_summary_plots]] +
+        theme(legend.position = "bottom") +
+        guides(fill=guide_legend(title="")) +
+        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.text.x = element_text(size = 12)) +
+        theme(axis.text.y = element_text(size = 12)) +
+        theme(legend.text=element_text(size=12)) +
+        geom_hline(yintercept= 1, linetype="dashed") +
+        theme(plot.title = element_text(size=16, face = "bold"))
+      
+      output$summary_plot = renderPlot(oversplitting_boxplot_summary)
+      multiple_summary_plots$oversplitting <<- oversplitting_boxplot_summary
+      
+    }
+      
+    )
+    
+    # download the plot
+    output$download_summary_oversplits_plot <- downloadHandler(
+      
+      filename = function (){paste("oversplitting_summary_plot", input$plot_format_summary_oversplits, sep = '.')},
+      
+      content = function (file){
+        
+        width.oversplits_summary = as.numeric(input$w_plot_summary_oversplits) 
+        height.oversplits_summary = as.numeric(input$h_plot_summary_oversplits) 
+        dpi.oversplits_summary = as.numeric(input$res_plot_summary_oversplits)
+        units.oversplits_summary = input$unit_plot_summary_oversplits
+        
+        ggsave(file, width = width.oversplits_summary, height = height.oversplits_summary, dpi = dpi.oversplits_summary, units = units.oversplits_summary,
+               oversplitting_boxplot_summary)
+      }
+    )
+    
+  }) # end of observe
+  
+    ################################################################################################
+    
+    
+  observe({
+    
+    infile_summary_percentage_match_inc = input$summary_percentage_match_inc
+    
+    if (is.null(infile_summary_percentage_match_inc)) {
+      return(NULL)
+    }
+  
+    # PERCENTAGE MATCH DATA INCLUDING SINGLETONS
+    
+    observeEvent(input$plot_summary_percentage_matches, {
+      
+      summary_percentage_matches_inc_csv = read.csv(infile_summary_percentage_match_inc$datapath, check.names = F)
+      summary_percentage_matches_inc_csv_melt = reshape2::melt(summary_percentage_matches_inc_csv)
+      
+      # PERCENTAGE MATCH DATA EXCLUDING SINGLETONS
+      infile_summary_percentage_match_exc = input$summary_percentage_match_exc
+      
+      if (is.null(infile_summary_percentage_match_exc)) {
+        return(NULL)
+      }
+      
+      summary_percentage_matches_exc = read.csv(infile_summary_percentage_match_exc$datapath, check.names = F)
+      summary_percentage_matches_exc_melt = reshape2::melt(summary_percentage_matches_exc)
+      
+      summary_percentage_matches_inc_csv_melt$ex_sing = summary_percentage_matches_exc_melt$value
+      colnames(summary_percentage_matches_inc_csv_melt) = c("file_name", "data_perc", "inc_singletons", "ex_singletons")
+      percentage_matches_combo = reshape2::melt(summary_percentage_matches_inc_csv_melt)
+      
+      perc_match_boxplot_summary <<- ggplot(data = percentage_matches_combo, aes(x = data_perc, y = value)) + 
+        geom_boxplot(aes(fill = variable)) +
+        stat_summary(fun = mean, aes(group = variable), geom="point", shape=as.numeric(input$percentage_match_plot_point_shape), size=3, color="black", position=position_dodge(0.77)) +
+        ylim(0,100) +
+        scale_fill_manual(values=c(input$percentage_match_inc_col, input$percentage_match_exc_col), name = "", labels = c("+ singletons", "- singletons")) +
+        xlab("Data Percentage") +
+        ylab("Percentage match") +
+        ggthemes[[input$ggtheme_summary_plots]] +
+        theme(legend.position = "bottom") +
+        guides(fill=guide_legend(title="")) +
+        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.text.x = element_text(size = 12)) +
+        theme(axis.text.y = element_text(size = 12)) +
+        theme(legend.text=element_text(size=12)) +
+        theme(plot.title = element_text(size=16, face = "bold"))
+      
+      output$summary_plot = renderPlot(perc_match_boxplot_summary)
+      multiple_summary_plots$perc_match <<- perc_match_boxplot_summary
+      
+    }
+    )
+    
+    # download the plot
+    output$download_summary_percentage_matches_plot <- downloadHandler(
+      
+      filename = function (){paste("percentage_matches_plot", input$plot_format_summary_percentage_matches, sep = '.')},
+      
+      content = function (file){
+        
+        width.percentage_matches_summary = as.numeric(input$w_plot_summary_percentage_matches) 
+        height.percentage_matches_summary = as.numeric(input$h_plot_summary_percentage_matches) 
+        dpi.percentage_matches_summary = as.numeric(input$res_plot_summary_percentage_matches)
+        units.percentage_matches_summary = input$unit_plot_summary_percentage_matches
+        
+        ggsave(file, width = width.percentage_matches_summary, height = height.percentage_matches_summary, dpi = dpi.percentage_matches_summary, units = units.percentage_matches_summary,
+               perc_match_boxplot_summary)
+      }
+    )
+  
+  }) # end of observe
+  
+    ################################################################################################
+  
+  
+   observe({
+     
+     infile_summary_percentage_singletons = input$summary_percentage_singletons
+     
+     if (is.null(infile_summary_percentage_singletons)) {
+       return(NULL)
+     }
+  
+    # PERCENTAGE SINGLETONS
+    
+    observeEvent(input$plot_summary_singletons, {
+      
+      summary_singletons_csv = read.csv(infile_summary_percentage_singletons$datapath, header = T, check.names = F)
+      summary_singletons_csv_melt = reshape2::melt(summary_singletons_csv)
+      
+      colnames(summary_singletons_csv_melt) = c("file_name", "data_perc", "perc_singletons")
+      
+      singletons_boxplot_summary <<- ggplot(data = summary_singletons_csv_melt, aes(x = data_perc, y = perc_singletons)) +
+        geom_boxplot(fill = input$percentage_singletons_col) +
+        ylim(0,100) +
+        stat_summary(fun = mean, geom="point", shape=as.numeric(input$percentage_singletons_plot_point_shape), size=4, color="black", position=position_dodge(0.77)) +
+        xlab("Data Percentage") +
+        ylab("Percentage singletons") +
+        ggthemes[[input$ggtheme_summary_plots]] +
+        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.text.x = element_text(size = 12)) +
+        theme(axis.text.y = element_text(size = 12)) +
+        theme(plot.title = element_text(size=16, face = "bold"))
+      
+      output$summary_plot = renderPlot(singletons_boxplot_summary)
+      multiple_summary_plots$singletons <<- singletons_boxplot_summary
+      
+    })
+    
+    # download the plot
+    output$download_summary_percentage_singletons_plot <- downloadHandler(
+      
+      filename = function (){paste("percentage_singletons_plot", input$plot_format_summary_percentage_singletons, sep = '.')},
+      
+      content = function (file){
+        
+        width.percentage_singletons_summary = as.numeric(input$w_plot_summary_percentage_singletons) 
+        height.percentage_singletons_summary = as.numeric(input$h_plot_summary_percentage_singletons) 
+        dpi.percentage_singletons_summary = as.numeric(input$res_plot_summary_percentage_singletons)
+        units.percentage_singletons_summary = input$unit_plot_summary_percentage_singletons
+        
+        ggsave(file, width = width.percentage_singletons_summary, height = height.percentage_singletons_summary, dpi = dpi.percentage_singletons_summary, units = units.percentage_singletons_summary,
+               singletons_boxplot_summary)
+      }
+    )
+    
+  }) # end of observe
+  
+    ################################################################################################
+  
+  observe({
+    
+    # OVERSPLITTING PER MORPHOSPECIES GROUP
+    infile_summary_oversplitting_morphospecies = input$summary_oversplitting_morphospecies
+    
+    if (is.null(infile_summary_oversplitting_morphospecies)) {
+      return(NULL)
+    }
+    
+    observeEvent(input$plot_summary_oversplits_per_morphospecies, {
+      
+      summary_oversplits_per_group_csv = read.csv(infile_summary_oversplitting_morphospecies$datapath, header = T, check.names = F)
+      
+      oversplitting_bar_summary <<- ggplot(data = summary_oversplits_per_group_csv, aes(x = predef_unique, y = Freq)) +
+        geom_bar(stat = "summary", fill = input$oversplitting_morphospecies_col, col = "black") +
+        expand_limits(y = 0) +
+        xlab("Morphospecies") +
+        ylab("Mean oversplitting ratio per morphospecies \n group, on the full dataset (100%)") +
+        ggthemes[[input$ggtheme_summary_plots]] +
+        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.text.x = element_text(size = 12)) +
+        theme(axis.text.y = element_text(size = 12)) +
+        theme(plot.title = element_text(size=16, face = "bold")) +
+        theme(axis.text.x = element_text(angle = input$x_axis_angle)) +
+        geom_hline(yintercept= 1, linetype="dashed") 
+      
+      output$summary_plot = renderPlot(oversplitting_bar_summary)
+      multiple_summary_plots$oversplitting <<- oversplitting_bar_summary
+      
+    })
+    
+    # download the plot
+    output$download_summary_oversplitting_morphospecies_plot <- downloadHandler(
+      
+      filename = function (){paste("oversplitting_morphospecies_plot", input$plot_format_summary_oversplitting_morphospecies, sep = '.')},
+      
+      content = function (file){
+        
+        width.oversplitting_morphospecies_summary = as.numeric(input$w_plot_summary_oversplitting_morphospecies) 
+        height.oversplitting_morphospecies_summary = as.numeric(input$h_plot_summary_oversplitting_morphospecies) 
+        dpi.oversplitting_morphospecies_summary = as.numeric(input$res_plot_summary_oversplitting_morphospecies)
+        units.oversplitting_morphospecies_summary = input$unit_plot_summary_oversplitting_morphospecies
+        
+        ggsave(file, width = width.oversplitting_morphospecies_summary, height = height.oversplitting_morphospecies_summary, dpi = dpi.oversplitting_morphospecies_summary, units = units.oversplitting_morphospecies_summary,
+               oversplitting_bar_summary)
+      }
+    )
+    
+  }) # end of observe
+  
+  observe({
+    
+    req(input$gridextra_ncol)
+      
+  observeEvent(input$plot_multiple_summary_plots, {
+    
+    output$summary_plot = renderPlot(gridExtra::grid.arrange(grobs = multiple_summary_plots, ncol = input$gridextra_ncol))
+    
+    # download the plot
+    output$download_multiple_summary_plots <- downloadHandler(
+      
+      filename = function (){paste("mutlple_summary_plots", input$plot_format_multiple_summary_plots, sep = '.')},
+      
+      content = function (file){
+        
+        width.multiple_summary_plots = as.numeric(input$w_plot_multiple_summary_plots) 
+        height.multiple_summary_plots = as.numeric(input$h_plot_multiple_summary_plots) 
+        dpi.multiple_summary_plots = as.numeric(input$res_plot_multiple_summary_plots)
+        units.multiple_summary_plots = input$unit_multiple_summary_plots
+        
+        ggsave(file, width = width.multiple_summary_plots, height = height.multiple_summary_plots, dpi = dpi.multiple_summary_plots, units = units.multiple_summary_plots,
+               gridExtra::grid.arrange(grobs = multiple_summary_plots, ncol = input$gridextra_ncol))
+      }
+    )
+    
+  })
+  
   }) # end of observe
   
   #########################################################################################################################
