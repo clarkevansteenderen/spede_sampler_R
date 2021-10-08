@@ -75,6 +75,105 @@ observeEvent(input$resample_fastas, {
   
 }) # end of observe
   
+
+  ################################################################################################
+  # GENETIC DIVERGENCE CALCULATION
+  ################################################################################################
+  
+  # read in the groupings file
+  groups_genetic_divergence = reactive({
+    
+    infile = input$genetic_divergence_groupings
+    
+    if (is.null(infile)) {
+      return(NULL)
+    }
+    
+    else{
+      genetic_divergence_groups <<- read.csv(infile$datapath)
+      return(genetic_divergence_groups)
+    }
+    
+  }) # end of reactive
+  
+  # select which column is the grouping and which is the sample names
+  observeEvent(input$genetic_divergence_groupings_uploaded, {
+    updateSelectInput(session,"genetic_divergence_group_col", choices=colnames(groups_genetic_divergence()))
+    updateSelectInput(session,"genetic_divergence_sample_name_col", choices=colnames(groups_genetic_divergence()))
+  })
+  
+  # input the file path to the fasta files
+  
+  observeEvent(input$calculate_genetic_divergences,{
+  
+  fasta_file_path_gen_diverg = input$fasta_file_path_genetic_divergence
+  
+  if (!dir.exists(fasta_file_path_gen_diverg)) 
+    shinyalert::shinyalert("Error", "File path does not exist", type = "error")
+  
+  else{
+    
+    setwd(fasta_file_path_gen_diverg)
+    gen_diverg_fasta_files = gtools::mixedsort( list.files(pattern = "\\.fas") ) 
+    w_group_dists = c()
+    b_group_dists = c()
+    
+    seq_name_col = as.name(input$genetic_divergence_sample_name_col)
+    morphogroup_col = as.name(input$genetic_divergence_group_col)
+    
+    withProgress(message = 'Calculating genetic divergences...', value = 0, {
+      
+      for(i in seq(along = gen_diverg_fasta_files)){
+        
+        target = ape::read.FASTA(gen_diverg_fasta_files[i])
+        dists = ape::dist.dna(target)
+        
+        seq_names = names(target)
+        
+        new_dat = data.frame(matrix(nrow = length(seq_names), ncol =2))
+        colnames(new_dat) = c("seq_name", "group")
+        new_dat$seq_name = seq_names
+        
+        for(m in (1:length(seq_names))){
+          for(n in (1:nrow(genetic_divergence_groups))){
+            if(seq_names[m] == genetic_divergence_groups[[seq_name_col]][n])
+              new_dat$group[m] = genetic_divergence_groups[[morphogroup_col]][n]
+          }
+        }
+        
+        MD = vegan::meandist(dists, new_dat$group)
+        MD_summary = summary(MD)
+        w_group_dists[i] = MD_summary$W
+        b_group_dists[i] = MD_summary$B
+        #o_group_dists[i] = MD_summary$D
+        
+        # Increment the progress bar, and update the detail text.
+        incProgress(1/length(gen_diverg_fasta_files), detail = paste("Processing Fasta file ", i, " of ", length(gen_diverg_fasta_files), "[ ", round(i/length(gen_diverg_fasta_files)*100, 0), "% ]"))
+        # Pause for 0.1 seconds to simulate a long computation.
+        Sys.sleep(0.1)
+        
+      } # end of for loop
+      
+      group_dists_df = data.frame(matrix(nrow = length(gen_diverg_fasta_files), ncol = 3))
+      colnames(group_dists_df) = c("filename", "intra_dist", "inter_dist")
+      group_dists_df$filename = gen_diverg_fasta_files
+      group_dists_df$intra_dist = w_group_dists
+      group_dists_df$inter_dist = b_group_dists
+      
+    }) # end of progress bar
+    
+    shinyalert::shinyalert("Complete", "Divergences Successfully Calculated", type = "success")
+    
+  } # end of else
+  
+  output$download_genetic_dists = downloadHandler(
+    
+    filename = function (){paste('genetic_dists', 'csv', sep = '.')},
+    content = function (file){write.csv(group_dists_df, file, row.names = FALSE)}
+  )
+  
+  }) # end of observeEvent
+  
 ################################################################################################
   # GENERATE XML FILES FOR BEAST
 ################################################################################################
@@ -373,7 +472,7 @@ observeEvent(input$resample_fastas, {
   output$folder_path = renderText( path() )  # quick check to see if the directory is stored as 'path'
   
   ################################################################################################
-  # Read in an optional csv file with predefined grouping information
+  # Read in an optional csv file with predefined grouping information for the GMYC analysis
   ################################################################################################
   
   
@@ -1404,15 +1503,17 @@ observeEvent(input$resample_fastas, {
       clust_accum <<- ggplot(data = summary_clusters_csv_melt, aes(x = as.numeric( data_perc ), y = clusters)) + 
         geom_point() +
         geom_smooth(span = 3, col = input$clust_ent_summary_line_col, fill = input$clust_ent_summary_ci_col, alpha = input$clust_ent_summary_ci_alpha) +
-        expand_limits(y = 0) +
+        scale_y_continuous(breaks = seq(0, max(summary_clusters_csv_melt$clusters), by = input$clust_ent_summary_y_interval)) +
+        #expand_limits(y = 0) +
         #geom_boxplot(fill = "#1EAD4B") +
         #stat_summary(fun = mean, geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
         xlab("Data Percentage") +
         ylab("Number of clusters") +
+        ggtitle(input$clust_ent_summary_plot_title) +
         ggthemes[[input$ggtheme_summary_plots]] +
         theme(legend.position = "bottom") +
-        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
-        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
         theme(axis.text.x = element_text(size = 12)) +
         theme(axis.text.y = element_text(size = 12)) +
         theme(legend.text=element_text(size=12)) +
@@ -1469,15 +1570,16 @@ observeEvent(input$resample_fastas, {
       ent_accum <<- ggplot(data = summary_entities_csv_melt, aes(x = as.numeric( data_perc ), y = entities)) + 
         geom_point() +
         geom_smooth(span = 3, col = input$clust_ent_summary_line_col, fill = input$clust_ent_summary_ci_col, alpha = input$clust_ent_summary_ci_alpha) +
-        expand_limits(y = 0) +
+        scale_y_continuous(breaks = seq(0, max(summary_entities_csv_melt$entities), by = input$clust_ent_summary_y_interval)) +
+        #expand_limits(y = 0) +
         #geom_boxplot(fill = "#1EAD4B") +
         #stat_summary(fun = mean, geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
         xlab("Data Percentage") +
         ylab("Number of entities") +
         ggthemes[[input$ggtheme_summary_plots]] +
         theme(legend.position = "bottom") +
-        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
-        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
         theme(axis.text.x = element_text(size = 12)) +
         theme(axis.text.y = element_text(size = 12)) +
         theme(legend.text=element_text(size=12)) +
@@ -1546,15 +1648,16 @@ observeEvent(input$resample_fastas, {
       oversplitting_boxplot_summary <<- ggplot(data = oversplitting_combo, aes(x = data_perc, y = value)) + 
         geom_boxplot(aes(fill = variable)) +
         expand_limits(y = 0) +
-        stat_summary(fun = mean, aes(group = variable), geom="point", shape = as.numeric(input$oversplitting_plot_point_shape), size=3, color="black", position=position_dodge(0.77)) +
+        #scale_y_continuous(breaks = seq(0, max(oversplitting_combo$value), by = input$oversplitting_plot_summary_y_interval)) +
+        stat_summary(fun = mean, aes(group = variable), geom="point", shape = as.numeric(input$oversplitting_plot_point_shape), size=input$oversplitting_plot_point_size, color=input$oversplitting_plot_point_col, position=position_dodge(0.77)) +
         scale_fill_manual(values=c(input$oversplitting_inc_col, input$oversplitting_exc_col), name = "", labels = c("+ singletons", "- singletons")) +
         xlab("Data Percentage") +
         ylab("Oversplitting ratio") +
         ggthemes[[input$ggtheme_summary_plots]] +
         theme(legend.position = "bottom") +
         guides(fill=guide_legend(title="")) +
-        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
-        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
         theme(axis.text.x = element_text(size = 12)) +
         theme(axis.text.y = element_text(size = 12)) +
         theme(legend.text=element_text(size=12)) +
@@ -1621,7 +1724,7 @@ observeEvent(input$resample_fastas, {
       
       perc_match_boxplot_summary <<- ggplot(data = percentage_matches_combo, aes(x = data_perc, y = value)) + 
         geom_boxplot(aes(fill = variable)) +
-        stat_summary(fun = mean, aes(group = variable), geom="point", shape=as.numeric(input$percentage_match_plot_point_shape), size=3, color="black", position=position_dodge(0.77)) +
+        stat_summary(fun = mean, aes(group = variable), geom="point", shape=as.numeric(input$percentage_match_plot_point_shape), size=input$percentage_match_plot_point_size, color=input$percentage_match_plot_point_col, position=position_dodge(0.77)) +
         ylim(0,100) +
         scale_fill_manual(values=c(input$percentage_match_inc_col, input$percentage_match_exc_col), name = "", labels = c("+ singletons", "- singletons")) +
         xlab("Data Percentage") +
@@ -1629,8 +1732,8 @@ observeEvent(input$resample_fastas, {
         ggthemes[[input$ggtheme_summary_plots]] +
         theme(legend.position = "bottom") +
         guides(fill=guide_legend(title="")) +
-        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
-        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
         theme(axis.text.x = element_text(size = 12)) +
         theme(axis.text.y = element_text(size = 12)) +
         theme(legend.text=element_text(size=12)) +
@@ -1684,12 +1787,12 @@ observeEvent(input$resample_fastas, {
       singletons_boxplot_summary <<- ggplot(data = summary_singletons_csv_melt, aes(x = data_perc, y = perc_singletons)) +
         geom_boxplot(fill = input$percentage_singletons_col) +
         ylim(0,100) +
-        stat_summary(fun = mean, geom="point", shape=as.numeric(input$percentage_singletons_plot_point_shape), size=4, color="black", position=position_dodge(0.77)) +
+        stat_summary(fun = mean, geom="point", shape=as.numeric(input$percentage_singletons_plot_point_shape), size=input$percentage_singletons_plot_point_size, color=input$percentage_singletons_plot_point_col, position=position_dodge(0.77)) +
         xlab("Data Percentage") +
         ylab("Percentage singletons") +
         ggthemes[[input$ggtheme_summary_plots]] +
-        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
-        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
         theme(axis.text.x = element_text(size = 12)) +
         theme(axis.text.y = element_text(size = 12)) +
         theme(plot.title = element_text(size=16, face = "bold"))
@@ -1739,8 +1842,8 @@ observeEvent(input$resample_fastas, {
         xlab("Morphospecies") +
         ylab("Mean oversplitting ratio per morphospecies \n group, on the full dataset (100%)") +
         ggthemes[[input$ggtheme_summary_plots]] +
-        theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
-        theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+        theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+        theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
         theme(axis.text.x = element_text(size = 12)) +
         theme(axis.text.y = element_text(size = 12)) +
         theme(plot.title = element_text(size=16, face = "bold")) +

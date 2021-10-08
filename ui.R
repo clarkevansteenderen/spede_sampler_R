@@ -121,6 +121,28 @@ ui <- fluidPage(
                                         
                                       ),
                                       
+                                      tabPanel(strong("Genetic Divergence"),
+                                        br(),
+                                        img(src="fruit_piercing_moth.png", align = "left", height="20%", width="20%"),
+                                        br(), br(),
+                                        h3(strong("Genetic Divergence Estimates")),
+                                        strong("Generate average within-group genetic divergence estimates"),
+                                        br(), br(), br(),
+                                        wellPanel(
+                                          fileInput("genetic_divergence_groupings", label="Upload a .csv file with sequence names and morphospecies groups:", accept = ".csv"),
+                                          actionButton("genetic_divergence_groupings_uploaded", strong("Confirm file"), style = 'font-size:120%; color: black; background-color: #A6C3C6; border-color: black', icon("thumbs-o-up")),
+                                          br(), br(),
+                                          selectInput("genetic_divergence_group_col", "Select Group Column:", choices="", width = "350px"),
+                                          selectInput("genetic_divergence_sample_name_col", "Select Sample Name Column:", choices="", width = "350px"),
+                                          br(),
+                                          textInput(inputId = 'fasta_file_path_genetic_divergence', label = 'Manually insert a file path to the folder containing your Fasta files:'),
+                                          br(),
+                                          actionButton("calculate_genetic_divergences", strong("Calculate"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                          br(), br(),
+                                          downloadButton("download_genetic_dists", strong('Download Data'), style="color: black; background-color: #A6C3C6; border-color: black")
+                                        )
+                                      ),
+                                      
                                       tabPanel(strong("BEAST XML Files"),
                                                br(),
                                                img(src="beast.png", align = "left", height="10%", width="10%"),
@@ -129,7 +151,7 @@ ui <- fluidPage(
                                                strong("Use functionality from BEAUti to create an input .xml file for a BEAST analysis"),
                                                br(), br(), br(),
                                                wellPanel(
-                                                 textInput(inputId = 'resampled_fasta_file_path', label = 'Manually insert a file path to the folder containing your resampled Fasta files: '),
+                                                 textInput(inputId = 'resampled_fasta_file_path', label = 'Manually insert a file path to the folder containing your resampled Fasta files:'),
                                                  br(),
                                                  fluidRow(
                                                    column(width = 2,
@@ -684,7 +706,7 @@ ui <- fluidPage(
                                                
                                       ),
                                       
-                                      tabPanel(strong("Plot Percentage matches"),
+                                      tabPanel(strong("Plot Percentage Matches"),
                                                br(), br(),
                                                img(src="lysathia.png", align = "left", height="15%", width="15%"),
                                                br(), br(), br(),
@@ -892,16 +914,20 @@ ui <- fluidPage(
                                                ), # end of fluidrown
                                                
                                                fluidRow(
-                                                 column(width = 4,
-                                                  selectInput("clust_ent_summary_line_col", "Line colour:", choices = c("black", "blue", "brown", "darkblue", "darkgreen", "forestgreen", "grey", "lightblue", "orange", "pink", "purple", "red", "white"), selected = "lightblue"),      
+                                                 column(width = 3,
+                                                  selectInput("clust_ent_summary_line_col", "Line colour:", choices = c("black", "blue", "brown", "darkblue", "darkgreen", "forestgreen", "grey", "lightblue", "orange", "pink", "purple", "red", "turquoise", "white"), selected = "lightblue"),      
                                                  ),
-                                                 column(width = 4,
-                                                  selectInput("clust_ent_summary_ci_col", "Confidence interval colour:", choices = c("black", "grey", "lightblue", "salmon", "lightgreen", "white", "yellow"), selected = "grey"),      
+                                                 column(width = 3,
+                                                  selectInput("clust_ent_summary_ci_col", "CI band colour:", choices = c("black", "grey", "lightblue", "salmon", "lightgreen", "white", "yellow"), selected = "grey"),      
                                                  ),
-                                                 column(width = 4,
+                                                 column(width = 3,
                                                   numericInput("clust_ent_summary_ci_alpha", "Alpha value:", value = 0.2, min = 0, step = 0.1),      
+                                                 ),
+                                                 column(width = 3,
+                                                  numericInput("clust_ent_summary_y_interval", "Y-axis interval:", value = 10, min = 1, step = 1),      
                                                  )
                                                ),
+                                               
                                                actionButton("plot_summary_clusts", strong("Plot clusters"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                actionButton("plot_summary_ents", strong("Plot entities"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(), br(),
@@ -954,10 +980,18 @@ ui <- fluidPage(
                                                  ),
                                                  column(width = 4,
                                                         selectInput("oversplitting_plot_point_shape", label = "Point shape of means: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18), selected = 17),  
-                                                        )
+                                                        ),
+                                                 column(width = 4,
+                                                        selectInput("oversplitting_plot_point_col", label = "Colour of mean points: ", choices = c("black", "white", "red", "grey", "blue", "darkblue")),  
+                                                 ),
+                                                 column(width = 3,
+                                                        sliderInput("oversplitting_plot_point_size", label = "Point size: ", value = 3, min = 0, max = 10, step = 0.5),
+                                                 ),
                                                  
                                                ),
                                                
+                                               #numericInput("oversplitting_plot_summary_y_interval", "Y-axis interval:", value = 0.2, min = 0.001, step = 0.1),      
+                                              
                                                actionButton("plot_summary_oversplits", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(), br(),
                                                
@@ -1007,7 +1041,13 @@ ui <- fluidPage(
                                                  ),
                                                  column(width = 4,
                                                         selectInput("percentage_match_plot_point_shape", label = "Point shape of means: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18), selected = 17),  
-                                                 )
+                                                 ),
+                                                 column(width = 4,
+                                                        selectInput("percentage_match_plot_point_col", label = "Colour of mean points: ", choices = c("black", "white", "red", "grey", "blue", "darkblue")),  
+                                                 ),
+                                                 column(width = 3,
+                                                        sliderInput("percentage_match_plot_point_size", label = "Point size: ", value = 3, min = 0, max = 10, step = 0.5),
+                                                 ),
                                                  
                                                ),
                                                
@@ -1043,8 +1083,24 @@ ui <- fluidPage(
                                                h3(strong("Percentage Singletons")),
                                                wellPanel(
                                                fileInput("summary_percentage_singletons", "Percentage singletons data"),
+                                               
+                                               fluidRow(
+                                                 
+                                                 column(width = 3,
                                                selectInput("percentage_singletons_col", "Barplot colour:", choices = c("grey", "lightblue", "lightgreen", "lightyellow", "salmon", "red", "black", "royalblue", "forestgreen", "white"), selected = "lightblue",  width = "250px"), 
+                                                 ),
+                                               column(width = 3,
                                                selectInput("percentage_singletons_plot_point_shape", label = "Point shape of means: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18), selected = 17, width = "250px"),
+                                               ),
+                                               column(width = 3,
+                                               selectInput("percentage_singletons_plot_point_col", label = "Colour of mean points: ", choices = c("black", "white", "red", "grey", "blue", "darkblue"), width = "250px"),  
+                                               ),
+                                               column(width = 3,
+                                                      sliderInput("percentage_singletons_plot_point_size", label = "Point size: ", value = 3, min = 0, max = 10, step = 0.5),
+                                               ),
+                                               
+                                               ), # end of fluidrow
+                                               
                                                actionButton("plot_summary_singletons", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                
                                                br(), br(),
