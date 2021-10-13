@@ -138,9 +138,18 @@ ui <- fluidPage(
                                           textInput(inputId = 'fasta_file_path_genetic_divergence', label = 'Manually insert a file path to the folder containing your Fasta files:'),
                                           br(),
                                           actionButton("calculate_genetic_divergences", strong("Calculate"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                          actionButton("view_genetic_divergences", strong("View"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                          
                                           br(), br(),
                                           downloadButton("download_genetic_dists", strong('Download Data'), style="color: black; background-color: #A6C3C6; border-color: black")
-                                        )
+                                        ),
+                                        tableOutput("genetic_divergence_table"),
+                                        
+                                        # wellPanel(
+                                        #   strong("Genetic divergence per morphospecies"),
+                                        #   br(), br(),
+                                        #   downloadButton("download_divergences_per_group", strong('Download Data'), style="color: black; background-color: #A6C3C6; border-color: black")
+                                        # )
                                       ),
                                       
                                       tabPanel(strong("BEAST XML Files"),
@@ -1163,6 +1172,57 @@ ui <- fluidPage(
                                                br(),
                                                
                                                ),
+                                               
+                                               h3(strong("Genetic Divergences")),
+                                               wellPanel(
+                                                 
+                                                  fileInput("genetic_divergence_data", "Genetic Divergence Data"),
+                                                
+                                                 fluidRow(
+                                                   column(width = 3,
+                                                          selectInput("genetic_divergence_line_col", "Line colour:", choices = c("black", "blue", "brown", "darkblue", "darkgreen", "forestgreen", "grey", "lightblue", "orange", "pink", "purple", "red", "turquoise", "white"), selected = "lightblue"),      
+                                                   ),
+                                                   column(width = 3,
+                                                          selectInput("genetic_divergence_ci_col", "CI band colour:", choices = c("black", "grey", "lightblue", "salmon", "lightgreen", "white", "yellow"), selected = "grey"),      
+                                                   ),
+                                                   column(width = 3,
+                                                          numericInput("genetic_divergence_ci_alpha", "Alpha value:", value = 0.2, min = 0, step = 0.1),      
+                                                   ),
+                                                   column(width = 3,
+                                                          numericInput("genetic_divergence_y_interval", "Y-axis interval:", value = 0.005, min = 1, step = 1),      
+                                                   )
+                                                 ),
+                                                 
+                                                 textInput("genetic_divergence_y_label", "y-axis label:", value = "Mean genetic divergence"),
+                                                 br(),
+                                                 actionButton("plot_genetic_divergence", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                                 
+                                                 br(), br(),
+                                                 
+                                                 fluidRow(
+                                                   column(width = 3,
+                                                          selectInput("plot_format_genetic_divergence", "Image format:", choices = c("pdf", "png", "svg"), width = "150px"),
+                                                   ),
+                                                   column(width = 3,
+                                                          textInput("w_plot_genetic_divergence", "Width: ", 20, width = "150px"),
+                                                   ),
+                                                   column(width = 3,
+                                                          textInput("h_plot_genetic_divergence", "Height: ", 15, width = "150px"),
+                                                   ),
+                                                   column(width = 3,
+                                                          selectInput("unit_plot_genetic_divergence", "Unit: ", choices=c("cm", "in"), width = "150px"),
+                                                   ),
+                                                   column(width = 3,
+                                                          conditionalPanel(
+                                                            condition = "input.plot_format_genetic_divergence == 'png'",
+                                                            textInput("res_plot_genetic_divergence", "Res (dpi): ", 300), width = "150px")
+                                                   ),
+                                                 ),
+                                                 
+                                                 downloadButton("download_genetic_divergence_plot", label = strong("Download plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                                 br()
+                                                 
+                                               ), # end of wellpanel
                                                
                                                h3(strong("Multi-Plots")),
                                                wellPanel(

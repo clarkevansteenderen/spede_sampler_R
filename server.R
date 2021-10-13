@@ -117,6 +117,9 @@ observeEvent(input$resample_fastas, {
     gen_diverg_fasta_files = gtools::mixedsort( list.files(pattern = "\\.fas") ) 
     w_group_dists = c()
     b_group_dists = c()
+    o_group_dists = c()
+    
+    spp_dists = list()
     
     seq_name_col = as.name(input$genetic_divergence_sample_name_col)
     morphogroup_col = as.name(input$genetic_divergence_group_col)
@@ -141,11 +144,24 @@ observeEvent(input$resample_fastas, {
           }
         }
         
+        tryCatch({
+          
         MD = vegan::meandist(dists, new_dat$group)
         MD_summary = summary(MD)
         w_group_dists[i] = MD_summary$W
         b_group_dists[i] = MD_summary$B
-        #o_group_dists[i] = MD_summary$D
+        o_group_dists[i] = MD_summary$D
+        
+        MD_df = as.data.frame(MD)
+        vals = c()
+        
+        for(k in 1:nrow(MD_df)){
+          vals[k] = MD_df[k,k]
+        }
+        
+        spp_dists[[i]] = vals
+        
+        }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
         
         # Increment the progress bar, and update the detail text.
         incProgress(1/length(gen_diverg_fasta_files), detail = paste("Processing Fasta file ", i, " of ", length(gen_diverg_fasta_files), "[ ", round(i/length(gen_diverg_fasta_files)*100, 0), "% ]"))
@@ -154,23 +170,42 @@ observeEvent(input$resample_fastas, {
         
       } # end of for loop
       
-      group_dists_df = data.frame(matrix(nrow = length(gen_diverg_fasta_files), ncol = 3))
-      colnames(group_dists_df) = c("filename", "intra_dist", "inter_dist")
+      group_dists_df = data.frame(matrix(nrow = length(gen_diverg_fasta_files), ncol = 4))
+      colnames(group_dists_df) = c("filename", "intra_dist", "inter_dist", "overall_dist")
       group_dists_df$filename = gen_diverg_fasta_files
       group_dists_df$intra_dist = w_group_dists
       group_dists_df$inter_dist = b_group_dists
+      group_dists_df$overall_dist = o_group_dists
+      
+      # tryCatch({
+      # spp_dists = as.data.frame(do.call(rbind, spp_dists))
+      # colnames(spp_dists) = levels(as.factor(genetic_divergence_groups[[morphogroup_col]]))
+      # rownames(spp_dists) = gen_diverg_fasta_files 
+      # }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
       
     }) # end of progress bar
     
     shinyalert::shinyalert("Complete", "Divergences Successfully Calculated", type = "success")
     
+    
   } # end of else
+  
+  observeEvent(input$view_genetic_divergences, {
+    output$genetic_divergence_table = renderTable(group_dists_df, rownames = TRUE, colnames = TRUE, digits = 3)
+  })
+  
   
   output$download_genetic_dists = downloadHandler(
     
     filename = function (){paste('genetic_dists', 'csv', sep = '.')},
     content = function (file){write.csv(group_dists_df, file, row.names = FALSE)}
   )
+  
+  # output$download_divergences_per_group = downloadHandler(
+  #   
+  #   filename = function (){paste('genetic_dists_per_morphogroup', 'csv', sep = '.')},
+  #   content = function (file){write.csv(spp_dists, file, row.names = FALSE)}
+  # )
   
   }) # end of observeEvent
   
@@ -1509,7 +1544,7 @@ observeEvent(input$resample_fastas, {
         #stat_summary(fun = mean, geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
         xlab("Data Percentage") +
         ylab("Number of clusters") +
-        ggtitle(input$clust_ent_summary_plot_title) +
+        #ggtitle(input$clust_ent_summary_plot_title) +
         ggthemes[[input$ggtheme_summary_plots]] +
         theme(legend.position = "bottom") +
         theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
@@ -1821,6 +1856,67 @@ observeEvent(input$resample_fastas, {
     
   }) # end of observe
   
+    ################################################################################################
+    
+    # GENETIC DIVERGENCE DATA
+    
+    observe({
+      infile_genetic_diversity = input$genetic_divergence_data
+      
+      if (is.null(infile_genetic_diversity)) {
+        return(NULL)
+      }
+      
+      
+      observeEvent(input$plot_genetic_divergence, {
+        
+        genetic_divergences_csv = read.csv(infile_genetic_diversity$datapath, check.names = F)
+        genetic_divergences_csv_melt = reshape2::melt(genetic_divergences_csv)
+        
+        colnames(genetic_divergences_csv_melt) = c("file_name", "data_perc", "intra_dist")
+        
+        # CREATE PLOT
+        genetic_divergence_plot <<- ggplot(data = genetic_divergences_csv_melt, aes(x = as.numeric( data_perc ), y = intra_dist)) + 
+          geom_point() +
+          geom_smooth(span = 3, col = input$genetic_divergence_line_col, fill = input$genetic_divergence_ci_col, alpha = input$genetic_divergence_ci_alpha) +
+          scale_y_continuous(breaks = seq(0, max(genetic_divergences_csv_melt$intra_dist), by = input$genetic_divergence_y_interval)) +
+          xlab("Data Percentage") +
+          ylab(input$genetic_divergence_y_label) +
+          ggthemes[[input$ggtheme_summary_plots]] +
+          theme(legend.position = "bottom") +
+          theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+          theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+          theme(axis.text.x = element_text(size = 12)) +
+          theme(axis.text.y = element_text(size = 12)) +
+          theme(legend.text=element_text(size=12)) +
+          theme(plot.title = element_text(size=16, face = "bold")) +
+          scale_x_continuous(breaks = as.numeric(genetic_divergences_csv_melt$data_perc), labels = genetic_divergences_csv_melt$data_perc) 
+          
+        
+        output$summary_plot = renderPlot(genetic_divergence_plot)
+        multiple_summary_plots$genetic_divergence <<- genetic_divergence_plot
+        
+      })
+      
+      # download the plot
+      output$download_genetic_divergence_plot <- downloadHandler(
+        
+        filename = function (){paste("genetic_divergence_plot", input$plot_format_genetic_divergence, sep = '.')},
+        
+        content = function (file){
+          
+          width.genetic_divergence = as.numeric(input$w_plot_genetic_divergence) 
+          height.genetic_divergence = as.numeric(input$h_plot_genetic_divergence) 
+          dpi.genetic_divergence = as.numeric(input$res_plot_genetic_divergence)
+          units.genetic_divergence = input$unit_plot_genetic_divergence
+          
+          ggsave(file, width = width.genetic_divergence, height = height.genetic_divergence, dpi = dpi.genetic_divergence, units = units.genetic_divergence,
+                 genetic_divergence_plot)
+        }
+      )
+      
+    }) # end of observe
+    
     ################################################################################################
   
   observe({
