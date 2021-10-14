@@ -301,9 +301,9 @@ and the entities table looks like this:
 | resampled_9.nex  | 6  | 11 | 10 | 10  |
 | resampled_10.nex | 7  | 9  | 12 | 10  |
 
-The resulting summary plots can be plotted as shown below, using the **Summary Plots** tab. A) The number of clusters and entities at each dataset size (the dotted lines indicate the expected number of species (n = 5), and species + lineages (n = 11) in the dataset), B) The oversplitting ratios with and without singletons across dataset sizes (the dotted line indicates the expected ratio of 1), and C) the percentage of singleton sequences across dataset sizes. Triangles represent mean values.
+The resulting summary plots can be plotted as shown below, using the **Summary Plots** tab. The number of A1) clusters and A2) entities at each dataset size (the dotted lines indicate the expected number of species (n = 5), and species + lineages (n = 11) in the dataset), B) The oversplitting ratios with and without singletons across dataset sizes (the dotted line indicates the expected ratio of 1), C) the percentage of singleton sequences across dataset sizes, D) Barplots highlighting which predefined groups were oversplit by the GMYC, and E) The percentage match scores between predefined groups and GMYC species across dataset sizes. Triangles represent mean values.
 
-<img src="worked_example_figures/combo_plots_cochineal_git.png" alt="drawing" width="550"/>
+<img src="combo_plots_cochineal.png" alt="drawing" width="500"/>
 
 The R code to create these plots is shown here:
 
