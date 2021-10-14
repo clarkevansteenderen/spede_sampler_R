@@ -270,7 +270,7 @@ The **View Matches** button displays the percentage matches including and exclud
 
 The output above means, for example, that the GMYC method oversplit the *Dactylopius tomentosus* predefined group into an average of 3.9 times more 'species' than expected (i.e. all the samples with the predefined group labelled "tomentosus" are expected to be grouped into one species by the GMYC method). The *D. tomentosus* sequences in this dataset are known to contain different lineages/biotypes. The high value of 3.9 may therefore not be a case of incorrect 'oversplitting', but rather due to genuine intraspecific divisions. Each dataset needs to be analysed in the context of what is known about the organism's biology.
 
-18. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. In this way, the results of the 25, 50, 75, and 100% datasets can be joined into single files in order to be easily plotted. For example, the four files clust_ent_data_25.csv, clust_ent_data_50.csv, clust_ent_data_75.csv, and clust_ent_data_100.csv can be uploaded, and all the cluster data can be amalgamated into one file, and all the entity data into another.
+18. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. In this way, the results of the 25, 50, 75, and 100% datasets can be joined into single files in order to be easily plotted. For example, the four files **clust_ent_data_25.csv**, **clust_ent_data_50.csv**, **clust_ent_data_75.csv**, and **clust_ent_data_100.csv** can be uploaded, and all the cluster data can be amalgamated into one file, and all the entity data into another.
 The clusters summary table looks like this:
 
 |                  | 25 | 50 | 75 | 100 |
@@ -301,11 +301,11 @@ and the entities table looks like this:
 | resampled_9.nex  | 6  | 11 | 10 | 10  |
 | resampled_10.nex | 7  | 9  | 12 | 10  |
 
-The resulting summary plots can be plotted as shown below, using the **Summary Plots** tab. The number of A1) clusters and A2) entities at each dataset size (the dotted lines indicate the expected number of species (n = 5), and species + lineages (n = 11) in the dataset), B) The oversplitting ratios with and without singletons across dataset sizes (the dotted line indicates the expected ratio of 1), C) the percentage of singleton sequences across dataset sizes, D) Barplots highlighting which predefined groups were oversplit by the GMYC, and E) The percentage match scores between predefined groups and GMYC species across dataset sizes. Triangles represent mean values.
+The resulting summary plots for each measure can be plotted as shown below, using the **Summary Plots** tab. The number of A1) clusters and A2) entities at each dataset size (the dotted lines indicate the expected number of species (n = 5), and species + lineages (n = 11) in the dataset), B) The oversplitting ratios with and without singletons across dataset sizes (the dotted line indicates the expected ratio of 1), C) the percentage of singleton sequences across dataset sizes, D) Barplots highlighting which predefined groups were oversplit by the GMYC, and E) The percentage match scores between predefined groups and GMYC species across dataset sizes. Triangles represent mean values.
 
 <img src="combo_plots_cochineal.png" alt="drawing" width="500"/>
 
-The R code to create these plots is shown here:
+The R code to create these plots is shown here, for users who wish to further tweak their plots:
 
 ```r
 library(readxl)
