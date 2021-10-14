@@ -58,42 +58,52 @@ Insert the file path to an aligned FASTA file (.fas or .fasta extension) in the 
 
 For example, if your input .fas file contained the following three sequences:
 
->seq1<br>
-AAAGGGTTTAA<br>
->seq2<br>
-CCCGGGAAAGT<br>
->seq3<br>
-GGTTTAAGGGT<br>
+```javascript
+>seq1
+AAAGGGTTTAA
+>seq2
+CCCGGGAAAGT
+>seq3
+GGTTTAAGGGT
+```
 
 If you wish to randomly select two of these sequences, and iterate the process four times, the program will create four .fas files, which could be for example:
 
 **iteration1.fas:**
 
->seq2<br>
-CCCGGGAAAGT<br>
->sequence1<br>
-AAAGGGTTTAA<br>
+```javascript
+>seq2
+CCCGGGAAAGT
+>sequence1
+AAAGGGTTTAA
+```
 
 **iteration2.fas**
 
->seq2<br>
-CCCGGGAAAGT<br>
->seq3<br>
-GGTTTAAGGGT<br>
+```javascript
+>seq2
+CCCGGGAAAGT
+>seq3
+GGTTTAAGGGT
+```
 
 **iteration3.fas**
 
->seq3<br>
-GGTTTAAGGGT<br>
->sequence1<br>
-AAAGGGTTTAA<br>
+```javascript
+>seq3
+GGTTTAAGGGT
+>sequence1
+AAAGGGTTTAA
+```
 
 **iteration4.fas**
 
->seq3<br>
-GGTTTAAGGGT<br>
->seq2<br>
-CCCGGGAAAGT<br>
+```javascript
+>seq3
+GGTTTAAGGGT
+>seq2
+CCCGGGAAAGT
+```
 
 ## BEAST XML Files
 
