@@ -231,9 +231,7 @@ Upload the desired dataframe downloaded from the **Amalgamate** tab in the appro
 | Minimum  | 9.00  | 10.00  | 
 | Maximum  | 11.00   | 12.00 | 
 
-11. The **Plot Results** tab allows for the plotting of the A) the number of clusters vs entities for each tree file, B) box-and-whisker plot for the clusters and entities (showing Q1, Q3, median, minimum, maximum, and outlier values), and a line graph for the number of GMYC C) clusters and D) entities for each tree file uploaded.
-
-<img src="worked_example_figures/clust_ents_plot.png" alt="drawing" width="350"/>
+11. The **Plot Results** tab allows for the plotting of the the number of clusters vs entities for each tree file, box-and-whisker plot for the clusters and entities (showing Q1, Q3, median, minimum, maximum, and outlier values), and a line graph for the number of GMYC clusters and entities for each tree file uploaded.
 
 14. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
 
