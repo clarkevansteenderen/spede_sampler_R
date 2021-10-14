@@ -201,9 +201,8 @@ Select which data column you wish to extract from the dropdown menu. The algorit
 
 Download this as a .csv file.
 
-## Plot for multiple-column data
-Upload the dataframe downloaded from the **Amalgamate** tab and apply the desired plot settings/tweaks. Plot a boxplot and/or barplot of the data and download as an .svg file.
-
+## Summary Plots
+Upload the desired dataframe downloaded from the **Amalgamate** tab in the appropriate panel (Clusters and Entities, Oversplitting Ratios, Percentage Matches, Percentage Singletons, Oversplitting Ratios per Predefined Group) and apply the desired plot settings/tweaks for each. For a combined plot, scroll to the **Multi-Plots** panel, and click **Plot All**. Each plot can be downloaded as a PDF, PNG, or SVG file with desired sizes.
 
 ## :pencil2: **Worked Example using cochineal 12S sequences**
 
