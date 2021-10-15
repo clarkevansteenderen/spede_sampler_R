@@ -100,7 +100,7 @@ observeEvent(input$resample_fastas, {
   
    } # end of if statement re input$resampling_approach
   
-    else{
+    else{ # if the user wishes to keep at least one sequence representative per predefined group
       
       if(input$set_seed_resampling == TRUE) set.seed(123)
       
@@ -122,13 +122,15 @@ observeEvent(input$resample_fastas, {
             withProgress(message = 'Resampling...', value = 0, { 
               
             for (k in 1:input$fasta_resample_iterations){
-            
+                  
+                  # subset each predefined group, and store them all in a list called "subset_groups"
                   subset_groups = c()
                   
                   for(i in levels( groups_resampling_df[[grp_col]] )){
                     subset_groups[[i]] = subset(groups_resampling_df, groups_resampling_df[[grp_col]] == i)
                   }
                   
+                  # randomly select one sequence from each predefined group, and store it in a list called "extracted_samples"
                   extracted_samples = c()
                   
                   for(j in 1:length(subset_groups)){
@@ -137,18 +139,23 @@ observeEvent(input$resample_fastas, {
                     subset_groups[[j]] = subset_groups[[j]][-rand_ind, ]
                   }
                   
+                  # convert these lists into dataframes
                   extracted_samples = dplyr::bind_rows(lapply(extracted_samples, as.data.frame.list))
                   subset_groups = dplyr::bind_rows(lapply(subset_groups, as.data.frame.list))
                   
-                  # get the number of sequences to resample
-                  
+                  # get the number of sequences to resample, taking into account the sequences that were already extracted to serve as representative sequences for each group
                   num = num_fasta_seqs - nrow(extracted_samples)
                   
+                  # randomly select from the remaining sequences
+                  # get random indices (or one index, depending):
                   resampled_ind = sample(nrow(subset_groups), num, replace = FALSE) 
+                  # subset the associated rows based on those indices
                   resampled = subset_groups[resampled_ind,] 
+                  # bind the randomly selected sequences to the ones that were extracted in the beginning (one representative sequence for each group)
                   final = rbind(extracted_samples, resampled) 
+                  # extract the actual sequences in the fasta file based on the randomly selected names
                   seqs_subsetted = subset(seqs, labels(seqs) %in% final[[id_col]]) 
-                  
+                  # write the fasta file
                   write.dna(seqs_subsetted, paste(out_folder, "/", input$resampled_fasta_file_name, "_", k, ".fasta", sep = ""), format = "fasta")
                   
                   # Increment the progress bar, and update the detail text.
