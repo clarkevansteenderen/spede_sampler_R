@@ -20,7 +20,31 @@ server = function(input, output, session) {
 # RANDOM RESAMPLING OF FASTA FILE SEQUENCES
 ################################################################################################
   
-  # Read in the fasta file
+  # optionally read in an excel file of sequence names and predefined groups:
+  
+  groups_resampling = reactive({
+    
+    infile = input$resampling_groupings
+    
+    if (is.null(infile)) {
+      return(NULL)
+    }
+    
+    else{
+      resample_groups <<- read.csv(infile$datapath)
+      return(resample_groups)
+    }
+    
+  }) # end of reactive
+  
+  # select which column is the grouping and which is the sample names
+  observeEvent(input$resampling_groupings_uploaded, {
+    updateSelectInput(session,"resampling_group_col", choices=colnames(groups_resampling()))
+    updateSelectInput(session,"resampling_sample_name_col", choices=colnames(groups_resampling()))
+  })
+  
+  
+  # Read in the fasta file:
   
 observe({
     
@@ -34,42 +58,113 @@ observe({
   # get the number of sequences in the alignment file
   output$num_seqs = renderText({paste("There are ", length(seqs), " sequences in your alignment.")})
   
+  
 observeEvent(input$resample_fastas, {
   
-  # get the number of sequences to resample
-  num_fasta_seqs = floor( (input$fasta_subsample_percent/100) * length(seqs) )
+  if(input$resampling_approach == "Random resampling"){
   
-  # create an empty folder to store resampled fasta files
-  dir.create(input$resampled_fasta_folder_name)
+        # get the number of sequences to resample
+        num_fasta_seqs = floor( (input$fasta_subsample_percent/100) * length(seqs) )
+        
+        # create an empty folder to store resampled fasta files
+        dir.create(input$resampled_fasta_folder_name)
+        
+        # ITERATE THIS N TIMES
+        out_file = paste(input$resampled_fasta_folder_name, "/", input$resampled_fasta_file_name, sep = "")
+        
+       if(input$set_seed_resampling == TRUE) set.seed(123)
+        
+        # function from the FastaUtils github package, Guillem Salazar
+        fasta.sample<-function(infile=NULL,nseq=NULL,file.out=NULL,replacement=FALSE){
+          seqs<- Biostrings::readDNAStringSet(infile)
+          selected<-seqs[sample(1:length(seqs),nseq,replace=replacement)]
+          Biostrings::writeXStringSet(selected,filepath=file.out)}
+        
+        withProgress(message = 'Resampling...', value = 0, {
+          
+        for (i in 1:input$fasta_resample_iterations){
+          
+          fasta.sample(infile = in_seqs$datapath, nseq = num_fasta_seqs, file.out = paste(out_file, "_", i, ".fasta", sep = ""), 
+                                   replacement = FALSE)
+        
+          # Increment the progress bar, and update the detail text.
+          incProgress(1/input$fasta_resample_iterations, detail = paste("Resampling file ", i, " of ", input$fasta_resample_iterations, "[ ", round(i/input$fasta_resample_iterations*100, 0), "% ]"))
+          # Pause for 0.1 seconds to simulate a long computation.
+          Sys.sleep(0.1)
+          
+        }
+          
+        }) # end of progressbar
+        
+        shinyalert::shinyalert("Complete", "Successfully resampled", type = "success")
   
-  # ITERATE THIS N TIMES
-  out_file = paste(input$resampled_fasta_folder_name, "/", input$resampled_fasta_file_name, sep = "")
+   } # end of if statement re input$resampling_approach
   
- if(input$set_seed_resampling == TRUE) set.seed(123)
-  
-  # function from the FastaUtils github package, Guillem Salazar
-  fasta.sample<-function(infile=NULL,nseq=NULL,file.out=NULL,replacement=FALSE){
-    seqs<- Biostrings::readDNAStringSet(infile)
-    selected<-seqs[sample(1:length(seqs),nseq,replace=replacement)]
-    Biostrings::writeXStringSet(selected,filepath=file.out)}
-  
-  withProgress(message = 'Resampling...', value = 0, {
-    
-  for (i in 1:input$fasta_resample_iterations){
-    
-    fasta.sample(infile = in_seqs$datapath, nseq = num_fasta_seqs, file.out = paste(out_file, "_", i, ".fasta", sep = ""), 
-                             replacement = FALSE)
-  
-    # Increment the progress bar, and update the detail text.
-    incProgress(1/input$fasta_resample_iterations, detail = paste("Resampling file ", i, " of ", input$fasta_resample_iterations, "[ ", round(i/input$fasta_resample_iterations*100, 0), "% ]"))
-    # Pause for 0.1 seconds to simulate a long computation.
-    Sys.sleep(0.1)
-    
-  }
-    
-  }) # end of progressbar
-  
-  shinyalert::shinyalert("Complete", "Successfully resampled", type = "success")
+    else{
+      
+      if(input$set_seed_resampling == TRUE) set.seed(123)
+      
+      id_col = as.name(input$resampling_sample_name_col)
+      grp_col = as.name(input$resampling_group_col)
+      groups_resampling_df = groups_resampling()
+      groups_resampling_df[[grp_col]] = as.factor( groups_resampling_df[[grp_col]] )
+      
+      num_fasta_seqs = floor( (input$fasta_subsample_percent/100) * length(seqs) )
+      
+      num_groups = length( levels( groups_resampling_df[[grp_col]] ) )
+      
+      if(num_fasta_seqs < num_groups) shinyalert::shinyalert("Warning", paste("Please select a larger percentage to resample. You need at least ", ceiling( num_groups/length(seqs) * 100 ), "%"), type = "warning")
+      
+      else{
+              out_folder = paste(input$resampled_fasta_folder_name)
+              dir.create(out_folder)
+              
+            withProgress(message = 'Resampling...', value = 0, { 
+              
+            for (k in 1:input$fasta_resample_iterations){
+            
+                  subset_groups = c()
+                  
+                  for(i in levels( groups_resampling_df[[grp_col]] )){
+                    subset_groups[[i]] = subset(groups_resampling_df, groups_resampling_df[[grp_col]] == i)
+                  }
+                  
+                  extracted_samples = c()
+                  
+                  for(j in 1:length(subset_groups)){
+                    rand_ind = sample(nrow(subset_groups[[j]]), 1, replace = FALSE) 
+                    extracted_samples[[j]] = subset_groups[[j]][rand_ind,]
+                    subset_groups[[j]] = subset_groups[[j]][-rand_ind, ]
+                  }
+                  
+                  extracted_samples = dplyr::bind_rows(lapply(extracted_samples, as.data.frame.list))
+                  subset_groups = dplyr::bind_rows(lapply(subset_groups, as.data.frame.list))
+                  
+                  # get the number of sequences to resample
+                  
+                  num = num_fasta_seqs - nrow(extracted_samples)
+                  
+                  resampled_ind = sample(nrow(subset_groups), num, replace = FALSE) 
+                  resampled = subset_groups[resampled_ind,] 
+                  final = rbind(extracted_samples, resampled) 
+                  seqs_subsetted = subset(seqs, labels(seqs) %in% final[[id_col]]) 
+                  
+                  write.dna(seqs_subsetted, paste(out_folder, "/", input$resampled_fasta_file_name, "_", k, ".fasta", sep = ""), format = "fasta")
+                  
+                  # Increment the progress bar, and update the detail text.
+                  incProgress(1/input$fasta_resample_iterations, detail = paste("Resampling file ", k, " of ", input$fasta_resample_iterations, "[ ", round(k/input$fasta_resample_iterations*100, 0), "% ]"))
+                  # Pause for 0.1 seconds to simulate a long computation.
+                  Sys.sleep(0.1)
+            
+            } # end of for loop
+              
+            }) # end of progressbar
+            
+            shinyalert::shinyalert("Complete", "Successfully resampled", type = "success")
+        
+      } # end of else
+      
+    } # end of else
   
 }) # end of observeEvent
   
@@ -81,133 +176,133 @@ observeEvent(input$resample_fastas, {
   ################################################################################################
   
   # read in the groupings file
-  groups_genetic_divergence = reactive({
-    
-    infile = input$genetic_divergence_groupings
-    
-    if (is.null(infile)) {
-      return(NULL)
-    }
-    
-    else{
-      genetic_divergence_groups <<- read.csv(infile$datapath)
-      return(genetic_divergence_groups)
-    }
-    
-  }) # end of reactive
-  
-  # select which column is the grouping and which is the sample names
-  observeEvent(input$genetic_divergence_groupings_uploaded, {
-    updateSelectInput(session,"genetic_divergence_group_col", choices=colnames(groups_genetic_divergence()))
-    updateSelectInput(session,"genetic_divergence_sample_name_col", choices=colnames(groups_genetic_divergence()))
-  })
-  
-  # input the file path to the fasta files
-  
-  observeEvent(input$calculate_genetic_divergences,{
-  
-  fasta_file_path_gen_diverg = input$fasta_file_path_genetic_divergence
-  
-  if (!dir.exists(fasta_file_path_gen_diverg)) 
-    shinyalert::shinyalert("Error", "File path does not exist", type = "error")
-  
-  else{
-    
-    setwd(fasta_file_path_gen_diverg)
-    gen_diverg_fasta_files = gtools::mixedsort( list.files(pattern = "\\.fas") ) 
-    w_group_dists = c()
-    b_group_dists = c()
-    o_group_dists = c()
-    
-    spp_dists = list()
-    
-    seq_name_col = as.name(input$genetic_divergence_sample_name_col)
-    morphogroup_col = as.name(input$genetic_divergence_group_col)
-    
-    withProgress(message = 'Calculating genetic divergences...', value = 0, {
-      
-      for(i in seq(along = gen_diverg_fasta_files)){
-        
-        target = ape::read.FASTA(gen_diverg_fasta_files[i])
-        dists = ape::dist.dna(target)
-        
-        seq_names = names(target)
-        
-        new_dat = data.frame(matrix(nrow = length(seq_names), ncol =2))
-        colnames(new_dat) = c("seq_name", "group")
-        new_dat$seq_name = seq_names
-        
-        for(m in (1:length(seq_names))){
-          for(n in (1:nrow(genetic_divergence_groups))){
-            if(seq_names[m] == genetic_divergence_groups[[seq_name_col]][n])
-              new_dat$group[m] = genetic_divergence_groups[[morphogroup_col]][n]
-          }
-        }
-        
-        tryCatch({
-          
-        MD = vegan::meandist(dists, new_dat$group)
-        MD_summary = summary(MD)
-        w_group_dists[i] = MD_summary$W
-        b_group_dists[i] = MD_summary$B
-        o_group_dists[i] = MD_summary$D
-        
-        MD_df = as.data.frame(MD)
-        vals = c()
-        
-        for(k in 1:nrow(MD_df)){
-          vals[k] = MD_df[k,k]
-        }
-        
-        spp_dists[[i]] = vals
-        
-        }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-        
-        # Increment the progress bar, and update the detail text.
-        incProgress(1/length(gen_diverg_fasta_files), detail = paste("Processing Fasta file ", i, " of ", length(gen_diverg_fasta_files), "[ ", round(i/length(gen_diverg_fasta_files)*100, 0), "% ]"))
-        # Pause for 0.1 seconds to simulate a long computation.
-        Sys.sleep(0.1)
-        
-      } # end of for loop
-      
-      group_dists_df = data.frame(matrix(nrow = length(gen_diverg_fasta_files), ncol = 4))
-      colnames(group_dists_df) = c("filename", "intra_dist", "inter_dist", "overall_dist")
-      group_dists_df$filename = gen_diverg_fasta_files
-      group_dists_df$intra_dist = w_group_dists
-      group_dists_df$inter_dist = b_group_dists
-      group_dists_df$overall_dist = o_group_dists
-      
-      # tryCatch({
-      # spp_dists = as.data.frame(do.call(rbind, spp_dists))
-      # colnames(spp_dists) = levels(as.factor(genetic_divergence_groups[[morphogroup_col]]))
-      # rownames(spp_dists) = gen_diverg_fasta_files 
-      # }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
-      
-    }) # end of progress bar
-    
-    shinyalert::shinyalert("Complete", "Divergences Successfully Calculated", type = "success")
-    
-    
-  } # end of else
-  
-  observeEvent(input$view_genetic_divergences, {
-    output$genetic_divergence_table = renderTable(group_dists_df, rownames = TRUE, colnames = TRUE, digits = 3)
-  })
-  
-  
-  output$download_genetic_dists = downloadHandler(
-    
-    filename = function (){paste('genetic_dists', 'csv', sep = '.')},
-    content = function (file){write.csv(group_dists_df, file, row.names = FALSE)}
-  )
-  
-  # output$download_divergences_per_group = downloadHandler(
+  # groups_genetic_divergence = reactive({
   #   
-  #   filename = function (){paste('genetic_dists_per_morphogroup', 'csv', sep = '.')},
-  #   content = function (file){write.csv(spp_dists, file, row.names = FALSE)}
+  #   infile = input$genetic_divergence_groupings
+  #   
+  #   if (is.null(infile)) {
+  #     return(NULL)
+  #   }
+  #   
+  #   else{
+  #     genetic_divergence_groups <<- read.csv(infile$datapath)
+  #     return(genetic_divergence_groups)
+  #   }
+  #   
+  # }) # end of reactive
+  # 
+  # # select which column is the grouping and which is the sample names
+  # observeEvent(input$genetic_divergence_groupings_uploaded, {
+  #   updateSelectInput(session,"genetic_divergence_group_col", choices=colnames(groups_genetic_divergence()))
+  #   updateSelectInput(session,"genetic_divergence_sample_name_col", choices=colnames(groups_genetic_divergence()))
+  # })
+  # 
+  # # input the file path to the fasta files
+  # 
+  # observeEvent(input$calculate_genetic_divergences,{
+  # 
+  # fasta_file_path_gen_diverg = input$fasta_file_path_genetic_divergence
+  # 
+  # if (!dir.exists(fasta_file_path_gen_diverg)) 
+  #   shinyalert::shinyalert("Error", "File path does not exist", type = "error")
+  # 
+  # else{
+  #   
+  #   setwd(fasta_file_path_gen_diverg)
+  #   gen_diverg_fasta_files = gtools::mixedsort( list.files(pattern = "\\.fas") ) 
+  #   w_group_dists = c()
+  #   b_group_dists = c()
+  #   o_group_dists = c()
+  #   
+  #   spp_dists = list()
+  #   
+  #   seq_name_col = as.name(input$genetic_divergence_sample_name_col)
+  #   morphogroup_col = as.name(input$genetic_divergence_group_col)
+  #   
+  #   withProgress(message = 'Calculating genetic divergences...', value = 0, {
+  #     
+  #     for(i in seq(along = gen_diverg_fasta_files)){
+  #       
+  #       target = ape::read.FASTA(gen_diverg_fasta_files[i])
+  #       dists = ape::dist.dna(target)
+  #       
+  #       seq_names = names(target)
+  #       
+  #       new_dat = data.frame(matrix(nrow = length(seq_names), ncol =2))
+  #       colnames(new_dat) = c("seq_name", "group")
+  #       new_dat$seq_name = seq_names
+  #       
+  #       for(m in (1:length(seq_names))){
+  #         for(n in (1:nrow(genetic_divergence_groups))){
+  #           if(seq_names[m] == genetic_divergence_groups[[seq_name_col]][n])
+  #             new_dat$group[m] = genetic_divergence_groups[[morphogroup_col]][n]
+  #         }
+  #       }
+  #       
+  #       tryCatch({
+  #         
+  #       MD = vegan::meandist(dists, new_dat$group)
+  #       MD_summary = summary(MD)
+  #       w_group_dists[i] = MD_summary$W
+  #       b_group_dists[i] = MD_summary$B
+  #       o_group_dists[i] = MD_summary$D
+  #       
+  #       MD_df = as.data.frame(MD)
+  #       vals = c()
+  #       
+  #       for(k in 1:nrow(MD_df)){
+  #         vals[k] = MD_df[k,k]
+  #       }
+  #       
+  #       spp_dists[[i]] = vals
+  #       
+  #       }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+  #       
+  #       # Increment the progress bar, and update the detail text.
+  #       incProgress(1/length(gen_diverg_fasta_files), detail = paste("Processing Fasta file ", i, " of ", length(gen_diverg_fasta_files), "[ ", round(i/length(gen_diverg_fasta_files)*100, 0), "% ]"))
+  #       # Pause for 0.1 seconds to simulate a long computation.
+  #       Sys.sleep(0.1)
+  #       
+  #     } # end of for loop
+  #     
+  #     group_dists_df = data.frame(matrix(nrow = length(gen_diverg_fasta_files), ncol = 4))
+  #     colnames(group_dists_df) = c("filename", "intra_dist", "inter_dist", "overall_dist")
+  #     group_dists_df$filename = gen_diverg_fasta_files
+  #     group_dists_df$intra_dist = w_group_dists
+  #     group_dists_df$inter_dist = b_group_dists
+  #     group_dists_df$overall_dist = o_group_dists
+  #     
+  #     # tryCatch({
+  #     # spp_dists = as.data.frame(do.call(rbind, spp_dists))
+  #     # colnames(spp_dists) = levels(as.factor(genetic_divergence_groups[[morphogroup_col]]))
+  #     # rownames(spp_dists) = gen_diverg_fasta_files 
+  #     # }, error=function(e){cat("ERROR :",conditionMessage(e), "\n")})
+  #     
+  #   }) # end of progress bar
+  #   
+  #   shinyalert::shinyalert("Complete", "Divergences Successfully Calculated", type = "success")
+  #   
+  #   
+  # } # end of else
+  # 
+  # observeEvent(input$view_genetic_divergences, {
+  #   output$genetic_divergence_table = renderTable(group_dists_df, rownames = TRUE, colnames = TRUE, digits = 3)
+  # })
+  # 
+  # 
+  # output$download_genetic_dists = downloadHandler(
+  #   
+  #   filename = function (){paste('genetic_dists', 'csv', sep = '.')},
+  #   content = function (file){write.csv(group_dists_df, file, row.names = FALSE)}
   # )
-  
-  }) # end of observeEvent
+  # 
+  # # output$download_divergences_per_group = downloadHandler(
+  # #   
+  # #   filename = function (){paste('genetic_dists_per_morphogroup', 'csv', sep = '.')},
+  # #   content = function (file){write.csv(spp_dists, file, row.names = FALSE)}
+  # # )
+  # 
+  # }) # end of observeEvent
   
 ################################################################################################
   # GENERATE XML FILES FOR BEAST
@@ -1935,8 +2030,8 @@ observeEvent(input$resample_fastas, {
       oversplitting_bar_summary <<- ggplot(data = summary_oversplits_per_group_csv, aes(x = predef_unique, y = Freq)) +
         geom_bar(stat = "summary", fill = input$oversplitting_morphospecies_col, col = "black") +
         expand_limits(y = 0) +
-        xlab("Morphospecies") +
-        ylab("Mean oversplitting ratio per morphospecies \n group, on the full dataset (100%)") +
+        xlab("Predefined group") +
+        ylab("Mean oversplitting ratio per predefined \n group, on the full dataset (100%)") +
         ggthemes[[input$ggtheme_summary_plots]] +
         theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
         theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
@@ -1954,7 +2049,7 @@ observeEvent(input$resample_fastas, {
     # download the plot
     output$download_summary_oversplitting_morphospecies_plot <- downloadHandler(
       
-      filename = function (){paste("oversplitting_morphospecies_plot", input$plot_format_summary_oversplitting_morphospecies, sep = '.')},
+      filename = function (){paste("oversplitting_predefined_groups_plot", input$plot_format_summary_oversplitting_morphospecies, sep = '.')},
       
       content = function (file){
         
