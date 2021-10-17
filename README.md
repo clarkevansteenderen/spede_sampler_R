@@ -244,11 +244,11 @@ Upload the desired dataframe downloaded from the **Amalgamate** tab in the appro
 | Minimum  | 9.00  | 10.00  | 
 | Maximum  | 11.00   | 12.00 | 
 
-11. The **Plot Results** tab allows for the plotting of the the number of clusters vs entities for each tree file, box-and-whisker plot for the clusters and entities (showing Q1, Q3, median, minimum, maximum, and outlier values), and a line graph for the number of GMYC clusters and entities for each tree file uploaded.
+14. The **Plot Results** tab allows for the plotting of the the number of clusters vs entities for each tree file, box-and-whisker plot for the clusters and entities (showing Q1, Q3, median, minimum, maximum, and outlier values), and a line graph for the number of GMYC clusters and entities for each tree file uploaded.
 
-14. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
+15. The **Plot Trees** tab allows for the plotting of any tree from those uploaded. The user can select whether the original FastTree or RAxML bootstrap or GMYC support values should be displayed. 
 
-15. The **Percentage Matches** tab shows the results of how the GMYC species designations compare to the predefined groups in the **cochineal-ids.csv** file.
+16. The **Percentage Matches** tab shows the results of how the GMYC species designations compare to the predefined groups in the **cochineal-ids.csv** file.
 The **View GMYC species list** button shows a datatable containing each sample name with the assigned GMYC species. The corresponding predefined group given to that particular sample is appended as a third column. For example:
 
 | GMYC_spec | sample_name | ids | 
@@ -268,9 +268,9 @@ The **View Matches** button displays the percentage matches including and exclud
 | Minimum             | 100.00  | 100.00  | 0.00  | 2.00 | 1.80 |
 | Maximum             | 100.00 | 100.00 | 10.00| 2.40 | 2.20 |
 
-16. The **Plot Percentage matches** tab allows for the plotting of the percentage match; A) including or B) excluding GMYC single-sample species for each tree file.
+17. The **Plot Percentage matches** tab allows for the plotting of the percentage match; A) including or B) excluding GMYC single-sample species for each tree file.
 
-17. The **GMYC Oversplitting** tab displays GMYC species oversplitting relative to the user's predefined groups. The **View Summary Table** button allows the user to download the mean, standard deviation, minimum and maximum oversplitting values for each predefined group.
+18. The **GMYC Oversplitting** tab displays GMYC species oversplitting relative to the user's predefined groups. The **View Summary Table** button allows the user to download the mean, standard deviation, minimum and maximum oversplitting values for each predefined group.
 
 | predefined_group        | mean    | sd   | min | max |
 |-----------      |-------|----- |----- |----- |
@@ -281,7 +281,7 @@ The **View Matches** button displays the percentage matches including and exclud
 
 The output above means, for example, that the GMYC method oversplit the *Dactylopius tomentosus* predefined group into an average of 3.9 times more 'species' than expected (i.e. all the samples with the predefined group labelled "tomentosus" are expected to be grouped into one species by the GMYC method). The *D. tomentosus* sequences in this dataset are known to contain different lineages/biotypes. The high value of 3.9 may therefore not be a case of incorrect 'oversplitting', but rather due to genuine intraspecific divisions. Each dataset needs to be analysed in the context of what is known about the organism's biology.
 
-18. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. In this way, the results of the 25, 50, 75, and 100% datasets can be joined into single files in order to be easily plotted. For example, the four files **clust_ent_data_25.csv**, **clust_ent_data_50.csv**, **clust_ent_data_75.csv**, and **clust_ent_data_100.csv** can be uploaded, and all the cluster data can be amalgamated into one file, and all the entity data into another.
+19. The **Amalgamate** tab allows the user to upload multiple files downloaded from the **Percentage Matches**  --> **View Matches** --> **Download** button. In this way, the results of the 25, 50, 75, and 100% datasets can be joined into single files in order to be easily plotted. For example, the four files **clust_ent_data_25.csv**, **clust_ent_data_50.csv**, **clust_ent_data_75.csv**, and **clust_ent_data_100.csv** can be uploaded, and all the cluster data can be amalgamated into one file, and all the entity data into another.
 The clusters summary table looks like this:
 
 |                  | 25 | 50 | 75 | 100 |
