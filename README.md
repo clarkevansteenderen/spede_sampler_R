@@ -316,7 +316,9 @@ The resulting summary plots for each measure can be plotted as shown below, usin
 
 <img src="combo_plots_cochineal.png" alt="drawing" width="500"/>
 
-The R code to create these plots is shown here, for users who wish to further tweak their plots:
+---
+
+**The R code to create these plots is shown here, for users who wish to further tweak their plots:**
 
 ```r
 library(readxl)
