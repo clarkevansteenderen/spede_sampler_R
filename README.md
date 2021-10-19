@@ -155,9 +155,9 @@ Click the "Run GMYC" button to start the GMYC analysis.
 Matches between user-defined groups and GMYC species are recorded as "yes" or "no", where "yes" outcomes can be either splits, or perfect matches. "No" outcomes are treated as merges. In the diagram below, the oversplitting ratio would be calculated as: number of GMYC species/user-defined groups = 4/5 = 0.8. Since this is less than the expected value of 1 (where there is no oversplitting), one can conclude that the GMYC is undersplitting species, or "merging" user-defined groups. In other words, the user has likely overestimated the number of species in their dataset. The oversplitting ratio excluding singletons would be (GMYC species - singletons)/user-defined groups = (4-1)/5 = 0.6.
 The overall percentage match = Σ(y) + Σ(singletons)/( Σ(y) + Σ(n) + Σ(singletons) ) = (3 + 1)/(3 + 1 + 1) = 0.8 Excluding singletons, the match = Σ(y)/ ( Σ(y) + Σ(n) ) = 3/(3 + 1) = 0.75. The percentage of singletons = Σ(singletons)/number of GMYC species = 1/5 = 20%.
 
-Species A (spA) was split into two GMYC species, and would thus be recorded as having twice the species richness expected. Species 1, 2, and 3 would be reported as a GMYC merge.
+Species A (spA) was split into two GMYC species, and would thus be recorded as having twice the species richness expected. Species 1 (sp1), 2 (sp2), and 3 (sp3) would be reported as a GMYC merge. Species B (spB) is a singleton.
 
-<img src="match_merge_split.png" alt="drawing" width="500"/>
+<img src="match_merge_split_singles.png" alt="drawing" width="500"/>
 
 ## View Data
 
