@@ -367,6 +367,51 @@ clust_ent_boxplot = ggplot(data = clusts_ents, aes(x = data_perc, y = value)) +
   geom_hline(yintercept= 5, linetype="dashed") +
   geom_hline(yintercept= 11, linetype="dashed") ; clust_ent_boxplot
   #guides(fill=guide_legend(title=""))
+  
+# PLOT, JUST CLUSTERS
+
+clust_accum = ggplot(data = clusters_melt, aes(x = as.numeric( data_perc ), y = clusters)) + 
+  geom_point() +
+  geom_smooth(span = 3, col = "blue", fill = "lightblue", alpha = 0.2) +
+  #geom_boxplot(fill = "#1EAD4B") +
+  #stat_summary(fun = mean, geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
+  xlab("Data Percentage") +
+  ylab("Number of clusters") +
+  ggtitle("A1") +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+  theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(legend.text=element_text(size=12)) +
+  theme(plot.title = element_text(size=16, face = "bold")) +
+  ylim(0,15) +
+  geom_hline(yintercept= 5, linetype="dashed") +
+  scale_x_continuous(breaks = as.numeric(clusters_melt$data_perc), labels = clusters_melt$data_perc) +
+  geom_hline(yintercept= 11, linetype="dashed") ; clust_accum
+
+# PLOT, JUST ENTITIES
+
+ent_accum = ggplot(data = clusters_melt, aes(x = as.numeric( data_perc ), y = entities)) + 
+  geom_point() +
+  geom_smooth(span = 3, col = "blue", fill = "lightblue", alpha = 0.2) +
+  #geom_boxplot(fill = "#1EAD4B") +
+  #stat_summary(fun = mean, geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
+  xlab("Data Percentage") +
+  ylab("Number of entities") +
+  ggtitle("A2") +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+  theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(legend.text=element_text(size=12)) +
+  theme(plot.title = element_text(size=16, face = "bold")) +
+  ylim(0,15) +
+  geom_hline(yintercept= 5, linetype="dashed") +
+  geom_hline(yintercept= 11, linetype="dashed") ; ent_accum
 
 # OVERSPLITTING RATIOS
 
