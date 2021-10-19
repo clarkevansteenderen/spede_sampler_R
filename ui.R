@@ -706,6 +706,15 @@ ui <- fluidPage(
                                                          br(),
                                                actionButton("view_gmyc_spec", label = strong("View"), style="color: black; background-color: #A6C3C6; border-color: black", icon("edit")), 
                                                downloadButton("download_gmyc_spec", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               br(), br(),
+                                               #strong("These GMYC species are recorded as merges/undersplits:"),
+                                               htmlOutput("merges"),
+                                               tags$head(tags$style("#merges{color: darkcyan;
+                                                       font-size: 16px;
+                                                       }"
+                                                          )
+                                                      ),
+                                               
                                                ), 
                                                
                                                br(),

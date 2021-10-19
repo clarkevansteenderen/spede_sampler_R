@@ -719,6 +719,8 @@ observeEvent(input$resample_fastas, {
                 # create a list of which predefined species are being oversplit by the gmyc algorithm
                 oversplitting_species = vector("list")
                 
+                merged_gmyc_specs = vector("list")
+                
                 ################################################################################################
                 # Loop through the files in the chosen directory to create an ultrametric tree for each,
                 # then run the GMYC analysis,
@@ -890,7 +892,36 @@ observeEvent(input$resample_fastas, {
                       oversplitting_species[[i]] = predef_unique_table
                     }
                     
+                    
+                    ##################################
+                    # added 18/10/2021:
+                    # find which species are undersplit/merged:
+                    
+                    no_indices = which(matches.df$`match(y/n)` == "n")
+                    #print(no_indices)
+                    merged_gmyc_specs[[i]] = no_indices
+                    
+                    #if(length(no_indices) > 0){
+                      
+                     # output$merged_gmyc_spec = renderText(paste("Merged GMYC species: ", no_indices))
+                      
+                    # print(no_indices)
+                    #  
+                    # for(w in length(no_indices)){
+                    # 
+                    # print(spec_split[no_indices[w]])
+                    # 
+                    # }
+                    
+                    
+                   # }
+                    
+                    ###################################
+                    
+                    
                        }# end of if statement
+                    
+                    
                     
                     ################################################################################################
                     
@@ -945,6 +976,7 @@ observeEvent(input$resample_fastas, {
             file_i = which(files == gmyc_spec_to_show) # get the index of that file to match up with the trees stored in the spec_list_container list
             
             output$matches = renderTable(gmyc_spec_container[[file_i]], rownames = FALSE, colnames = TRUE, digits = 0)
+            output$merges = renderText(c("<B>", "These GMYC species (GMYC_spec) were merged: ", merged_gmyc_specs[[file_i]]))
             }
             
             ################################################################################################
