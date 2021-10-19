@@ -49,7 +49,7 @@ shiny::runApp(appDir = getwd())
 
 ## **FUNCTIONALITY FLOW DIAGRAM**
 
-<img src="spede_workflow.png" alt="drawing" width="900"/>
+<img src="spede_sampler_workflow.png" alt="drawing" width="900"/>
 
 # **USAGE, TAB-BY-TAB**
 
