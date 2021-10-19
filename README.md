@@ -157,7 +157,7 @@ The overall percentage match = Σ(y) + Σ(singletons)/( Σ(y) + Σ(n) + Σ(singl
 
 Species A (spA) was split into two GMYC species, and would thus be recorded as having twice the species richness expected. Species 1 (sp1), 2 (sp2), and 3 (sp3) would be reported as a GMYC merge. Species B (spB) is a singleton.
 
-<img src="match_merge_split_singles.png" alt="drawing" width="500"/>
+<img src="match_merge_split.png" alt="drawing" width="500"/>
 
 ## View Data
 
