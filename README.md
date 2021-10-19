@@ -152,6 +152,10 @@ Select which column comprises the groups, and which is the sample name column fr
 
 Click the "Run GMYC" button to start the GMYC analysis. 
 
+Matches between user-defined groups and GMYC species are recorded as "yes" or "no", where "yes" outcomes can be either splits, or perfect matches. "No" outcomes are treated as merges. See the diagram below for a graphical explanation:
+
+<img src="match_merge_split.png" alt="drawing" width="500"/>
+
 ## View Data
 
 "Print all data to the screen" prints the number of clusters and entities and clusters for each tree file, and "Print summary statistics to the screen" displays the mean, standard deviation, and minimum and maximum values for all the data.
