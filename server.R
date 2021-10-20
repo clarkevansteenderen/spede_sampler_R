@@ -955,12 +955,29 @@ observeEvent(input$resample_fastas, {
             oversplitting_species_bound = dplyr::bind_rows(oversplitting_species)
             oversplitting_species_bound = oversplitting_species_bound[oversplitting_species_bound$Freq > 1,] # remove rows with species that had a frequency of only one (ie those that were not oversplit)
             
+            exact_matches = dplyr::bind_rows(oversplitting_species)
+            exact_matches = exact_matches[exact_matches$Freq == 1,]
+            
             mean_oversplits_per_grp = 
               oversplitting_species_bound %>% 
               dplyr::group_by(predef_unique) %>%
               dplyr::summarise(across(everything(), c(mean = mean, sd = sd, min = min, max = max)))
             
             colnames(mean_oversplits_per_grp) = c("predefined_group", "mean", "sd", "min", "max")
+            
+            mean_exact_matches_per_grp =
+              exact_matches %>%
+              dplyr::group_by(predef_unique) %>%
+              dplyr::summarise(across(everything(), c(sum=sum)))
+
+            colnames(mean_exact_matches_per_grp) = c("predefined_group", "sum")
+            mean_exact_matches_per_grp$mean = round(mean_exact_matches_per_grp$sum/length(files)*100, 2)
+            
+            num_user_defined_groups = length(unique(groups[[groups_col]]))
+            num_exact_matches = nrow(mean_exact_matches_per_grp)
+            percentage_exact_matches = round(num_exact_matches/num_user_defined_groups*100, 2)
+            
+            output$percent_exact_matches = renderText(c("<B>", "There are ", percentage_exact_matches, "% overall exact GMYC matches."))
             
           }
           
@@ -1116,6 +1133,92 @@ observeEvent(input$resample_fastas, {
                        xlab("Predefined group") +
                        ylab("Oversplitting ratio") +
                        ggthemes[[input$GMYC_oversplit_ggtheme]] 
+              )}
+          )
+          
+          ################################################################################################
+          # View which predefined groups were exact GMYC matches
+          ################################################################################################
+          
+          observeEvent(input$GMYC_exact_match_table_view, {
+            
+            if (is.null( predefined_groups_uploaded() )) shinyalert::shinyalert("No grouping information uploaded", "You did not upload a .csv file with predefined grouping information for your sequences", type = "warning")
+            else{
+              if(nrow(mean_exact_matches_per_grp) > 0){
+                
+                output$GMYC_exact_match_table = renderTable(mean_exact_matches_per_grp, rownames = FALSE, colnames = TRUE, digits = 2)
+              }
+              
+              else shinyalert::shinyalert("No exact matches", "None of your predefined groups were exact GMYC matches", type = "info")
+            }
+          })
+          
+          # download the summary table
+          output$GMYC_exact_match_table_download = downloadHandler(
+            
+            filename = function (){paste('mean_exact_matches_per_group', 'csv', sep = '.')},
+            content = function (file){write.csv(mean_exact_matches_per_grp, file, row.names = FALSE)}
+          )
+          
+          # View the full table data
+          observeEvent(input$GMCY_exact_match_full_table,{
+            output$GMYC_exact_match_table = renderTable(exact_matches, rownames = FALSE, colnames = TRUE, digits = 2)
+          })
+          
+          # download the full data table
+          output$GMYC_exact_matches_full_table_download = downloadHandler(
+            
+            filename = function (){paste('mean_exact_matches_per_group_full', 'csv', sep = '.')},
+            content = function (file){write.csv(exact_matches, file, row.names = FALSE)}
+          )
+          
+          ################################################################################################
+          # Barplot of which predefined groups were exact GMYC matches
+          ################################################################################################
+          observeEvent(input$GMYC_exact_match_barplot, {
+            
+            if (is.null( predefined_groups_uploaded() )) shinyalert::shinyalert("No grouping information uploaded", "You did not upload a .csv file with predefined grouping information for your sequences", type = "warning")
+            else{
+              if(nrow(exact_matches) > 0){
+                
+                output$GMYC_exact_match_plot = renderPlot({
+                  
+                  ggplot(data = mean_exact_matches_per_grp, aes(x=predefined_group, y=mean)) + 
+                    geom_bar(stat = "identity", colour = input$exact_match_barchart_outline, fill = input$exact_match_barchart_fill) + 
+                    ylim(0,100) +
+                    xlab("Predefined group") +
+                    ylab("Mean exact match (%)") +
+                    ggthemes[[input$GMYC_exact_match_ggtheme]] +
+                    theme(axis.text.x = element_text(angle = req( input$x_axis_angle_exact_matches)) )
+                })
+                
+                
+              }
+              
+              else shinyalert::shinyalert("No exact matches", "None of your predefined groups were exact GMYC matches", type = "info")
+            } 
+          }) 
+          
+          # download the barplot
+          output$GMYC_exact_match_barplot_download = downloadHandler(
+            
+            filename = function (){paste(input$file_name_exact_match_bar, input$plot_format_exact_match, sep = '.')},
+            
+            content = function (file){
+              
+              width = as.numeric(input$w_plot_exact_match) 
+              height = as.numeric(input$h_plot_exact_match) 
+              dpi = as.numeric(input$res_plot_exact_match)
+              units = input$res_plot_exact_match
+              
+              ggsave(file, width = width, height = height, dpi = dpi, units = units,
+                     ggplot(data = mean_exact_matches_per_grp, aes(x=predefined_group, y=mean)) + 
+                       geom_bar(stat = "identity", colour = input$exact_match_barchart_outline, fill = input$exact_match_barchart_fill) + 
+                       ylim(0,100) +
+                       xlab("Predefined group") +
+                       ylab("Mean exact match (%)") +
+                       ggthemes[[input$GMYC_exact_match_ggtheme]] +
+                       theme(axis.text.x = element_text(angle = input$x_axis_angle_exact_matches)) 
               )}
           )
           
@@ -2077,7 +2180,7 @@ observeEvent(input$resample_fastas, {
         theme(axis.text.x = element_text(size = 12)) +
         theme(axis.text.y = element_text(size = 12)) +
         theme(plot.title = element_text(size=16, face = "bold")) +
-        theme(axis.text.x = element_text(angle = input$x_axis_angle)) +
+        theme(axis.text.x = element_text(angle = req( input$x_axis_angle)) ) +
         geom_hline(yintercept= 1, linetype="dashed") 
       
       output$summary_plot = renderPlot(oversplitting_bar_summary)

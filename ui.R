@@ -902,6 +902,90 @@ ui <- fluidPage(
                                                
                                       ),
                                       
+                                      tabPanel(strong("GMYC Exact Matches"),
+                                               br(), br(),
+                                               img(src="cornops_nymph.png", align = "left", height="20%", width="20%"),
+                                               br(), br(), br(),
+                                               h3(strong("GMYC Exact Matches")),
+                                               strong("Assess which taxa are exact GMYC matches"),
+                                               br(),br(),
+                                               
+                                               wellPanel(align = "justify",
+                                                         h4(strong("View output:")),
+                                                         br(), 
+                                                         htmlOutput("percent_exact_matches"),
+                                                         tags$head(tags$style("#percent_exact_matches{color: darkcyan;
+                                                             font-size: 16px;
+                                                             }"
+                                                         )
+                                                         ),
+                                                         br(), br(),
+                                                         actionButton("GMCY_exact_match_full_table", label = strong("View full"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                                         actionButton("GMYC_exact_match_table_view", label = strong("View summary"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                                         br(), br(),
+                                                         downloadButton("GMYC_exact_match_full_table_download", label = strong("Download full"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                                         downloadButton("GMYC_exact_match_table_download", label = strong("Download summary"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               ),
+                                               br(), 
+                                               
+                                               wellPanel(align = "justify",
+                                                         selectInput("GMYC_exact_match_ggtheme", "Select ggplot Theme:", choices = names(ggthemes), selected = ggthemes["Classic"], width = "150px"),
+                                               ),
+                                               br(), 
+                                               
+                                               wellPanel(align = "justify",
+                                                         h4(strong("BARPLOT")),
+                                                         br(),
+                                                         fluidRow(
+                                                           column(width = 3,
+                                                                  selectInput("exact_match_barchart_fill", "Fill: ", choices = c("black", "lightgrey", "white", "lightblue", "lightgreen"), selected = "white", width = "150px"),
+                                                           ),
+                                                           column(width = 3,
+                                                                  selectInput("exact_match_barchart_outline", "Outline: ", choices = c("black", "steelblue", "white", "darkgreen"), selected = "black", width = "150px"),
+                                                           ),
+                                                           column(width = 3,
+                                                                  numericInput("x_axis_angle_exact_matches", "x-axis label angle:", value = 0, min = 0, step = 1, width = "150px"),
+                                                                  )
+                                                         ),  
+                                                         
+                                                         actionButton("GMYC_exact_match_barplot", label = strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: darkgreen"),
+                                                         hr(),
+                                                         h4(strong("DOWNLOAD")),
+                                                         br(), 
+                                                         textInput("file_name_exact_match_bar", "File name: ", "gmyc_exact_match_barplot"),
+                                                         
+                                                         fluidRow(
+                                                           column(width = 3,
+                                                                  selectInput("plot_format_exact_match", "Image format:", choices = c("pdf", "png", "svg"), width = "150px"),
+                                                           ),
+                                                           column(width = 3,
+                                                                  textInput("w_plot_exact_match", "Width: ", 20, width = "150px"),
+                                                           ),
+                                                           column(width = 3,
+                                                                  textInput("h_plot_exact_match", "Height: ", 15, width = "150px"),
+                                                           ),
+                                                           column(width = 3,
+                                                                  selectInput("unit_plot_exact_match", "Unit: ", choices=c("cm", "in"), width = "150px"),
+                                                           ),
+                                                           column(width = 3,
+                                                                  conditionalPanel(
+                                                                    condition = "input.plot_format_exact_match == 'png'",
+                                                                    textInput("res_plot_exact_match", "Res (dpi): ", 300), width = "150px")
+                                                           ),
+                                                         ),
+                                                         
+                                                         downloadButton("GMYC_exact_match_barplot_download", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: darkgreen"),
+                                               ),
+                                               br(), 
+                                               h3(strong("Table/Plot output:")),
+                                               br(), br(),
+                                               tableOutput("GMYC_exact_match_table"),
+                                               br(), br(),
+                                               plotOutput("GMYC_exact_match_plot"),
+                                               br(), br()
+                                               
+                                      ),
+                                      
                                       tabPanel(strong("Amalgamate"),
                                                br(), br(),
                                                img(src="tetramesa.png", align = "left", height="15%", width="15%"),
@@ -1304,7 +1388,7 @@ ui <- fluidPage(
                                               br(), br(),
                                               strong("Image credits with thanks to David Taylor at the Center for Biological Control (CBC):"),
                                               br(), br(),
-                                              HTML("Random resampling tab: <i>Cornops aquaticum</i>"),
+                                              HTML("Random resampling tab: <i>Cornops aquaticum</i> adult"),
                                               br(),
                                               HTML("View Data tab: Iris flea beetle"),
                                               br(),
@@ -1317,6 +1401,8 @@ ui <- fluidPage(
                                               HTML("Plot percentage matches tab: <i>Lysathia</i>"),
                                               br(),
                                               HTML("GMYC Oversplitting tab: <i>Bactrocera</i>"),
+                                              br(),
+                                              HTML("GMYC Exact Matches tab: <i>Cornops aquaticum</i> nymph"),
                                               br(),
                                               HTML("Amalgamate tab: <i>Tetramesa</i>"),
                                               br(),
