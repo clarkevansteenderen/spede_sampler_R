@@ -351,6 +351,9 @@ The resulting summary plots for each measure can be plotted as shown below, usin
 
 <img src="combo_plots_cochineal.png" alt="drawing" width="500"/>
 
+A1 and A2 indicate that the number of clusters and entities recorded approach the same number of predefined species and lineages (n = 11), and that the asymptotic shape suggests that further sampling in the same collecting areas is unlikely to yield further species or lineages.
+Plot B shows that the user-defined groups were underestimates of species richness, as the average oversplitting ratio always exceeds a value of 1. The presence of singletons tended to result in higher oversplitting ratios than when they were excluded, which is more pronounced in smaller datasets (25% - 50%). Plot C shows how the percentage of singletons decreased as the dataset size increased. Plot D graphically shows the predefined groups that were oversplit by the GMYC, with *D. tomensosus* showing the greatest mean oversplitting ratio. Plot E shows that the overall percentage match scores, including and excluding singletons, remained high irrespective of data size.
+
 ---
 
 **The R code to create these plots is shown here, for users who wish to further tweak their plots:**
