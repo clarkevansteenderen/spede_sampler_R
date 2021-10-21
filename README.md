@@ -19,9 +19,10 @@ If the user has predefined grouping data for their samples, this can be uploaded
 This application outputs:
 1. The number of clusters and entities estimated by the GMYC method for the uploaded data
 2. The percentage matches between predefined groupings and GMYC species estimates; with and without GMYC species represented by single-samples (= singletons)
-3. Oversplitting ratios (the ratio of the number of GMYC species to predefined groups)
-4. Which predefined groups were split into more than one GMYC species, indicating possible undiscovered diversity
-5. Summary plots 
+3. The percentage of exact GMYC matches and merges
+4. Overall oversplitting ratios (the ratio of the number of GMYC species to predefined groups)
+5. Which predefined groups were split into more than one GMYC species, indicating possible undiscovered diversity
+6. Summary ggplots that are customisable
 
 ## **HOW TO RUN THE R SHINY APPLICATION**
 
