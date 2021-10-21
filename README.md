@@ -356,7 +356,8 @@ Plot B shows that the user-defined groups were underestimates of species richnes
 
 ---
 
-**The R code to create these plots is shown here, for users who wish to further tweak their plots:**
+## **R code**
+**For users who wish to further tweak their plots**
 
 ```r
 library(readxl)
