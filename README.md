@@ -499,6 +499,64 @@ singletons_boxplot = ggplot(data = singletons_melt, aes(x = data_perc, y = perc_
   theme(axis.text.y = element_text(size = 12)) +
   theme(plot.title = element_text(size=16, face = "bold")) ; singletons_boxplot
   
-combo_plots = gridExtra::grid.arrange(clust_ent_boxplot, oversplitting_boxplot, singletons_boxplot, oversplitting_bar)
-ggsave(plot = combo_plots, width = 25, height = 25, dpi = 350, filename = "combo_plots_cochineal.pdf", units = "cm")
+# OVERSPLITTING PER SPECIES
+
+oversplits_per_group = read.csv("cochineal_12S/oversplits/mean_oversplits_per_group_full_100.csv", header = T, check.names = F)
+
+oversplitting_bar = ggplot(data = oversplits_per_group, aes(x = predef_unique, y = Freq)) +
+  geom_bar(stat = "summary", fill = "lightgrey", col = "black") +
+  xlab("Morphospecies") +
+  ylab("Mean oversplitting ratio per morphospecies \n group, on the full dataset (100%)") +
+  theme_classic() +
+  ggtitle("D") +
+  theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+  theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(plot.title = element_text(size=16, face = "bold")) +
+  geom_hline(yintercept= 1, linetype="dashed") 
+
+
+# PERCENTAGE MATCHES
+
+percentage_matches = read.csv("cochineal_12S/match_data/percentage_match.csv", check.names = F)
+percentage_matches_m = reshape2::melt(percentage_matches)
+
+percentage_matches_excl_s = read.csv("cochineal_12S/match_data/percentage_match_excl_singles.csv", check.names = F)
+percentage_matches_excl_s_melt = reshape2::melt(percentage_matches_excl_s)
+
+percentage_matches_m$ex_sing = percentage_matches_excl_s_melt$value
+colnames(percentage_matches_m) = c("file_name", "data_perc", "inc_singletons", "ex_singletons")
+percentage_matches_combo = reshape2::melt(percentage_matches_m)
+
+perc_match_boxplot = ggplot(data = percentage_matches_combo, aes(x = data_perc, y = value)) + 
+  geom_boxplot(aes(fill = variable)) +
+  stat_summary(fun = mean, aes(group = variable), geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
+  scale_fill_manual(values=c("#2D86F0", "#F02D5A"), name = "", labels = c("+ singletons", "- singletons")) +
+  xlab("Data Percentage") +
+  ylab("Percentage match") +
+  ggtitle("E") +
+  theme_classic() +
+  theme(legend.position = "bottom") +
+  guides(fill=guide_legend(title="")) +
+  theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
+  theme(axis.title.x = element_text(size = 12, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
+  theme(axis.text.x = element_text(size = 12)) +
+  theme(axis.text.y = element_text(size = 12)) +
+  theme(legend.text=element_text(size=12)) +
+  ylim(0,100) +
+  theme(plot.title = element_text(size=16, face = "bold")) ; perc_match_boxplot 
+
+# COMBINE THE PLOTS
+
+combo_plots = gridExtra::grid.arrange(clust_accum,
+                                      ent_accum,
+                                      oversplitting_boxplot, 
+                                      singletons_boxplot, 
+                                      oversplitting_bar, 
+                                      perc_match_boxplot)
+
+# SAVE THE OUTPUT
+
+ggsave(plot = combo_plots, width = 25, height = 35, dpi = 350, filename = "combo_plots_cochineal.svg", units = "cm")
 ```
