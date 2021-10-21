@@ -977,7 +977,7 @@ observeEvent(input$resample_fastas, {
             num_exact_matches = nrow(mean_exact_matches_per_grp)
             percentage_exact_matches = round(num_exact_matches/num_user_defined_groups*100, 2)
             
-            output$percent_exact_matches = renderText(c("<B>", "There are ", percentage_exact_matches, "% overall exact GMYC matches."))
+            output$percent_exact_matches = renderText(c("<B>", "There are ", percentage_exact_matches, "% overall exact GMYC matches across GMYC results."))
             
           }
           
@@ -993,7 +993,10 @@ observeEvent(input$resample_fastas, {
             file_i = which(files == gmyc_spec_to_show) # get the index of that file to match up with the trees stored in the spec_list_container list
             
             output$matches = renderTable(gmyc_spec_container[[file_i]], rownames = FALSE, colnames = TRUE, digits = 0)
-            output$merges = renderText(c("<B>", "These GMYC species (GMYC_spec) were merged: ", merged_gmyc_specs[[file_i]]))
+            
+            if(length(merged_gmyc_specs[[file_i]]) > 0) merged_output_text = merged_gmyc_specs[[file_i]]
+            else merged_output_text = "None"
+            output$merges = renderText(c( "<B>", "These GMYC species (GMYC_spec) were merged: ", merged_output_text ))
             }
             
             ################################################################################################

@@ -1386,7 +1386,7 @@ ui <- fluidPage(
                                               br(), br(),
                                               strong("SPEDE-sampler is currently under review. Please cite as: van Steenderen, C.J.M., and Sutton, G.F. 2021. SPEDE-sampler: an R Shiny application to assess how methodological choices and taxon-sampling can affect GMYC output and interpretation. Molecular Ecology Resources (Under Review)."),
                                               br(), br(),
-                                              strong("Image credits with thanks to David Taylor at the Center for Biological Control (CBC):"),
+                                              strong("Image credits with thanks to David Taylor at the Centre for Biological Control (CBC):"),
                                               br(), br(),
                                               HTML("Random resampling tab: <i>Cornops aquaticum</i> adult"),
                                               br(),
