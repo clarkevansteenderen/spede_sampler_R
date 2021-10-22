@@ -1929,7 +1929,7 @@ observeEvent(input$resample_fastas, {
         xlab("Data Percentage") +
         ylab("Oversplitting ratio") +
         ggthemes[[input$ggtheme_summary_plots]] +
-        theme(legend.position = "bottom") +
+        theme(legend.position = c(input$oversplitting_plot_legend_x_pos, input$oversplitting_plot_legend_y_pos)) +
         guides(fill=guide_legend(title="")) +
         theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
         theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +
@@ -2005,7 +2005,7 @@ observeEvent(input$resample_fastas, {
         xlab("Data Percentage") +
         ylab("Percentage match") +
         ggthemes[[input$ggtheme_summary_plots]] +
-        theme(legend.position = "bottom") +
+        theme(legend.position = c(input$percentage_match_plot_legend_x_pos, input$percentage_match_plot_legend_y_pos)) +
         guides(fill=guide_legend(title="")) +
         theme(axis.title.y = element_text(size = 14, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
         theme(axis.title.x = element_text(size = 14, margin = margin(t = 20, r = 0, b = 0, l = 0))) +

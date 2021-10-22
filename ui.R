@@ -75,7 +75,12 @@ ui <- fluidPage(
                           fluidRow(actionButton("app", strong("BEGIN"), style = 'font-size:150%; color: black; background-color: #A6C3C6; border-color: black'), align = "center"),
                           br(), br(),
                           div(img(src='cover_insects.png',  height = 'auto', width = '80%'), style="display: block; margin-left: auto; margin-right: auto; text-align: center;"),
-                          
+                          br(),
+                          strong("Software created by: Clarke J.M. van Steenderen"),
+                          br(),
+                          strong("Contributing author to the associated publication: Guy F. Sutton"),
+                          br(),
+                          strong("Acknowledgements: The Centre for Biological Control (CBC) and Rhodes University for funding")
                           # br(), br(),
                           # HTML("SPEDE-SAMPLER offers the following functionalities: 
                           #                                         (1) Runs GMYC analyses on multiple Maximum Likelihood tree files and records the number of clusters and entities, 
@@ -1106,8 +1111,15 @@ ui <- fluidPage(
                                                  
                                                ),
                                                
-                                               #numericInput("oversplitting_plot_summary_y_interval", "Y-axis interval:", value = 0.2, min = 0.001, step = 0.1),      
-                                              
+                                               fluidRow(
+                                                 column(width = 4,
+                                               numericInput("oversplitting_plot_legend_x_pos", "Legend position x coordinate:", value = 0.9, min = 0, max = 1, step = 0.1, width = "250px"), 
+                                                 ),
+                                               column(width = 4,
+                                                      numericInput("oversplitting_plot_legend_y_pos", "Legend position y coordinate:", value = 0.1, min = 0, max = 1, step = 0.1, width = "250px"), 
+                                                 ),
+                                               ),
+                                               
                                                actionButton("plot_summary_oversplits", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(), br(),
                                                
@@ -1165,6 +1177,15 @@ ui <- fluidPage(
                                                         sliderInput("percentage_match_plot_point_size", label = "Point size: ", value = 3, min = 0, max = 10, step = 0.5),
                                                  ),
                                                  
+                                               ),
+                                               
+                                               fluidRow(
+                                                 column(width = 4,
+                                                        numericInput("percentage_match_plot_legend_x_pos", "Legend position x coordinate:", value = 0.9, min = 0, max = 1, step = 0.1, width = "250px"), 
+                                                 ),
+                                                 column(width = 4,
+                                                        numericInput("percentage_match_plot_legend_y_pos", "Legend position y coordinate:", value = 0.1, min = 0, max = 1, step = 0.1, width = "250px"), 
+                                                 ),
                                                ),
                                                
                                                actionButton("plot_summary_percentage_matches", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
@@ -1384,7 +1405,7 @@ ui <- fluidPage(
                                               br(), br(),
                                               strong("Clarke van Steenderen is a PhD student, and Guy Sutton is a post-doctoral researcher with the the Centre for Biological Control in the Department of Zoology and Entomology at Rhodes University, South Africa"),
                                               br(), br(),
-                                              strong("SPEDE-sampler is currently under review. Please cite as: van Steenderen, C.J.M., and Sutton, G.F. 2021. SPEDE-sampler: an R Shiny application to assess how methodological choices and taxon-sampling can affect GMYC output and interpretation. Molecular Ecology Resources (Under Review)."),
+                                              strong("SPEDE-sampler is currently under review. Please cite as: van Steenderen, C.J.M., and Sutton, G.F. 2021. SPEDE-sampler: an R Shiny application to assess how methodological choices and taxon-sampling can affect GMYC output and interpretation."),
                                               br(), br(),
                                               strong("Image credits with thanks to David Taylor at the Centre for Biological Control (CBC):"),
                                               br(), br(),
