@@ -159,22 +159,22 @@ Matches between user-defined groups and GMYC species are recorded as "yes" or "n
 
 **In the diagram below:**
 
-📌 Species 1 (sp1), 2 (sp2), and 3 (sp3) would be flagged as being merged (merge type I)
+🐛 Species 1 (sp1), 2 (sp2), and 3 (sp3) would be flagged as being merged (merge type I)
 
-📌 Species A (SpA) would be flagged as being oversplit by the GMYC by a factor of 2, since the GMYC split it into two separate groups (GMYC_spec 2 and 3)
+🐛 Species A (SpA) would be flagged as being oversplit by the GMYC by a factor of 2, since the GMYC split it into two separate groups (GMYC_spec 2 and 3)
 
-📌 Species Z (spZ) would be recorded as an exact match for this particular GMCY run. In a hypothetical scenario, if a total of three GMYC analyses were run, where species Z is recorded as an exact match in two of the runs, then Species Z would have a 67\% exact match score (i.e. exact match score = Σ (exact match count)/number of input files x 100 = 2/3 x 100 = 67\%). Overall, with species Z being the only group with an exact match, the exact match incidence in the dataset = (number of user-defined groups with a recorded exact match)/(number of user-defined groups) = 1/8 = 13\%.
+🐛 Species Z (spZ) would be recorded as an exact match for this particular GMCY run. In a hypothetical scenario, if a total of three GMYC analyses were run, where species Z is recorded as an exact match in two of the runs, then Species Z would have a 67\% exact match score (i.e. exact match score = Σ (exact match count)/number of input files x 100 = 2/3 x 100 = 67\%). Overall, with species Z being the only group with an exact match, the exact match incidence in the dataset = (number of user-defined groups with a recorded exact match)/(number of user-defined groups) = 1/8 = 13\%.
 
-📌 Species B (spB) would be recorded as a singleton. 
+🐛 Species B (spB) would be recorded as a singleton. 
 
-📌 Species Y (spY) and species W (spW) would also be recorded as a merge, even though spW is a singleton (merge type II). 
+🐛 Species Y (spY) and species W (spW) would also be recorded as a merge, even though spW is a singleton (merge type II). 
 
-📌 The oversplitting ratio including singletons would be calculated as: the number of GMYC species/user-defined groups = 6/8 = 0.75. The oversplitting ratio excluding singletons would be: (GMYC species - singletons)/user-defined groups = (6-1)/8 = 0.63. Since these values are less than the expected value of 1 (where there is no oversplitting), one can conclude that the GMYC is undersplitting species, or "merging" user-defined groups. In other words, the user has likely overestimated the number of species in their dataset.
+🐛 The oversplitting ratio including singletons would be calculated as: the number of GMYC species/user-defined groups = 6/8 = 0.75. The oversplitting ratio excluding singletons would be: (GMYC species - singletons)/user-defined groups = (6-1)/8 = 0.63. Since these values are less than the expected value of 1 (where there is no oversplitting), one can conclude that the GMYC is undersplitting species, or "merging" user-defined groups. In other words, the user has likely overestimated the number of species in their dataset.
 
-📌 The overall percentage match, including singletons = Σ (y) + Σ (singletons)/( Σ (y) + Σ (n) + Σ (singletons) ) = (3 + 1)/(3 + 2 + 1) = 0.67. 
+🐛 The overall percentage match, including singletons = Σ (y) + Σ (singletons)/( Σ (y) + Σ (n) + Σ (singletons) ) = (3 + 1)/(3 + 2 + 1) = 0.67. 
 Excluding singletons, the percentage match = Σ (y)/( Σ (y) + Σ (n) ) = 3/(3 + 2) = 0.6. This suggests that the inclusion of singletons resulted in a slightly inflated percentage match score.
 
-📌 The percentage of singletons = Σ (singletons)/number of GMYC species = 1/6 = 17\%. 
+🐛 The percentage of singletons = Σ (singletons)/number of GMYC species = 1/6 = 17\%. 
 
 <img src="spede_mini_example.png" alt="drawing" width="500"/>
 
