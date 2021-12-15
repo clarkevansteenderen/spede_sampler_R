@@ -402,7 +402,7 @@ clust_ent_boxplot = ggplot(data = clusts_ents, aes(x = data_perc, y = value)) +
   geom_hline(yintercept= 11, linetype="dashed") ; clust_ent_boxplot
   #guides(fill=guide_legend(title=""))
   
-# PLOT, JUST CLUSTERS
+# PLOT JUST CLUSTERS, WITH AN ACCUMULATION CURVE
 
 clust_accum = ggplot(data = clusters_melt, aes(x = as.numeric( data_perc ), y = clusters)) + 
   geom_point() +
@@ -425,7 +425,7 @@ clust_accum = ggplot(data = clusters_melt, aes(x = as.numeric( data_perc ), y = 
   scale_x_continuous(breaks = as.numeric(clusters_melt$data_perc), labels = clusters_melt$data_perc) +
   geom_hline(yintercept= 11, linetype="dashed") ; clust_accum
 
-# PLOT, JUST ENTITIES
+# PLOT JUST ENTITIES, WITH AN ACCUMULATION CURVE
 
 ent_accum = ggplot(data = clusters_melt, aes(x = as.numeric( data_perc ), y = entities)) + 
   geom_point() +
