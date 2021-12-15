@@ -27,7 +27,7 @@ This application outputs:
 ## **HOW TO RUN THE R SHINY APPLICATION**
 
 1. Download and unzip the **spede_sampler_R** repository
-2. Open R, and install (if applicable) and load the shiny library
+2. Open R, and install (if applicable) the shiny library
 
 ```r
 install.packages("shiny")
