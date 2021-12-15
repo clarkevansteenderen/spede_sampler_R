@@ -62,7 +62,7 @@ shiny::runApp(appDir = getwd())
 | PROBLEM | FIX |
 |---------|-----|
 | namespace ‘ellipsis’ 0.3.1 is already loaded, but >= 0.3.2 is required | Restart R |
-| package 'splits' is not available for this version of R        | install.packages(“splits”, repos=”http://R-Forge.R-project.org“)    |
+| package 'splits' is not available for this version of R        | install.packages("splits", repos="http://R-Forge.R-project.org")    |
 |         |     |
 
 ## **FUNCTIONALITY FLOW DIAGRAM**
