@@ -3,7 +3,7 @@ mypackages <- c("ape", "remotes", "here", "gridExtra", "data.table", "dplyr", "s
                 "magrittr", "shinyFiles", "shinythemes", "shinyalert", "phytools", "reshape2", "devtools", "ggplot2", "tools", "devtools", "beautier", "tracerer")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
-install.packages(“splits”, repos=”http://R-Forge.R-project.org“)
+install.packages("splits", repos="http://R-Forge.R-project.org")
 
 library(devtools)
 library(shiny)
