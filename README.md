@@ -42,13 +42,11 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("Biostrings")
 
 ```
-4. Install the beautier, beastier (and BEAST2), and tracerer packages:
+4. Install the beastier package, with BEAST2:
 
 ```r
-install.packages("beautier")
 remotes::install_github("richelbilderbeek/beastierinstall")
 beastierinstall::install_beast2()
-install.packages("tracerer")
 ```
 
 5. Change the working directory to the downloaded folder
