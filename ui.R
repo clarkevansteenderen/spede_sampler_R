@@ -1,6 +1,6 @@
 
 mypackages <- c("ape", "remotes", "here", "gridExtra", "data.table", "dplyr", "shiny", "shinyWidgets", "ips", "Rmisc", "shinyhelper", "gtools", 
-                "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2", "tools", "devtools")
+                "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2", "tools", "devtools", "beautier", "tracerer")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -27,6 +27,8 @@ library(tools)
 library(Biostrings)
 library(here)
 library(gridExtra)
+library(tracerer)
+library(beautier)
 
 #devtools::install_github("GuillemSalazar/FastaUtils")
 #library(FastaUtils)
