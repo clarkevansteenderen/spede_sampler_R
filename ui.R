@@ -1,5 +1,5 @@
 
-mypackages <- c("ape", "here", "gridExtra", "data.table", "dplyr", "shiny", "shinyWidgets", "ips", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2", "tools")
+mypackages <- c("ape", "remotes", "here", "gridExtra", "data.table", "dplyr", "shiny", "shinyWidgets", "ips", "Rmisc", "shinyhelper", "gtools", "magrittr", "shinyFiles", "shinythemes", "shinyalert", "splits", "phytools", "reshape2", "devtools", "ggplot2", "tools")
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
@@ -9,6 +9,7 @@ if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 #BiocManager::install("Biostring")
 
 library(shiny)
+library(remotes)
 library(ape)
 library(splits)
 library(shinyhelper)
