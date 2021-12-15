@@ -37,9 +37,17 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("Biostrings")
 library(Biostrings)
 ```
+4. Install the beautier, beastier (and BEAST2), and tracerer packages:
 
-4. Change the working directory to the downloaded folder
-5. Run the application using the **runApp()** function
+```r
+remotes::install_github("ropensci/beautier")
+remotes::install_github("richelbilderbeek/beastierinstall")
+beastierinstall::install_beast2()
+remotes::install_github("ropensci/tracerer")
+```
+
+5. Change the working directory to the downloaded folder
+6. Run the application using the **runApp()** function
 
 ``` r
 install.packages("shiny")
