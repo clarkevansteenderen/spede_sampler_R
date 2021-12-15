@@ -28,6 +28,11 @@ This application outputs:
 
 1. Download and unzip the **spede_sampler_R** repository
 2. Open R, and install (if applicable) and load the shiny library
+
+```r
+install.packages("shiny")
+```
+
 3. Install the Biostrings package:
 
 ```r
@@ -50,8 +55,6 @@ remotes::install_github("ropensci/tracerer")
 6. Run the application using the **runApp()** function
 
 ``` r
-install.packages("shiny")
-library(shiny)
 setwd("path/to/spede_sampler_R-main")
 shiny::runApp(appDir = getwd())
 ```
