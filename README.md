@@ -27,10 +27,11 @@ This application outputs:
 ## **HOW TO RUN THE R SHINY APPLICATION**
 
 1. Download and unzip the **spede_sampler_R** repository
-2. Open R, and install (if applicable) the shiny library
+2. Open R, and install (if applicable) the shiny and remotes libraries:
 
 ```r
 install.packages("shiny")
+install.pakcages("remotes")
 ```
 
 3. Install the Biostrings package:
