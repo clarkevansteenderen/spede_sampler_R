@@ -56,6 +56,13 @@ beastierinstall::install_beast2()
 setwd("path/to/spede_sampler_R-main")
 shiny::runApp(appDir = getwd())
 ```
+## **POSSIBLE ISSUES AND HOW TO FIX THEM**
+ 
+| PROBLEM | FIX |
+|---------|-----|
+| namespace ‘ellipsis’ 0.3.1 is already loaded, but >= 0.3.2 is required | Restart R |
+|         |     |
+|         |     |
 
 ## **FUNCTIONALITY FLOW DIAGRAM**
 
