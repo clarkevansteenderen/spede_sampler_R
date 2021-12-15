@@ -28,14 +28,14 @@ This application outputs:
 
 1. Download and unzip the **spede_sampler_R** repository
 2. Open R, and install (if applicable) and load the shiny library
-3. Install and load the Biostrings package:
+3. Install the Biostrings package:
 
 ```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
 BiocManager::install("Biostrings")
-library(Biostrings)
+
 ```
 4. Install the beautier, beastier (and BEAST2), and tracerer packages:
 
