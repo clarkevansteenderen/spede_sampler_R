@@ -43,7 +43,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("Biostrings")
 
 ```
-4. Install the beastier package, with BEAST2:
+4. Install the beastier package, with BEAST2. Ensure that the rJava package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
 
 ```r
 remotes::install_github("ropensci/beastier")
