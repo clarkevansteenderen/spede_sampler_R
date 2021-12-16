@@ -33,17 +33,7 @@ This application outputs:
 install.packages("shiny")
 ```
 
-3. Install the `Biostrings` package:
-
-```r
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("Biostrings")
-
-```
-Ensure that the `rJava` package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
-
+3. Ensure that the `rJava` package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
 4. Change the working directory to the downloaded folder
 5. Run the application using the **runApp()** function
 
