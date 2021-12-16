@@ -20,7 +20,7 @@ This application outputs:
 1. The number of clusters and entities estimated by the GMYC method for the uploaded data
 2. The percentage matches between predefined groupings and GMYC species estimates; with and without GMYC species represented by single-samples (= singletons)
 3. The percentage of exact GMYC matches and merges
-4. Overall oversplitting ratios (the ratio of the number of GMYC species to predefined groups)
+4. Overall splitting ratios (the ratio of the number of GMYC species to predefined groups)
 5. Which predefined groups were split into more than one GMYC species, indicating possible undiscovered diversity
 6. Summary ggplots that are customisable
 
@@ -189,7 +189,7 @@ Matches between user-defined groups and GMYC species are recorded as "yes" or "n
 
 🐛 Species Y (spY) and species W (spW) would also be recorded as a merge, even though spW is a singleton (merge type II). 
 
-🐛 The oversplitting ratio including singletons would be calculated as: the number of GMYC species/user-defined groups = 6/8 = 0.75. The oversplitting ratio excluding singletons would be: (GMYC species - singletons)/user-defined groups = (6-1)/8 = 0.63. Since these values are less than the expected value of 1 (where there is no oversplitting), one can conclude that the GMYC is undersplitting species, or "merging" user-defined groups. In other words, the user has likely overestimated the number of species in their dataset.
+🐛 The splitting ratio including singletons would be calculated as: the number of GMYC species/user-defined groups = 6/8 = 0.75. The splitting ratio excluding singletons would be: (GMYC species - singletons)/user-defined groups = (6-1)/8 = 0.63. Since these values are less than the expected value of 1 (where there is no oversplitting), one can conclude that the GMYC is undersplitting species, or "merging" user-defined groups. In other words, the user has likely overestimated the number of species in their dataset.
 
 🐛 The overall percentage match, including singletons = Σ (y) + Σ (singletons)/( Σ (y) + Σ (n) + Σ (singletons) ) = (3 + 1)/(3 + 2 + 1) = 0.67. 
 Excluding singletons, the percentage match = Σ (y)/( Σ (y) + Σ (n) ) = 3/(3 + 2) = 0.6. This suggests that the inclusion of singletons resulted in a slightly inflated percentage match score.
@@ -227,7 +227,7 @@ The **View Matches Summary** section displays the average, standard deviation, a
 
 Plot the percentage match (GMYC species to predefined groups) for each tree file as a line graph.
 
-## GMYC Oversplitting
+## GMYC splitting
 
 The **View summary** button in the **View output** panel displays the mean, standard deviation, and minimum and maximum values for the predefined groups that have been split into more than one species/groups by the GMYC algorithm. The "View full" button gives a table with all the predifined groups that were split into more than one group across all trees.
 These data can be plotted as box-and-whisker or bar plots.
@@ -240,7 +240,7 @@ Text will appear in the panel to report what percentage of your predefined group
 ## Amalgamate
 Upload multiple .csv files containing the output downloaded from the **Percentage Matches** tab. These have the following column layout (e.g. the output for a 50% resampled dataset):
 
-| filename        | percentage_match    | percentage_match_excl_singles   | percentage_single_sample_GMYC_species   | oversplitting_ratio   | oversplitting_excl_singles |
+| filename        | percentage_match    | percentage_match_excl_singles   | percentage_single_sample_GMYC_species   | splitting_ratio   | splitting_excl_singles |
 |-----------      |-------|----- |----- |----- | ----- |
 | iteration1.tre  | 0.25  | 0.3  | 0.36 | 0.35 | 0.18 |
 | iteration2.tre  | 0.4   | 0.5  | 0.48 | 0.35 | 0.25 |
@@ -249,7 +249,7 @@ Upload multiple .csv files containing the output downloaded from the **Percentag
 
 And an example of the output from a 60% resampled dataset:
 
-| filename        | percentage_match    | percentage_match_excl_singles   | percentage_single_sample_GMYC_species   | oversplitting_ratio   | oversplitting_excl_singles |
+| filename        | percentage_match    | percentage_match_excl_singles   | percentage_single_sample_GMYC_species   | splitting_ratio   | splitting_excl_singles |
 |-----------      |-------|----- |----- |----- | ----- |
 | iteration1.tre  | 0.35  | 0.36 | 0.40 | 0.45 | 0.28 |
 | iteration2.tre  | 0.45  | 0.58 | 0.65 | 0.85 | 0.36 |
@@ -268,7 +268,7 @@ Select which data column you wish to extract from the dropdown menu. The algorit
 Download this as a .csv file.
 
 ## Summary Plots
-Upload the desired dataframe downloaded from the **Amalgamate** tab in the appropriate panel (Clusters and Entities, Oversplitting Ratios, Percentage Matches, Percentage Singletons, Oversplitting Ratios per Predefined Group) and apply the desired plot settings/tweaks for each. For a combined plot, scroll to the **Multi-Plots** panel, and click **Plot All**. Each plot can be downloaded as a PDF, PNG, or SVG file with desired sizes.
+Upload the desired dataframe downloaded from the **Amalgamate** tab in the appropriate panel (Clusters and Entities, Splitting Ratios, Percentage Matches, Percentage Singletons, Splitting Ratios per Predefined Group) and apply the desired plot settings/tweaks for each. For a combined plot, scroll to the **Multi-Plots** panel, and click **Plot All**. Each plot can be downloaded as a PDF, PNG, or SVG file with desired sizes.
 
 ## :pencil2: **Worked Example using cochineal 12S sequences**
 
@@ -312,9 +312,9 @@ The **View GMYC species list** button shows a datatable containing each sample n
 | 1 | VS015Ofi | opuntiae |
 | 1 | CSW004E | opuntiae |
 
-The **View Matches** button displays the percentage matches including and excluding single-sample representatives, the percentage of GMYC species represented by a single sample, and the oversplitting ratio including and excluding single-sample GMYC species. The **View Matches Summary** shows the average, standard deviation, minimum, and maximum values for these measures. 
+The **View Matches** button displays the percentage matches including and excluding single-sample representatives, the percentage of GMYC species represented by a single sample, and the splitting ratio including and excluding single-sample GMYC species. The **View Matches Summary** shows the average, standard deviation, minimum, and maximum values for these measures. 
 
-| statistic        | percentage_matches    | percentage_matches_excl_single_samples   | percentage_single_sample_GMYC_species | oversplitting_ratio | oversplitting_ratio_excl_single_sample_spp |
+| statistic        | percentage_matches    | percentage_matches_excl_single_samples   | percentage_single_sample_GMYC_species | splitting_ratio | splitting_ratio_excl_single_sample_spp |
 |--------             |-------|----- |----- |----- |----- |
 | Average             | 100.00  | 100.00 | 6.41 | 2.41 | 2.00 |
 | Standard deviation  | 0.00  | 0.00 | 4.47 | 2.61 | 0.16 |
@@ -323,7 +323,7 @@ The **View Matches** button displays the percentage matches including and exclud
 
 17. The **Plot Percentage matches** tab allows for the plotting of the percentage match; A) including or B) excluding GMYC single-sample species for each tree file.
 
-18. The **GMYC Oversplitting** tab displays GMYC species oversplitting relative to the user's predefined groups. The **View Summary Table** button allows the user to download the mean, standard deviation, minimum and maximum oversplitting values for each predefined group.
+18. The **GMYC Splitting** tab displays GMYC species splitting relative to the user's predefined groups. The **View Summary Table** button allows the user to download the mean, standard deviation, minimum and maximum splitting values for each predefined group.
 
 | predefined_group        | mean    | sd   | min | max |
 |-----------      |-------|----- |----- |----- |
@@ -367,12 +367,12 @@ and the entities table looks like this:
 | resampled_9.nex  | 6  | 11 | 10 | 10  |
 | resampled_10.nex | 7  | 9  | 12 | 10  |
 
-The resulting summary plots for each measure can be plotted as shown below, using the **Summary Plots** tab. The number of A1) clusters and A2) entities at each dataset size (the dotted lines indicate the expected number of species (n = 5), and species + lineages (n = 11) in the dataset), B) The oversplitting ratios with and without singletons across dataset sizes (the dotted line indicates the expected ratio of 1), C) the percentage of singleton sequences across dataset sizes, D) Barplots highlighting which predefined groups were oversplit by the GMYC, and E) The percentage match scores between predefined groups and GMYC species across dataset sizes. Triangles represent mean values.
+The resulting summary plots for each measure can be plotted as shown below, using the **Summary Plots** tab. The number of A1) clusters and A2) entities at each dataset size (the dotted lines indicate the expected number of species (n = 5), and species + lineages (n = 11) in the dataset), B) The splitting ratios with and without singletons across dataset sizes (the dotted line indicates the expected ratio of 1), C) the percentage of singleton sequences across dataset sizes, D) Barplots highlighting which predefined groups were oversplit by the GMYC, and E) The percentage match scores between predefined groups and GMYC species across dataset sizes. Triangles represent mean values.
 
 <img src="combo_plots_cochineal.png" alt="drawing" width="500"/>
 
 A1 and A2 indicate that the number of clusters and entities recorded approach the same number of predefined species and lineages (n = 11), and that the asymptotic shape suggests that further sampling in the same collecting areas is unlikely to yield further species or lineages.
-Plot B shows that the user-defined groups were underestimates of species richness, as the average oversplitting ratio always exceeds a value of 1. The presence of singletons tended to result in higher oversplitting ratios than when they were excluded, which is more pronounced in smaller datasets (25% - 50%). Plot C shows how the percentage of singletons decreased as the dataset size increased. Plot D graphically shows the predefined groups that were oversplit by the GMYC, with *D. tomensosus* showing the greatest mean oversplitting ratio. Plot E shows that the overall percentage match scores, including and excluding singletons, remained high irrespective of data size.
+Plot B shows that the user-defined groups were underestimates of species richness, as the average splitting ratio always exceeds a value of 1. The presence of singletons tended to result in higher splitting ratios than when they were excluded, which is more pronounced in smaller datasets (25% - 50%). Plot C shows how the percentage of singletons decreased as the dataset size increased. Plot D graphically shows the predefined groups that were oversplit by the GMYC, with *D. tomensosus* showing the greatest mean splitting ratio. Plot E shows that the overall percentage match scores, including and excluding singletons, remained high irrespective of data size.
 
 ---
 
@@ -467,28 +467,28 @@ ent_accum = ggplot(data = clusters_melt, aes(x = as.numeric( data_perc ), y = en
   geom_hline(yintercept= 5, linetype="dashed") +
   geom_hline(yintercept= 11, linetype="dashed") ; ent_accum
 
-# OVERSPLITTING RATIOS
+# SPLITTING RATIOS
 
-oversplitting = read.csv("cochineal_12S/match_data/oversplitting_ratio.csv", header = T, check.names = F)
-oversplitting_melt = reshape2::melt(oversplitting)
-colnames(oversplitting_melt) = c("file_name", "data_perc", "oversplitting_ratio")
+splitting = read.csv("cochineal_12S/match_data/splitting_ratio.csv", header = T, check.names = F)
+splitting_melt = reshape2::melt(splitting)
+colnames(splitting_melt) = c("file_name", "data_perc", "splitting_ratio")
 
-oversplitting_excl_sing = read.csv("cochineal_12S/match_data/oversplitting_excl_singles.csv", header = T, check.names = F)
-oversplitting_excl_sing_melt = reshape2::melt(oversplitting_excl_sing)
-colnames(oversplitting_excl_sing_melt) = c("file_name", "data_perc", "oversplitting_ratio_excl")
+splitting_excl_sing = read.csv("cochineal_12S/match_data/splitting_excl_singles.csv", header = T, check.names = F)
+splitting_excl_sing_melt = reshape2::melt(splitting_excl_sing)
+colnames(splitting_excl_sing_melt) = c("file_name", "data_perc", "splitting_ratio_excl")
 
-oversplitting_melt$oversplitting_excl = oversplitting_excl_sing_melt$oversplitting_ratio_excl
+splitting_melt$splitting_excl = splitting_excl_sing_melt$splitting_ratio_excl
 
-oversplitting_combo = reshape::melt( oversplitting_melt )
+splitting_combo = reshape::melt( splitting_melt )
 
 # BOXPLOT
 
-oversplitting_boxplot = ggplot(data = oversplitting_combo, aes(x = data_perc, y = value)) + 
+splitting_boxplot = ggplot(data = splitting_combo, aes(x = data_perc, y = value)) + 
   geom_boxplot(aes(fill = variable)) +
   stat_summary(fun = mean, aes(group = variable), geom="point", shape=17, size=3, color="black", position=position_dodge(0.77)) +
   scale_fill_manual(values=c("#2D86F0", "#F02D5A"), name = "", labels = c("+ singletons", "- singletons")) +
   xlab("Data Percentage") +
-  ylab("Oversplitting ratio") +
+  ylab("Splitting ratio") +
   ggtitle("B") +
   theme_classic() +
   theme(legend.position = "bottom") +
@@ -499,7 +499,7 @@ oversplitting_boxplot = ggplot(data = oversplitting_combo, aes(x = data_perc, y 
   theme(axis.text.y = element_text(size = 12)) +
   theme(legend.text=element_text(size=12)) +
   geom_hline(yintercept= 1, linetype="dashed") +
-  theme(plot.title = element_text(size=16, face = "bold")) ; oversplitting_boxplot
+  theme(plot.title = element_text(size=16, face = "bold")) ; splitting_boxplot
 
 # PERCENTAGE SINGLETONS
 
@@ -520,14 +520,14 @@ singletons_boxplot = ggplot(data = singletons_melt, aes(x = data_perc, y = perc_
   theme(axis.text.y = element_text(size = 12)) +
   theme(plot.title = element_text(size=16, face = "bold")) ; singletons_boxplot
   
-# OVERSPLITTING PER SPECIES
+# SPLITTING PER SPECIES
 
 oversplits_per_group = read.csv("cochineal_12S/oversplits/mean_oversplits_per_group_full_100.csv", header = T, check.names = F)
 
-oversplitting_bar = ggplot(data = oversplits_per_group, aes(x = predef_unique, y = Freq)) +
+splitting_bar = ggplot(data = oversplits_per_group, aes(x = predef_unique, y = Freq)) +
   geom_bar(stat = "summary", fill = "lightgrey", col = "black") +
   xlab("Morphospecies") +
-  ylab("Mean oversplitting ratio per morphospecies \n group, on the full dataset (100%)") +
+  ylab("Mean splitting ratio per morphospecies \n group, on the full dataset (100%)") +
   theme_classic() +
   ggtitle("D") +
   theme(axis.title.y = element_text(size = 12, margin = margin(t = 0, r = 20, b = 0, l = 0))) +
@@ -572,9 +572,9 @@ perc_match_boxplot = ggplot(data = percentage_matches_combo, aes(x = data_perc, 
 
 combo_plots = gridExtra::grid.arrange(clust_accum,
                                       ent_accum,
-                                      oversplitting_boxplot, 
+                                      splitting_boxplot, 
                                       singletons_boxplot, 
-                                      oversplitting_bar, 
+                                      splitting_bar, 
                                       perc_match_boxplot)
 
 # SAVE THE OUTPUT
