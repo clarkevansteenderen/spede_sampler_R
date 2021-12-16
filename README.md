@@ -67,6 +67,8 @@ shiny::runApp(appDir = getwd())
 | JAVA_HOME cannot be determined from the Registry        |  Install the correct version of Java relative to your version of R (e.g. 64-bit versions for both)  |
 | Ubuntu: issues with installing Biostrings | `source("https://bioconductor.org/biocLite.R")`     `BiocInstaller::biocLite("Biostrings")` |
 
+Contact me at vsteenderen@gmail.com if you encounter a different problem.
+
 ## **FUNCTIONALITY FLOW DIAGRAM**
 
 <img src="spede_sampler_overview.png" alt="drawing" width="900"/>
