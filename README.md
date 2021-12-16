@@ -33,16 +33,25 @@ This application outputs:
 install.packages("shiny")
 ```
 
-3. Ensure that the `rJava` package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
-4. Install `beastierinstall` in order to load BEAST2:
+3. Install the Bioconductor package:
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("Biostrings")
+```
+
+4. Ensure that the `rJava` package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
+5. Install `beastierinstall` in order to load BEAST2:
 
 ```r
 remotes::install_github("richelbilderbeek/beastierinstall")
 beastierinstall::install_beast2()
 ```
 
-5. Change the working directory to the downloaded folder
-6. Run the application using the **runApp()** function
+6. Change the working directory to the downloaded folder
+7. Run the application using the **runApp()** function
 
 ``` r
 setwd("path/to/spede_sampler_R-main")
