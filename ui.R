@@ -835,7 +835,7 @@ ui <- fluidPage(
                                                hr(),
                                                h4(strong("DOWNLOAD")),
                                                br(), 
-                                               textInput("file_name_oversplit", "File name: ", "gmyc_oversplitting_boxplot"),
+                                               textInput("file_name_oversplit", "File name: ", "gmyc_splitting_boxplot"),
                                               
                                                fluidRow(
                                                  column(width = 3,
@@ -1088,38 +1088,38 @@ ui <- fluidPage(
                                                  fluidRow(
                                                    
                                                column(width = 6,
-                                               fileInput("summary_oversplitting_ratio_inc", "Splitting ratio data including singletons"),
+                                               fileInput("summary_splitting_ratio_inc", "Splitting ratio data including singletons"),
                                                ),
                                                column(width = 6,
-                                                      fileInput("summary_oversplitting_ratio_exc", "Splitting ratio data excluding singletons"),
+                                                      fileInput("summary_splitting_ratio_exc", "Splitting ratio data excluding singletons"),
                                                ),
                                                ), # end of fluidrow
                                                
                                                fluidRow(
                                                  column(width = 6,
-                                                        selectInput("oversplitting_inc_col", "Splitting ratio including singletons colour:", choices = c("grey", "hotpink", "lightblue", "lightyellow", "salmon", "lightgreen", "red", "royalblue", "white"), selected = "lightblue"),      
+                                                        selectInput("splitting_inc_col", "Splitting ratio including singletons colour:", choices = c("grey", "hotpink", "lightblue", "lightyellow", "salmon", "lightgreen", "red", "royalblue", "white"), selected = "lightblue"),      
                                                  ),
                                                  column(width = 6,
-                                                        selectInput("oversplitting_exc_col", "Splitting ratio excluding singletons colour:", choices = c("grey", "hotpink", "lightblue", "lightyellow", "salmon", "lightgreen", "red", "royalblue", "white"), selected = "lightyellow"),      
+                                                        selectInput("splitting_exc_col", "Splitting ratio excluding singletons colour:", choices = c("grey", "hotpink", "lightblue", "lightyellow", "salmon", "lightgreen", "red", "royalblue", "white"), selected = "lightyellow"),      
                                                  ),
                                                  column(width = 4,
-                                                        selectInput("oversplitting_plot_point_shape", label = "Point shape of means: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18), selected = 17),  
+                                                        selectInput("splitting_plot_point_shape", label = "Point shape of means: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18), selected = 17),  
                                                         ),
                                                  column(width = 4,
-                                                        selectInput("oversplitting_plot_point_col", label = "Colour of mean points: ", choices = c("black", "white", "red", "grey", "blue", "darkblue")),  
+                                                        selectInput("splitting_plot_point_col", label = "Colour of mean points: ", choices = c("black", "white", "red", "grey", "blue", "darkblue")),  
                                                  ),
                                                  column(width = 3,
-                                                        sliderInput("oversplitting_plot_point_size", label = "Point size: ", value = 3, min = 0, max = 10, step = 0.5),
+                                                        sliderInput("splitting_plot_point_size", label = "Point size: ", value = 3, min = 0, max = 10, step = 0.5),
                                                  ),
                                                  
                                                ),
                                                
                                                fluidRow(
                                                  column(width = 4,
-                                               numericInput("oversplitting_plot_legend_x_pos", "Legend position x coordinate:", value = 0.9, min = 0, max = 1, step = 0.1, width = "250px"), 
+                                               numericInput("splitting_plot_legend_x_pos", "Legend position x coordinate:", value = 0.9, min = 0, max = 1, step = 0.1, width = "250px"), 
                                                  ),
                                                column(width = 4,
-                                                      numericInput("oversplitting_plot_legend_y_pos", "Legend position y coordinate:", value = 0.1, min = 0, max = 1, step = 0.1, width = "250px"), 
+                                                      numericInput("splitting_plot_legend_y_pos", "Legend position y coordinate:", value = 0.1, min = 0, max = 1, step = 0.1, width = "250px"), 
                                                  ),
                                                ),
                                                
@@ -1272,8 +1272,8 @@ ui <- fluidPage(
                                                
                                                h3(strong("Splitting Ratios per Morphospecies Group")),
                                                wellPanel(
-                                               fileInput("summary_oversplitting_morphospecies", "Mean splitting data per morphospecies"),
-                                               selectInput("oversplitting_morphospecies_col", "Barplot colour:", choices = c("grey", "lightblue", "royalblue", "black", "red", "lightyellow", "salmon", "lightgreen", "white"), selected = "lightblue",  width = "250px"), 
+                                               fileInput("summary_splitting_morphospecies", "Mean splitting data per morphospecies"),
+                                               selectInput("splitting_morphospecies_col", "Barplot colour:", choices = c("grey", "lightblue", "royalblue", "black", "red", "lightyellow", "salmon", "lightgreen", "white"), selected = "lightblue",  width = "250px"), 
                                                numericInput("x_axis_angle", "x-axis label angle:", value = 0, min = 0, step = 1, width = "150px"),
                                                actionButton("plot_summary_oversplits_per_morphospecies", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                
@@ -1281,25 +1281,25 @@ ui <- fluidPage(
                                                
                                                fluidRow(
                                                  column(width = 3,
-                                                        selectInput("plot_format_summary_oversplitting_morphospecies", "Image format:", choices = c("pdf", "png", "svg"), width = "150px"),
+                                                        selectInput("plot_format_summary_splitting_morphospecies", "Image format:", choices = c("pdf", "png", "svg"), width = "150px"),
                                                  ),
                                                  column(width = 3,
-                                                        textInput("w_plot_summary_oversplitting_morphospecies", "Width: ", 20, width = "150px"),
+                                                        textInput("w_plot_summary_splitting_morphospecies", "Width: ", 20, width = "150px"),
                                                  ),
                                                  column(width = 3,
-                                                        textInput("h_plot_summary_oversplitting_morphospecies", "Height: ", 15, width = "150px"),
+                                                        textInput("h_plot_summary_splitting_morphospecies", "Height: ", 15, width = "150px"),
                                                  ),
                                                  column(width = 3,
-                                                        selectInput("unit_plot_summary_oversplitting_morphospecies", "Unit: ", choices=c("cm", "in"), width = "150px"),
+                                                        selectInput("unit_plot_summary_splitting_morphospecies", "Unit: ", choices=c("cm", "in"), width = "150px"),
                                                  ),
                                                  column(width = 3,
                                                         conditionalPanel(
-                                                          condition = "input.plot_format_summary_oversplitting_morphospecies == 'png'",
-                                                          textInput("res_plot_summary_oversplitting_morphospecies", "Res (dpi): ", 300), width = "150px")
+                                                          condition = "input.plot_format_summary_splitting_morphospecies == 'png'",
+                                                          textInput("res_plot_summary_splitting_morphospecies", "Res (dpi): ", 300), width = "150px")
                                                  ),
                                                ),
                                                
-                                               downloadButton("download_summary_oversplitting_morphospecies_plot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               downloadButton("download_summary_splitting_morphospecies_plot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(),
                                                
                                                ),
