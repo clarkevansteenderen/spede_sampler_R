@@ -43,10 +43,10 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("Biostrings")
 
 ```
-4. Install the `beastier` package, and then `beastierinstall` in order to install BEAST2. Ensure that the `rJava` package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
+Ensure that the `rJava` package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
 
-5. Change the working directory to the downloaded folder
-6. Run the application using the **runApp()** function
+4. Change the working directory to the downloaded folder
+5. Run the application using the **runApp()** function
 
 ``` r
 setwd("path/to/spede_sampler_R-main")
