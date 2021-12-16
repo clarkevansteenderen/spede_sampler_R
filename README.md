@@ -45,12 +45,6 @@ BiocManager::install("Biostrings")
 ```
 4. Install the `beastier` package, and then `beastierinstall` in order to install BEAST2. Ensure that the `rJava` package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
 
-```r
-remotes::install_github("ropensci/beastier")
-remotes::install_github("richelbilderbeek/beastierinstall")
-beastierinstall::install_beast2()
-```
-
 5. Change the working directory to the downloaded folder
 6. Run the application using the **runApp()** function
 
