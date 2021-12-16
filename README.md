@@ -31,7 +31,7 @@ This application outputs:
 
 ```r
 install.packages("shiny")
-install.pakcages("remotes")
+install.packages("remotes")
 ```
 
 3. Install the Biostrings package:
