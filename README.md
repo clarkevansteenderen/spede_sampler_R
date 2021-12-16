@@ -27,14 +27,14 @@ This application outputs:
 ## **HOW TO RUN THE R SHINY APPLICATION**
 
 1. Download and unzip the **spede_sampler_R** GitHub repository
-2. Open R, and install (if applicable) the shiny and remotes libraries:
+2. Open R, and install (if applicable) the `shiny` and `remotes` libraries:
 
 ```r
 install.packages("shiny")
 install.packages("remotes")
 ```
 
-3. Install the Biostrings package:
+3. Install the `Biostrings` package:
 
 ```r
 if (!requireNamespace("BiocManager", quietly = TRUE))
@@ -43,7 +43,7 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("Biostrings")
 
 ```
-4. Install the beastier package, and then beastierinstall in order to install BEAST2. Ensure that the rJava package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
+4. Install the `beastier` package, and then `beastierinstall` in order to install BEAST2. Ensure that the `rJava` package is installed. See [here](https://github.com/ropensci/beastier/blob/master/doc/rjava.md) for issues regarding rJava installation.
 
 ```r
 remotes::install_github("ropensci/beastier")
