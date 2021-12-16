@@ -6,11 +6,6 @@ mypackages <- c("ape", "remotes", "here", "gridExtra", "data.table", "dplyr", "s
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("Biostrings", suppressUpdates=TRUE)
-
 install.packages("splits", repos="http://R-Forge.R-project.org")
 
 library(devtools)
