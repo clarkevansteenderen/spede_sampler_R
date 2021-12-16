@@ -46,6 +46,7 @@ BiocManager::install("Biostrings")
 4. Install the beastier package, with BEAST2:
 
 ```r
+remotes::install_github("ropensci/beastier")
 remotes::install_github("richelbilderbeek/beastierinstall")
 beastierinstall::install_beast2()
 ```
