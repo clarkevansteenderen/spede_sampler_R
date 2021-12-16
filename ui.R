@@ -13,9 +13,6 @@ BiocManager::install("Biostrings")
 
 install.packages("splits", repos="http://R-Forge.R-project.org")
 
-remotes::install_github("richelbilderbeek/beastierinstall")
-beastierinstall::install_beast2()
-
 library(devtools)
 library(shiny)
 library(remotes)
