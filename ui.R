@@ -1123,30 +1123,30 @@ ui <- fluidPage(
                                                  ),
                                                ),
                                                
-                                               actionButton("plot_summary_oversplits", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               actionButton("plot_summary_splits", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(), br(),
                                                
                                                fluidRow(
                                                  column(width = 3,
-                                                        selectInput("plot_format_summary_oversplits", "Image format:", choices = c("pdf", "png", "svg"), width = "150px"),
+                                                        selectInput("plot_format_summary_splits", "Image format:", choices = c("pdf", "png", "svg"), width = "150px"),
                                                  ),
                                                  column(width = 3,
-                                                        textInput("w_plot_summary_oversplits", "Width: ", 20, width = "150px"),
+                                                        textInput("w_plot_summary_splits", "Width: ", 20, width = "150px"),
                                                  ),
                                                  column(width = 3,
-                                                        textInput("h_plot_summary_oversplits", "Height: ", 15, width = "150px"),
+                                                        textInput("h_plot_summary_splits", "Height: ", 15, width = "150px"),
                                                  ),
                                                  column(width = 3,
-                                                        selectInput("unit_plot_summary_oversplits", "Unit: ", choices=c("cm", "in"), width = "150px"),
+                                                        selectInput("unit_plot_summary_splits", "Unit: ", choices=c("cm", "in"), width = "150px"),
                                                  ),
                                                  column(width = 3,
                                                         conditionalPanel(
-                                                          condition = "input.plot_format_summary_oversplits == 'png'",
-                                                          textInput("res_plot_summary_oversplits", "Res (dpi): ", 300), width = "150px")
+                                                          condition = "input.plot_format_summary_splits == 'png'",
+                                                          textInput("res_plot_summary_splits", "Res (dpi): ", 300), width = "150px")
                                                  ),
                                                ),
                                                
-                                               downloadButton("download_summary_oversplits_plot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
+                                               downloadButton("download_summary_splits_plot", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(),
                                                
                                                ), # end of wellpanel
