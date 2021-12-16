@@ -68,9 +68,21 @@ shiny::runApp(appDir = getwd())
 
 Contact me at vsteenderen@gmail.com if you encounter a different problem.
 
-## **FUNCTIONALITY FLOW DIAGRAM**
+## **DEFINITIONS**
 
-<img src="spede_sampler_overview.png" alt="drawing" width="900"/>
+|TERM | DEFINITION |
+|---------|-----|
+|**Clusters** | The number of delimited groups comprising two ore more samples, excluding singletons. |
+|**Entities** | The number of delimited groups comprising two ore more samples, including singletons. |
+|**Exact match**| An instance during scoring when all the samples belonging to a particular user-defined group (morphospecies or other user-defined group) correspond to the same GMYC species. |
+|**Split match**| An instance during scoring when the samples belonging to a particular user-defined group (morphospecies or other user-defined group) are split into two ore more GMYC species groups. This indicates the possibility of the underestimation of species richness by the user. |
+|**Match (y/n)**| A means of denoting, in the work-through of the R code, whether there is agreement or not between a user's predefined group and a single corresponding GMYC species. |
+|**Merge**| An instance during scoring when two or more user-defined groups are merged into one GMYC species group. This indicates the possibility of an overestimation of species richness by the user. |
+|**Oversplitting**| The outcome where the GMYC model has estimated more species than those estimated by the user (= "discordant splitting"). This could mean either (1) the incorrect splitting into too many species, or (2) the genuine presence of undiscovered biodiversity or cryptic species. |
+| **Undersplitting**| The outcome where the GMYC model has estimated fewer species than those estimated by the user. This could mean either (1) the incorrect merging into too few species, or (2) the genuine presence of lower biodiversity than expected (e.g. variations in intraspecific morphological characters mistaken for interspecific ones). |
+|**Splitting ratio**| The ratio of the total number of estimated GMYC species to the total number of user-defined groups in the dataset. A value greater than one indicates oversplitting, while a value less than one denotes undersplitting. |
+|**(Overall) percentage match**| The overall proportion of successful matches (records of "y") in a dataset. |
+|**Singleton**| A species represented by only one individual/genetic sequence. |
 
 # **USAGE, TAB-BY-TAB**
 
