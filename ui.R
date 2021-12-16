@@ -9,7 +9,7 @@ if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
-BiocManager::install("Biostrings")
+BiocManager::install("Biostrings", suppressUpdates=TRUE)
 
 install.packages("splits", repos="http://R-Forge.R-project.org")
 
