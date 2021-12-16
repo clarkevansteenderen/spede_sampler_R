@@ -1900,7 +1900,7 @@ server = function(input, output, session) {
     }
     
     # PLOT
-    observeEvent(input$plot_summary_oversplits, {
+    observeEvent(input$plot_summary_splits, {
       
       summary_splitting_inc_csv = read.csv(infile_summary_splitting_ratio_inc$datapath, header = T, check.names = F)
       summary_splitting_inc_csv_melt = reshape2::melt(summary_splitting_inc_csv)
@@ -1948,18 +1948,18 @@ server = function(input, output, session) {
     )
     
     # download the plot
-    output$download_summary_oversplits_plot <- downloadHandler(
+    output$download_summary_splits_plot <- downloadHandler(
       
-      filename = function (){paste("splitting_summary_plot", input$plot_format_summary_oversplits, sep = '.')},
+      filename = function (){paste("splitting_summary_plot", input$plot_format_summary_splits, sep = '.')},
       
       content = function (file){
         
-        width.oversplits_summary = as.numeric(input$w_plot_summary_oversplits) 
-        height.oversplits_summary = as.numeric(input$h_plot_summary_oversplits) 
-        dpi.oversplits_summary = as.numeric(input$res_plot_summary_oversplits)
-        units.oversplits_summary = input$unit_plot_summary_oversplits
+        width.splits_summary = as.numeric(input$w_plot_summary_splits) 
+        height.splits_summary = as.numeric(input$h_plot_summary_splits) 
+        dpi.splits_summary = as.numeric(input$res_plot_summary_splits)
+        units.splits_summary = input$unit_plot_summary_splits
         
-        ggsave(file, width = width.oversplits_summary, height = height.oversplits_summary, dpi = dpi.oversplits_summary, units = units.oversplits_summary,
+        ggsave(file, width = width.splits_summary, height = height.splits_summary, dpi = dpi.splits_summary, units = units.splits_summary,
                splitting_boxplot_summary)
       }
     )
