@@ -1,7 +1,7 @@
 
 mypackages <- c("ape", "remotes", "here", "gridExtra", "data.table", "dplyr", "shiny", "shinyWidgets", "ips", "Rmisc", "shinyhelper", "gtools", 
                 "magrittr", "shinyFiles", "shinythemes", "shinyalert", "phytools", "reshape2", "devtools", "ggplot2", "tools", "devtools", "beastier", 
-                "beautier", "tracerer")
+                "beautier", "tracerer", "rJava")
 
 checkpkg <- mypackages[!(mypackages %in% installed.packages()[,"Package"])]
 if(length(checkpkg)) install.packages(checkpkg, dependencies = TRUE)
@@ -37,6 +37,7 @@ library(gridExtra)
 library(beastier)
 library(tracerer)
 library(beautier)
+library(rJava)
 
 ggthemes = list("Classic" = theme_classic(),
                 "Dark" = theme_dark(),
