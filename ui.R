@@ -804,11 +804,11 @@ ui <- fluidPage(
                                                
                                       ),
                                       
-                                      tabPanel(strong("GMYC Oversplitting"),
+                                      tabPanel(strong("GMYC Splitting"),
                                                br(), br(),
                                                img(src="bactrocera.png", align = "left", height="15%", width="15%"),
                                                br(), br(), br(),
-                                               h3(strong("GMYC oversplitting")),
+                                               h3(strong("GMYC splitting")),
                                                strong("Assess which taxa are split into multiple groups, indicating potential diversity"),
                                                br(),br(),
                                                
@@ -1083,24 +1083,24 @@ ui <- fluidPage(
                                                ), # end of wellpanel
                                                
                                                
-                                               h3(strong("Oversplitting Ratios")),
+                                               h3(strong("Splitting Ratios")),
                                                wellPanel(
                                                  fluidRow(
                                                    
                                                column(width = 6,
-                                               fileInput("summary_oversplitting_ratio_inc", "Oversplitting ratio data including singletons"),
+                                               fileInput("summary_oversplitting_ratio_inc", "Splitting ratio data including singletons"),
                                                ),
                                                column(width = 6,
-                                                      fileInput("summary_oversplitting_ratio_exc", "Oversplitting ratio data excluding singletons"),
+                                                      fileInput("summary_oversplitting_ratio_exc", "Splitting ratio data excluding singletons"),
                                                ),
                                                ), # end of fluidrow
                                                
                                                fluidRow(
                                                  column(width = 6,
-                                                        selectInput("oversplitting_inc_col", "Oversplitting ratio including singletons colour:", choices = c("grey", "hotpink", "lightblue", "lightyellow", "salmon", "lightgreen", "red", "royalblue", "white"), selected = "lightblue"),      
+                                                        selectInput("oversplitting_inc_col", "Splitting ratio including singletons colour:", choices = c("grey", "hotpink", "lightblue", "lightyellow", "salmon", "lightgreen", "red", "royalblue", "white"), selected = "lightblue"),      
                                                  ),
                                                  column(width = 6,
-                                                        selectInput("oversplitting_exc_col", "Oversplitting ratio excluding singletons colour:", choices = c("grey", "hotpink", "lightblue", "lightyellow", "salmon", "lightgreen", "red", "royalblue", "white"), selected = "lightyellow"),      
+                                                        selectInput("oversplitting_exc_col", "Splitting ratio excluding singletons colour:", choices = c("grey", "hotpink", "lightblue", "lightyellow", "salmon", "lightgreen", "red", "royalblue", "white"), selected = "lightyellow"),      
                                                  ),
                                                  column(width = 4,
                                                         selectInput("oversplitting_plot_point_shape", label = "Point shape of means: ", choices = c("Round filled" = 16, "Round open" = 1, "+" = 3, "X" = 4, "Square" = 15, "Triangle" = 17, "Diamond" = 18), selected = 17),  
@@ -1270,9 +1270,9 @@ ui <- fluidPage(
                                                
                                                ),
                                                
-                                               h3(strong("Oversplitting Ratios per Morphospecies Group")),
+                                               h3(strong("Splitting Ratios per Morphospecies Group")),
                                                wellPanel(
-                                               fileInput("summary_oversplitting_morphospecies", "Mean oversplitting data per morphospecies"),
+                                               fileInput("summary_oversplitting_morphospecies", "Mean splitting data per morphospecies"),
                                                selectInput("oversplitting_morphospecies_col", "Barplot colour:", choices = c("grey", "lightblue", "royalblue", "black", "red", "lightyellow", "salmon", "lightgreen", "white"), selected = "lightblue",  width = "250px"), 
                                                numericInput("x_axis_angle", "x-axis label angle:", value = 0, min = 0, step = 1, width = "150px"),
                                                actionButton("plot_summary_oversplits_per_morphospecies", strong("Plot"), style="color: black; background-color: #A6C3C6; border-color: black"),
@@ -1424,7 +1424,7 @@ ui <- fluidPage(
                                               br(),
                                               HTML("Plot percentage matches tab: <i>Lysathia</i>"),
                                               br(),
-                                              HTML("GMYC Oversplitting tab: <i>Bactrocera</i>"),
+                                              HTML("GMYC splitting tab: <i>Bactrocera</i>"),
                                               br(),
                                               HTML("GMYC Exact Matches tab: <i>Cornops aquaticum</i> nymph"),
                                               br(),
