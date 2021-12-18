@@ -62,7 +62,6 @@ shiny::runApp(appDir = getwd())
 | PROBLEM | FIX |
 |---------|-----|
 | namespace ‘ellipsis’ 0.3.1 is already loaded, but >= 0.3.2 is required | Restart R |
-| package 'splits' is not available for this version of R        | `install.packages("splits", repos="http://R-Forge.R-project.org")`    |
 | JAVA_HOME cannot be determined from the Registry        |  Install the correct version of Java relative to your version of R (e.g. 64-bit versions for both)  |
 | Ubuntu: issues with installing Biostrings | `source("https://bioconductor.org/biocLite.R")`     `BiocInstaller::biocLite("Biostrings")` |
 
