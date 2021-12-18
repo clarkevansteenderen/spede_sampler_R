@@ -208,7 +208,7 @@ Excluding singletons, the percentage match = Σ (y)/( Σ (y) + Σ (n) ) = 3/(3 +
 
 🐛 The percentage of singletons = Σ (singletons)/number of GMYC species = 1/6 = 17\%. 
 
-<img src="spede_mini_example.png" alt="drawing" width="500"/>
+<img src="match_merge_split.png" alt="drawing" width="500"/>
 
 ## View Data
 
