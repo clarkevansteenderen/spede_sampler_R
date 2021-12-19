@@ -63,10 +63,11 @@ shiny::runApp(appDir = getwd())
 |---------|-----|
 | namespace ‘ellipsis’ 0.3.1 is already loaded, but >= 0.3.2 is required | Restart R |
 | JAVA_HOME cannot be determined from the Registry        |  Install the correct version of Java relative to your version of R (e.g. 64-bit versions for both)  |
-| Ubuntu: issues with installing Biostrings | `source("https://bioconductor.org/biocLite.R")`     `BiocInstaller::biocLite("Biostrings")` |
+| Ubuntu: issues with installing `Biostrings` | `source("https://bioconductor.org/biocLite.R")`     `BiocInstaller::biocLite("Biostrings")` |
+| Ubuntu: issues with installing `beastierinstall` | Install the `usethis` and `devtools` packages|
 
 Other issues may be resolved by ensuring that you are using an updated version of R.
-For Ubuntu users, downloading the `usethis` and `devtools` packages solved a number of issues I came across when running SPEDE-sampler on this operating system. 
+ 
 Contact me at vsteenderen@gmail.com if you encounter a different problem.
 
 ## **DEFINITIONS**
