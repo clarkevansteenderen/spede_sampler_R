@@ -9,7 +9,7 @@
 
 ---
 
-## **OVERVIEW**
+## **OVERVIEW** 📑
 
 This R Shiny App offers an analysis pipeline for assessing how sampling effects and paramater choices can affect the results of a Generalised Mixed Yule Coalescent (GMYC) analysis. 
 The pipeline begins with the uploading of an aligned FASTA file, where a chosen percentage of the dataset is randomly resampled *n* times without replacement. Resampling can be done with guidance from user-predefined groups (e.g. morphospecies assignments), such that at least one representative sequence per group is present in the final selection.
@@ -24,7 +24,7 @@ This application outputs:
 5. Which predefined groups were split into more than one GMYC species, indicating possible undiscovered diversity
 6. Summary ggplots that are customisable
 
-## **HOW TO RUN THE R SHINY APPLICATION**
+## **HOW TO RUN THE R SHINY APPLICATION** ⚙️
 
 1. Download and unzip the **spede_sampler_R** GitHub repository, and save it in a desired directory.
 2. Open R, and install (if applicable) the `shiny` library:
@@ -57,7 +57,7 @@ beastierinstall::install_beast2()
 setwd("path/to/spede_sampler_R-main")
 shiny::runApp(appDir = getwd())
 ```
-## **POSSIBLE ISSUES AND HOW TO FIX THEM**
+## **POSSIBLE ISSUES AND HOW TO FIX THEM** 🔧
  
 | PROBLEM | FIX |
 |---------|-----|
@@ -70,7 +70,7 @@ Other issues may be resolved by ensuring that you are using an updated version o
  
 Contact me at vsteenderen@gmail.com if you encounter a different problem.
 
-## **DEFINITIONS**
+## **DEFINITIONS** 📚
 
 |TERM | DEFINITION |
 |---------|-----|
@@ -390,7 +390,7 @@ Plot B shows that the user-defined groups were underestimates of species richnes
 
 ---
 
-## **R code**
+## **R code** 💻
 **For users who wish to further tweak their plots**
 
 ```r
