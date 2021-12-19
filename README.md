@@ -66,6 +66,7 @@ shiny::runApp(appDir = getwd())
 | Ubuntu: issues with installing Biostrings | `source("https://bioconductor.org/biocLite.R")`     `BiocInstaller::biocLite("Biostrings")` |
 
 Other issues may be resolved by ensuring that you are using an updated version of R.
+For Ubuntu users, downloading the `usethis` and `devtools` packages solved a number of issues I came across when running SPEDE-sampler on this operating system. 
 Contact me at vsteenderen@gmail.com if you encounter a different problem.
 
 ## **DEFINITIONS**
