@@ -65,7 +65,11 @@ shiny::runApp(appDir = getwd())
 | JAVA_HOME cannot be determined from the Registry        |  Install the correct version of Java relative to your version of R (e.g. 64-bit versions for both)  |
 | Ubuntu: issues with installing `Biostrings` | `source("https://bioconductor.org/biocLite.R")`     `BiocInstaller::biocLite("Biostrings")` |
 | Ubuntu: issues with installing `beastierinstall` | Install the `usethis` and `devtools` packages|
-| Ubuntu: issues with installing the `usethis` and/or `devtools` packages | Install `libcurl` and `xml2`: sudo apt-get install libcurl4-openssl-dev sudo apt-get install libxml2-dev|
+| Ubuntu: issues with installing the `usethis` and/or `devtools` packages | Install `libcurl` and `xml2`: 
+
+sudo apt-get install libcurl4-openssl-dev 
+
+sudo apt-get install libxml2-dev|
 
 Other issues may be resolved by ensuring that you are using an updated version of R.
  
