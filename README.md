@@ -26,11 +26,7 @@ This application outputs:
 
 ## **HOW TO RUN THE R SHINY APPLICATION** ⚙️
 
-1. Download and unzip the **spede_sampler_R** GitHub repository, and save it in a desired directory. Linux users, download BEAST: 
-
-`sudo apt update`
-
-`sudo apt install beast-mcmc`
+1. Download and unzip the **spede_sampler_R** GitHub repository, and save it in a desired directory. 
 
 2. Open R, and install (if applicable) the `shiny` library:
 
