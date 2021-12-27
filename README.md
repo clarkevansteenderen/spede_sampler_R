@@ -26,6 +26,8 @@ This application outputs:
 
 ## **HOW TO RUN THE R SHINY APPLICATION** ⚙️
 
+💻 Note that SPEDE-sampler is currently compatible with a Windows operating system.
+
 1. Download and unzip the **spede_sampler_R** GitHub repository, and save it in a desired directory. 
 
 2. Open R, and install (if applicable) the `shiny` library:
@@ -65,9 +67,6 @@ shiny::runApp(appDir = getwd())
 | namespace ‘ellipsis’ 0.3.1 is already loaded, but >= 0.3.2 is required | Restart R |
 | JAVA_HOME cannot be determined from the Registry        |  Install the correct version of Java relative to your version of R (e.g. 64-bit versions for both)  |
 |Ubuntu: issues with installing rJava| `sudo apt-get install -y default-jre` `sudo apt-get install -y default-jdk` `sudo R CMD javareconf` `install.packages("rJava")` |
-| Ubuntu: issues with installing `Biostrings` | `source("https://bioconductor.org/biocLite.R")`     `BiocInstaller::biocLite("Biostrings")` |
-| Ubuntu: issues with installing `beastierinstall` | Install the `usethis` and `devtools` packages|
-| Ubuntu: issues with installing the `usethis` and/or `devtools` packages | Install `libcurl` and `xml2`: `sudo apt-get install libcurl4-openssl-dev` `sudo apt-get install libxml2-dev` |
 
 Other issues may be resolved by ensuring that you are using an updated version of R.
  
