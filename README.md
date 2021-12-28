@@ -143,7 +143,7 @@ GGTTTAAGGGT
 CCCGGGAAAGT
 ```
 
-If you have a file containing predefined groups for your sequences (morphospecies or ecospecies for example), and wish to keep at least one representative sequence per group in the resampled files, select **Keep at least one representative sequence per predefined group** from the dropdown menu under **Select resampling approach**. This will enable you to upload your Excel .CSV file. Click **Confirm file** once you have uploaded the desired file. Select which column contains the group designations, and which contains the sequence names. Click **Resample**. Scroll down to the **GMYC Analysis** section below to see an example of the format the .CSV file should be in.
+If you have a file containing predefined groups for your sequences (morphospecies or ecospecies for example), and wish to keep at least one representative sequence per group in the resampled files, select **Keep at least one representative sequence per predefined group** from the dropdown menu under **Select resampling approach**. You can now upload your Excel .CSV file. Click **Confirm file** once you have uploaded the desired file. Select which column contains the group designations, and which contains the sequence names. Click **Resample**. Scroll down to the **GMYC Analysis** section below to see an example of the format the .CSV file should be in.
 
 ## BEAST XML Files
 
