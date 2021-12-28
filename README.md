@@ -181,7 +181,7 @@ The .CSV file needs to contain a column for sample names, and one for their corr
 
 <br />
 
-Where only the first two columns are of interest, and the **group** column could be, for example, morphospecies. It does not matter what order the columns are in, as the application provides a dropdown list of all the columns, where you need to select which column contains groups, and which contains the sequence names. Note that the sequence names in this file need to match those in the FASTA file alignment exactly.
+Where only the first two columns are of interest, and the **group** column could be, for example, morphospecies. It does not matter what the exact names are of the columns, or the order they are in. The application provides a dropdown list of all the detected columns, where you need to select which column contains groups, and which contains the sequence names. Note that the sequence names in this file need to match those in the FASTA file alignment exactly.
 
 Click the **Confirm file** button once the file has uploaded.
 Select which column comprises the groups, and which is the sample name column from the dropdown menus.
