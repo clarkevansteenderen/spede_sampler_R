@@ -105,7 +105,7 @@ CCCGGGAAAGT
 GGTTTAAGGGT
 ```
 
-If you wish to randomly select two of these sequences, and iterate the process four times, the program will create four .fas files, which could be for example:
+If you wish to randomly select two of these sequences, and iterate the process four times, the program will create four .fas files, which could be, for example:
 
 **iteration1.fas:**
 
