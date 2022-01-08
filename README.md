@@ -9,7 +9,18 @@
 
 ---
 
-## **OVERVIEW** 📑
+## TABLE OF CONTENTS    
+[Overview](#overview)  
+[Installation and run instructions](#installation)  
+[Installation errors and fixes](#errors_fixes)  
+[Glossary](#glossary)   
+[Usage](#usage)     
+[Metrics](#metrics)     
+[Worked example](#worked_example)       
+[Additional R code](#rcode)
+    
+
+## **OVERVIEW** 📑 <a name="overview"/>
 
 This R Shiny App offers an analysis pipeline for assessing how sampling effects and paramater choices can affect the results of a Generalised Mixed Yule Coalescent (GMYC) analysis. 
 The pipeline begins with the uploading of an aligned FASTA file, where a chosen percentage of the dataset is randomly resampled *n* times without replacement. Resampling can be done with guidance from user-predefined groups (e.g. morphospecies assignments), such that at least one representative sequence per group is present in the final selection.
@@ -24,7 +35,7 @@ This application outputs:
 5. Which predefined groups were split into more than one GMYC species, indicating possible undiscovered diversity
 6. Summary ggplots that are customisable
 
-## **HOW TO RUN THE R SHINY APPLICATION** ⚙️
+## **HOW TO RUN THE R SHINY APPLICATION** ⚙️ <a name="installation"/>
 
 <img src="windows.png" alt="drawing" width="60"/> Note that SPEDE-sampler is currently compatible with a Windows operating system.
 
@@ -63,7 +74,7 @@ beastierinstall::install_beast2()
 setwd("path/to/spede_sampler_R-main")
 shiny::runApp(appDir = getwd())
 ```
-## **POSSIBLE ISSUES AND HOW TO FIX THEM** 🔧
+## **POSSIBLE ISSUES AND HOW TO FIX THEM** 🔧 <a name="errors_fixes"/>
  
 | PROBLEM | FIX |
 |---------|-----|
@@ -74,7 +85,7 @@ Other issues may be resolved by ensuring that you are using an updated version o
  
 Contact me at vsteenderen@gmail.com if you encounter a different problem.
 
-## **DEFINITIONS** 📚
+## **GLOSSARY** 📚 <a name="glossary"/>
 
 |TERM | DEFINITION |
 |---------|-----|
@@ -90,7 +101,7 @@ Contact me at vsteenderen@gmail.com if you encounter a different problem.
 |**(Overall) percentage match**| The overall proportion of successful matches (records of "y") in a dataset. |
 |**Singleton**| A species represented by only one individual/genetic sequence. |
 
-# **USAGE, TAB-BY-TAB**
+# **USAGE, TAB-BY-TAB** <a name="usage"/>
 
 ## Random Resampling
 
@@ -193,7 +204,7 @@ Click the **Run GMYC** button to start the GMYC analysis.
 
 Matches between user-defined groups and GMYC species are recorded as "yes" or "no", where "yes" outcomes can be either splits, or exact matches. "No" outcomes are treated as merges. A merge is recorded even if one of the groups contains a singleton (merge type II).
 
-## EXPLANATION OF GMYC METRIC CALCULATIONS
+## EXPLANATION OF GMYC METRIC CALCULATIONS <a name="metrics"/>
 
 **In the diagram below:**
 
@@ -288,9 +299,9 @@ Download this as a .csv file.
 ## Summary Plots
 Upload the desired dataframe downloaded from the **Amalgamate** tab in the appropriate panel (Clusters and Entities, Splitting Ratios, Percentage Matches, Percentage Singletons, Splitting Ratios per Predefined Group) and apply the desired plot settings/tweaks for each. For a combined plot, scroll to the **Multi-Plots** panel, and click **Plot All**. Each plot can be downloaded as a PDF, PNG, or SVG file with desired sizes.
 
-## :pencil2: **Worked Example using cochineal 12S sequences**
+## :pencil2: **WORKED EXAMPLE** <a name="worked_example"/>
 
-📌 The [**SPEDE_SAMPLER_DATA**](https://drive.google.com/drive/folders/1IwT4yDOZtkMAMeUpnpovfU2tzsvyUUbU?usp=sharing) Google Drive folder contains all the input files and results of this worked example. Sequences were randomly resampled for 25, 50, 75, and 100% of the 142 cochineal insect sequences in the **12S_aligned.fas** file. Each subsampled dataset contains 10 iterations (performed with a set seed for reproducibility). The **cochineal_ids.csv** file contains predefined species designations for each sequence based on the host plant the specimen was collected from (the cochineal insects display high host-specificity, where a particular species will typically only feed on one cactus species). See the associated [journal article](https://www.sciencedirect.com/science/article/pii/S1049964420306538) for more information about these insects and genetic sequences. There are currently 11 described cochineal species, four of which are used as biological control agents for invasive cactus species. These are *Dactylopius opuntiae*, *D. tomeontosus*, *D. ceylonicus*, and *D. austrinus*. *Dactylopius opuntiae* comprises the "ficus" and "stricta" lineages, and *D. tomentosus* comprises lineages including "cholla", "imbricata", "californica var. parkerii", "bigelovii", and "cylindropuntia".
+📌 The [**SPEDE_SAMPLER_DATA**](https://drive.google.com/drive/folders/1IwT4yDOZtkMAMeUpnpovfU2tzsvyUUbU?usp=sharing) Google Drive folder contains all the input files and results of this worked example. Sequences were randomly resampled for 25, 50, 75, and 100% of the 142 cochineal insect sequences (mitochondrial 12S) in the **12S_aligned.fas** file. Each subsampled dataset contains 10 iterations (performed with a set seed for reproducibility). The **cochineal_ids.csv** file contains predefined species designations for each sequence based on the host plant the specimen was collected from (the cochineal insects display high host-specificity, where a particular species will typically only feed on one cactus species). See the associated [journal article](https://www.sciencedirect.com/science/article/pii/S1049964420306538) for more information about these insects and genetic sequences. There are currently 11 described cochineal species, four of which are used as biological control agents for invasive cactus species. These are *Dactylopius opuntiae*, *D. tomeontosus*, *D. ceylonicus*, and *D. austrinus*. *Dactylopius opuntiae* comprises the "ficus" and "stricta" lineages, and *D. tomentosus* comprises lineages including "cholla", "imbricata", "californica var. parkerii", "bigelovii", and "cylindropuntia".
 
 **Steps:**
 
@@ -394,7 +405,7 @@ Plot B shows that the user-defined groups were underestimates of species richnes
 
 ---
 
-## **R code** 💻
+## **R CODE** 💻 <a name="rcode"/>
 **For users who wish to further tweak their plots**
 
 ```r
