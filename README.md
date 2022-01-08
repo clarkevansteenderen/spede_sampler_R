@@ -30,6 +30,8 @@ This application outputs:
 
 1. Download and unzip the **spede_sampler_R** GitHub repository, and save it in a desired directory. 
 
+<img src="spede_download.png" alt="drawing" width="600"/>
+
 2. Open R, and install (if applicable) the `shiny` library:
 
 ```r
