@@ -307,7 +307,7 @@ Upload the desired dataframe downloaded from the **Amalgamate** tab in the appro
 
 **Steps:**
 
-1. Download the **12S_aligned.fas** file. 
+1. Download the **12S_aligned.fas** and **cochineal_ids.csv** files. 
 2. Open the SPEDE-SAMPLER-GMYC R Shiny application using the instructions at the start of this README
 3. Upload the **12S_aligned.fas** file in the **Random resampling** tab in the application. Change the **percentage of sequences to resample** to 25%, the **number of iterations** to 10, and select **Set a seed**. Click **Resample**. For the remainder of these instructions, repeat the process for 50, 75, and 100% of the data, changing the output folder names accordingly where appropriate (e.g. RESAMPLED_FASTA_FILES_25, RESAMPLED_FASTA_FILES_50, RESAMPLED_FASTA_FILES_75, and RESAMPLED_FASTA_FILES_100).
 4. In the **BEAST XML Files** tab, insert the file path to the folder containing the resampled FASTA files of 25% of the dataset (to get the filepath, right-click on any of the fasta files --> Properties --> Copy the address in "Location"). Leave the default settings as they are, changing only the **MCMC** to 5 000 000, and the output folder name. Click **Generate**. This will generate a folder containing an XML file for each resampled FASTA file.
