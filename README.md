@@ -43,6 +43,8 @@ This application outputs:
 
 <img src="spede_download.png" alt="drawing" width="600"/>
 
+<br /> <br />                        
+
 2. Open R, and install (if applicable) the `shiny` library:
 
 ```r
