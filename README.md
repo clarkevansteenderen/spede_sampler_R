@@ -37,7 +37,7 @@ This application outputs:
 
 ## **HOW TO RUN THE R SHINY APPLICATION** ⚙️ <a name="installation"/>
 
-<img src="windows.png" alt="drawing" width="60"/> Note that SPEDE-sampler is currently compatible with a Windows operating system.
+<img src="windows.png" alt="drawing" width="60"/> Note that SPEDE-sampler is currently only compatible with a Windows operating system.
 
 1. Download and unzip the **spede_sampler_R** GitHub repository, and save it in a desired directory. 
 
