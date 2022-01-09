@@ -81,7 +81,7 @@ shiny::runApp(appDir = getwd())
 | PROBLEM | FIX |
 |---------|-----|
 | namespace ‘ellipsis’ 0.3.1 is already loaded, but >= 0.3.2 is required | Restart R |
-| JAVA_HOME cannot be determined from the Registry        |  Install the correct version of Java relative to your version of R (e.g. 64-bit versions for both)  |
+| JAVA_HOME cannot be determined from the Registry        |  Install the correct version of Java relative to your PC (e.g. 64-bit versions for both). Download JAVA [here](https://www.java.com/download/ie_manual.jsp)|
 
 Other issues may be resolved by ensuring that you are using an updated version of R.
  
