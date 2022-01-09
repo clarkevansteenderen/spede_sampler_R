@@ -83,9 +83,10 @@ shiny::runApp(appDir = getwd())
 |---------|-----|
 | namespace ‘ellipsis’ 0.3.1 is already loaded, but >= 0.3.2 is required | Restart R |
 | JAVA_HOME cannot be determined from the Registry        |  Install the correct version of Java relative to your PC (e.g. 64-bit versions for both). Download JAVA [here](https://www.java.com/download/ie_manual.jsp).|
+|JAVA_HOME not set as a variable|To check whether the JAVA_HOME variable has been set, run `Sys.getenv()` in the R console. If JAVA_HOME does not appear, it needs to be set manually. This can be done by first finding where your Java installation is located. Do this from the Windows command line by running `where java`. An example output might be: *C:\Program Files\Java\jdk-17.0.x.x\bin\java.exe*. Now set JAVA_HOME as a varialbe in R using `Sys.setenv(JAVA_HOME="C:/Program Files/Java/jdk-17.0.x.x/")` Note the "bin\java.exe" has been removed, plus every "\" has been replaced with "/", similar to how directories work in Unix-type environments. To confirm that it is working correctly, run `Sys.getenv()` and search for JAVA_HOME again. It should appear. 
 
-Other issues may be resolved by ensuring that you are using an updated version of R.
- 
+Other issues may be resolved by ensuring that you are using an updated version of R.|
+
 Contact me at vsteenderen@gmail.com if you encounter a different problem.
 
 ## **GLOSSARY** 📚 <a name="glossary"/>
