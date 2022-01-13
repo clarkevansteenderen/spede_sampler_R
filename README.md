@@ -424,7 +424,7 @@ clusters = read.csv("cochineal_12S/clust-ent-data/clusters_combined.csv", header
 clusters_melt = reshape2::melt(clusters)
 colnames(clusters_melt) = c("file_name", "data_perc", "clusters")
 
-# #ENTITIES
+# ENTITIES
 
 entities = read.csv("cochineal_12S/clust-ent-data/entities_combined.csv", header = T, check.names = F)
 entities_melt = reshape2::melt(entities)
