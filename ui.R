@@ -1438,7 +1438,8 @@ ui <- fluidPage(
                                            
                                     )
                 ),
-                useShinyalert() # set up the shinyalert package
+  
+                #useShinyalert() # set up the shinyalert package
           
                 # titlePanel(h3("Run GMYC analyses on resampled ML trees for SPEcies DElimitation", )),
                 # 
