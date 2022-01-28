@@ -9,6 +9,11 @@
 
 ---
 
+## SPEDE-sampler
+Please check out our publication:    
+
+van Steenderen, C.J.M. and Sutton, G.F. 2022. *SPEDE-sampler: an R Shiny application to assess how methodological choices and taxon-sampling can affect Generalised Mixed Yule Coalescent (GMYC) output and interpretation*. **Molecular Ecology Resources** doi: 10.1111/1755-0998.13591.
+
 ## TABLE OF CONTENTS    
 [Overview](#overview)  
 [Installation and run instructions](#installation)  
@@ -18,7 +23,6 @@
 [Metrics](#metrics)     
 [Worked example](#worked_example)       
 [Additional R code](#rcode)
-    
 
 ## **OVERVIEW** 📑 <a name="overview"/>
 
