@@ -1260,11 +1260,11 @@ server = function(input, output, session) {
             chosen_match_type = ""
             if( input$plot_matches_type == 1) {
               chosen_match_type = as.name("percentage_match")
-              ggtit = "GMYC species match to predefined groups vs ML tree/iteration file (including single-sample species)"
+              ggtit = "GMYC species match to predefined groups vs BEAST tree/iteration file (including single-sample species)"
             }
             else if (input$plot_matches_type == 2) {
               chosen_match_type = as.name("percentage_match_excl_singles")
-              ggtit = ggtit = "GMYC species match to predefined groups vs ML tree/iteration file (excluding single-sample species)"
+              ggtit = ggtit = "GMYC species match to predefined groups vs BEAST tree/iteration file (excluding single-sample species)"
             }
             
             output$match_plot = renderPlot({
@@ -1272,7 +1272,7 @@ server = function(input, output, session) {
                 geom_line(color = input$plot_matches_line_colour) + 
                 geom_point(color = input$plot_matches_point_colours)  + 
                 ggthemes[[input$ggtheme_matches]] +
-                xlab("ML tree file/iteration number") + 
+                xlab("BEAST tree file/iteration number") + 
                 ylab("Percentage match") + 
                 ggtitle(ggtit)
             })
@@ -1296,11 +1296,11 @@ server = function(input, output, session) {
             chosen_match_type = ""
             if( input$plot_matches_type == 1) {
               chosen_match_type = as.name("percentage_match")
-              ggtit = "GMYC species match to predefined groups vs ML tree/iteration file (including single-sample species)"
+              ggtit = "GMYC species match to predefined groups vs BEAST tree/iteration file (including single-sample species)"
             }
             else if (input$plot_matches_type == 2) {
               chosen_match_type = as.name("percentage_match_excl_singles")
-              ggtit = ggtit = "GMYC species match to predefined groups vs ML tree/iteration file (excluding single-sample species)"
+              ggtit = ggtit = "GMYC species match to predefined groups vs BEAST tree/iteration file (excluding single-sample species)"
             }
             
             ggsave(file, width = width, height = height, dpi = dpi, units = units,
@@ -1308,7 +1308,7 @@ server = function(input, output, session) {
                      geom_line(color = input$plot_matches_line_colour) + 
                      geom_point(color = input$plot_matches_point_colours)  + 
                      ggthemes[[input$ggtheme_matches]] +
-                     xlab("ML tree file/iteration number") + 
+                     xlab("BEAST tree file/iteration number") + 
                      ylab("Percentage match") + 
                      ggtitle(ggtit))
           }
@@ -1529,7 +1529,7 @@ server = function(input, output, session) {
             support_gmyc = splits::gmyc.support(tree_container[[file_index]]) # get the support values as estimated by the GMYC analysis
             is.na(support_gmyc[support_gmyc == 0]) = TRUE
             
-            support_original_tree = as.numeric(treex.ultra2$node.label) # get the original support values straight from the ML tree read in
+            support_original_tree = as.numeric(treex.ultra2$node.label) # get the original support values straight from the BEAST tree read in
             
             plot.result.gmyc(tree_container[[file_index]], cex = tip_label_size, edge.width = branch_width)
             
@@ -1655,7 +1655,7 @@ server = function(input, output, session) {
         )
         
         ################################################################################################
-        # Plot clusters vs iteration/ML file number
+        # Plot clusters vs iteration file number
         ################################################################################################
         
         observeEvent(input$plot_clusts_vs_iterations, {
@@ -1665,14 +1665,14 @@ server = function(input, output, session) {
               geom_line(color = input$plot_clusts_vs_iterations_line_colour) + 
               geom_point(color = input$plot_clusts_vs_iterations_point_colours, size = input$plot_clusts_vs_iterations_point_size, shape = as.numeric(input$plot_clusts_vs_iterations_point_shape))  + 
               ggthemes[[input$ggtheme_plots]] +
-              xlab("ML tree file/iteration number") + 
+              xlab("BEAST tree file/iteration number") + 
               ylab("Number of GMYC clusters") + 
-              ggtitle("GMYC number of clusters vs ML tree/iteration file")
+              ggtitle("GMYC number of clusters vs BEAST tree/iteration file")
           })
         })
         
         ################################################################################################
-        # Download clusters vs iteration/ML file number plot
+        # Download clusters vs iteration file number plot
         ################################################################################################
         
         output$download_clusts_vs_iterations <- downloadHandler(
@@ -1691,14 +1691,14 @@ server = function(input, output, session) {
                      geom_line(color = input$plot_clusts_vs_iterations_line_colour) + 
                      geom_point(color = input$plot_clusts_vs_iterations_point_colours, size = input$plot_clusts_vs_iterations_point_size, shape = as.numeric(input$plot_clusts_vs_iterations_point_shape))  + 
                      ggthemes[[input$ggtheme_plots]] +
-                     xlab("ML tree file/iteration number") + 
+                     xlab("BEAST tree file/iteration number") + 
                      ylab("Number of GMYC clusters") + 
-                     ggtitle("GMYC number of clusters vs ML tree/iteration file") )
+                     ggtitle("GMYC number of clusters vs BEAST tree/iteration file") )
           }
         )
         
         ################################################################################################
-        # Plot entities vs iteration/ML file number
+        # Plot entities vs iteration file number
         ################################################################################################
         
         observeEvent(input$plot_ents_vs_iterations, {
@@ -1708,14 +1708,14 @@ server = function(input, output, session) {
               geom_line(color = input$plot_ents_vs_iterations_line_colour) + 
               geom_point(color = input$plot_ents_vs_iterations_point_colours, size = input$plot_ents_vs_iterations_point_size, shape = as.numeric(input$plot_ents_vs_iterations_point_shape))  + 
               ggthemes[[input$ggtheme_plots]] +
-              xlab("ML tree file/iteration number") + 
+              xlab("BEAST tree file/iteration number") + 
               ylab("Number of GMYC entities") + 
-              ggtitle("GMYC number of entities vs ML tree/iteration file")
+              ggtitle("GMYC number of entities vs BEAST tree/iteration file")
           })
         })
         
         ################################################################################################
-        # Download entities vs iteration/ML file number plot
+        # Download entities vs iteration file number plot
         ################################################################################################
         
         output$download_ents_vs_iterations <- downloadHandler(
@@ -1734,9 +1734,9 @@ server = function(input, output, session) {
                      geom_line(color = input$plot_ents_vs_iterations_line_colour) + 
                      geom_point(color = input$plot_ents_vs_iterations_point_colours, size = input$plot_ents_vs_iterations_point_size, shape = as.numeric(input$plot_ents_vs_iterations_point_shape))  + 
                      ggthemes[[input$ggtheme_plots]] +
-                     xlab("ML tree file/iteration number") + 
+                     xlab("BEAST tree file/iteration number") + 
                      ylab("Number of GMYC entities") + 
-                     ggtitle("GMYC number of entities vs ML tree/iteration file") )
+                     ggtitle("GMYC number of entities vs BEAST tree/iteration file") )
           }
         )
         
