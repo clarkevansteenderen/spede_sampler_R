@@ -622,7 +622,7 @@ ui <- fluidPage(
                                                  ),
                                                ),
                                                
-                                               downloadButton("download_ents_vs_iterations", label = strong("Download"), style="color: black; background-color: lightpink; border-color: black"),
+                                               downloadButton("download_ents_vs_iterations", label = strong("Download"), style="color: black; background-color: #A6C3C6; border-color: black"),
                                                br(),
                                                ), 
                                                h3(strong("Plot output:")),
